@@ -30,6 +30,7 @@ MESSAGE( STATUS "CMAKE_CXX_FLAGS: " ${CMAKE_CXX_FLAGS} )
 # Declare Headers
 SET(${PROJECT_NAME}_HEADERS
     include/robust-equilibrium-lib/config.hh
+    include/robust-equilibrium-lib/util.hh
     include/robust-equilibrium-lib/solver_LP_abstract.hh
     include/robust-equilibrium-lib/solver_LP_qpoases.hh
     include/robust-equilibrium-lib/static_equilibrium.hh

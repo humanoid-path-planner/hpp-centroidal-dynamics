@@ -14,6 +14,7 @@ SET(${LIBRARY_NAME}_SOURCES
     ${INCLUDE_DIR}/robust-equilibrium-lib/static_equilibrium.hh
     static_equilibrium.cpp
     solver_LP_qpoases.cpp
+    util.cpp
   )
 
 INCLUDE_DIRECTORIES(${PROJECT_SOURCE_DIR}/src)
