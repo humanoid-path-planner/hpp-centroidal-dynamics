@@ -34,6 +34,7 @@ typedef Eigen::Matrix <value_type, 3, Eigen::Dynamic, Eigen::RowMajor>          
 typedef Eigen::Matrix <value_type, 4, 3, Eigen::RowMajor>                           Matrix43;
 typedef Eigen::Matrix <value_type, 6, Eigen::Dynamic, Eigen::RowMajor>              Matrix6X;
 typedef Eigen::Matrix <value_type, 6, 2, Eigen::RowMajor>                           Matrix62;
+typedef Eigen::Matrix <value_type, Eigen::Dynamic, 6, Eigen::RowMajor>              MatrixX6;
 typedef Eigen::Matrix <value_type, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor> MatrixXX;
 
 //define Eigen ref if available
@@ -89,9 +90,9 @@ dd_MatrixPtr cone_span_eigen_to_cdd(Cref_matrixXX input);
 Rotation crossMatrix(Cref_vector3 x);
 
 
-void init_library();
+void init_cdd_library();
 
-void release_library();
+void release_cdd_library();
 
 void uniform(Cref_matrixXX lower_bounds, Cref_matrixXX upper_bounds, Ref_matrixXX out);
 

@@ -1,6 +1,12 @@
+/*
+ * Copyright 2015, LAAS-CNRS
+ * Author: Andrea Del Prete
+ */
+
 #include <vector>
 #include <iostream>
 #include <robust-equilibrium-lib/static_equilibrium.hh>
+#include <robust-equilibrium-lib/logger.hh>
 
 using namespace robust_equilibrium;
 using namespace Eigen;
@@ -10,7 +16,7 @@ using namespace std;
 
 int main()
 {
-  init_library();
+//  init_cdd_library();
   srand ((unsigned int)(time(NULL)));
 
   int ret = 0;
@@ -31,9 +37,10 @@ int main()
   RPY_UPPER_BOUNDS << +0.0*gamma, +0.0*gamma, +M_PI;
   double X_MARG = 0.07;
   double Y_MARG = 0.07;
-  const int GRID_SIZE = 25;
+  const int GRID_SIZE = 20;
 
-  StaticEquilibrium solver(mass, generatorsPerContact, SOLVER_LP_QPOASES);
+  StaticEquilibrium solver_PP(mass, generatorsPerContact, SOLVER_LP_CLP);
+  StaticEquilibrium solver_LP(mass, generatorsPerContact, SOLVER_LP_CLP);
   MatrixXX contact_pos = MatrixXX::Zero(N_CONTACTS, 3);
   MatrixXX contact_rpy = MatrixXX::Zero(N_CONTACTS, 3);
   MatrixXX p = MatrixXX::Zero(4*N_CONTACTS,3); // contact points
@@ -50,21 +57,21 @@ int main()
   bool collision;
   for(unsigned int i=0; i<N_CONTACTS; i++)
   {
-//    while(true) // generate contact position
-//    {
-//      uniform(CONTACT_POINT_LOWER_BOUNDS, CONTACT_POINT_UPPER_BOUNDS, contact_pos.row(i));
-//      if(i==0)
-//        break;
-//      collision = false;
-//      for(unsigned int j=0; j<i-1; j++)
-//        if((contact_pos.row(i)-contact_pos.row(j)).norm() < MIN_FEET_DISTANCE)
-//          collision = true;
-//      if(collision==false)
-//        break;
-//    }
+    while(true) // generate contact position
+    {
+      uniform(CONTACT_POINT_LOWER_BOUNDS, CONTACT_POINT_UPPER_BOUNDS, contact_pos.row(i));
+      if(i==0)
+        break;
+      collision = false;
+      for(unsigned int j=0; j<i-1; j++)
+        if((contact_pos.row(i)-contact_pos.row(j)).norm() < MIN_FEET_DISTANCE)
+          collision = true;
+      if(collision==false)
+        break;
+    }
 
-//    // generate contact orientation
-//    uniform(RPY_LOWER_BOUNDS, RPY_UPPER_BOUNDS, contact_rpy.row(i));
+    // generate contact orientation
+    uniform(RPY_LOWER_BOUNDS, RPY_UPPER_BOUNDS, contact_rpy.row(i));
 
     generate_rectangle_contacts(LX, LY, contact_pos.row(i), contact_rpy.row(i),
                                 p.middleRows<4>(i*4), N.middleRows<4>(i*4));
@@ -79,7 +86,13 @@ int main()
     printf("Normal (%.3f,%.3f,%.3f)\n", N(i,0), N(i,1), N(i,2));
   }
 
-  if(!solver.setNewContacts(p, N, frictionCoefficients, STATIC_EQUILIBRIUM_ALGORITHM_PP))
+  if(!solver_LP.setNewContacts(p, N, frictionCoefficients, STATIC_EQUILIBRIUM_ALGORITHM_LP))
+  {
+    printf("Error while setting new contacts");
+    return -1;
+  }
+
+  if(!solver_PP.setNewContacts(p, N, frictionCoefficients, STATIC_EQUILIBRIUM_ALGORITHM_PP))
   {
     printf("Error while setting new contacts");
     return -1;
@@ -108,14 +121,21 @@ int main()
     {
 //      uniform(com_LB, com_UB, com);
       com(0) = x_range(j);
-      if(solver.checkRobustEquilibrium(com, 0.0))
+      double rob = solver_LP.computeEquilibriumRobustness(com);
+      if(solver_PP.checkRobustEquilibrium(com, 0.0))
       {
         equilibrium(i,j) = 1.0;
-        printf("1 ");
+        if(rob<=0)
+          SEND_ERROR_MSG("PP says com is in equilibrium but LP find negative robustness "+toString(rob));
+        if(rob>9.0)
+          rob = 9.0;
+        printf("%d ", (int)rob);
       }
       else
       {
         equilibrium(i,j) = 0.0;
+        if(rob>0)
+          SEND_ERROR_MSG("PP says com is NOT in equilibrium but LP find positive robustness "+toString(rob));
         printf("- ");
       }
 

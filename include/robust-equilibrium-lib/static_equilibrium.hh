@@ -1,3 +1,8 @@
+/*
+ * Copyright 2015, LAAS-CNRS
+ * Author: Andrea Del Prete
+ */
+
 #ifndef ROBUST_EQUILIBRIUM_LIB_STATIC_EQUILIBRIUM_H
 #define ROBUST_EQUILIBRIUM_LIB_STATIC_EQUILIBRIUM_H
 
@@ -20,8 +25,10 @@ enum ROBUST_EQUILIBRIUM_DLLAPI StaticEquilibriumAlgorithm
 class ROBUST_EQUILIBRIUM_DLLAPI StaticEquilibrium
 {
 private:
+  static bool m_is_cdd_initialized;
+
   StaticEquilibriumAlgorithm  m_algorithm;
-  SolverLPAbstract*           m_solver;
+  Solver_LP_abstract*         m_solver;
 
   unsigned int m_generatorsPerContact;
   double m_mass;

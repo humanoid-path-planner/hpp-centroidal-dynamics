@@ -31,8 +31,10 @@ MESSAGE( STATUS "CMAKE_CXX_FLAGS: " ${CMAKE_CXX_FLAGS} )
 SET(${PROJECT_NAME}_HEADERS
     include/robust-equilibrium-lib/config.hh
     include/robust-equilibrium-lib/util.hh
+    include/robust-equilibrium-lib/logger.hh
     include/robust-equilibrium-lib/solver_LP_abstract.hh
     include/robust-equilibrium-lib/solver_LP_qpoases.hh
+    include/robust-equilibrium-lib/solver_LP_clp.hh
     include/robust-equilibrium-lib/static_equilibrium.hh
   )
 
@@ -45,6 +47,7 @@ else()
 endif()
 
 find_package(CDD REQUIRED)
+find_package(CLP REQUIRED)
 
 add_subdirectory (src)
 add_subdirectory (test)

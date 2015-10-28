@@ -1,3 +1,8 @@
+/*
+ * Copyright 2015, LAAS-CNRS
+ * Author: Andrea Del Prete
+ */
+
 #ifndef _ROBUST_EQUILIBRIUM_LIB_CONFIG_HH
 #define _ROBUST_EQUILIBRIUM_LIB_CONFIG_HH
 
