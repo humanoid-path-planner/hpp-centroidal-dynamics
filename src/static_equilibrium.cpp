@@ -5,6 +5,7 @@
 
 #include <robust-equilibrium-lib/static_equilibrium.hh>
 #include <robust-equilibrium-lib/logger.hh>
+#include <robust-equilibrium-lib/stop-watch.hh>
 #include <iostream>
 #include <vector>
 
@@ -274,15 +275,23 @@ double StaticEquilibrium::findExtremumInDirection(Cref_vector2 direction, double
 
 bool StaticEquilibrium::computePolytopeProjection(Cref_matrix6X v)
 {
+//  getProfiler().start("eigen_to_cdd");
   dd_MatrixPtr V = cone_span_eigen_to_cdd(v.transpose());
+//  getProfiler().stop("eigen_to_cdd");
+
   dd_ErrorType error = dd_NoError;
+
+//  getProfiler().start("dd_DDMatrix2Poly");
   dd_PolyhedraPtr H_= dd_DDMatrix2Poly(V, &error);
+//  getProfiler().stop("dd_DDMatrix2Poly");
+
   if(error != dd_NoError)
   {
     SEND_ERROR_MSG("numerical instability in cddlib. ill formed polytope");
     return false;
   }
 
+//  getProfiler().start("cdd to eigen");
   dd_MatrixPtr b_A = dd_CopyInequalities(H_);
   // get equalities and add them as complementary inequality constraints
   std::vector<long> eq_rows;
@@ -292,7 +301,6 @@ bool StaticEquilibrium::computePolytopeProjection(Cref_matrix6X v)
       eq_rows.push_back(elem);
   }
   int rowsize = (int)b_A->rowsize;
-  SEND_DEBUG_MSG("Inequality matrix has "+toString(rowsize)+" rows and "+toString(b_A->colsize-1)+" columns");
   m_H.resize(rowsize + eq_rows.size(), (int)b_A->colsize-1);
   m_h.resize(rowsize + eq_rows.size());
   for(int i=0; i < rowsize; ++i)
@@ -307,6 +315,7 @@ bool StaticEquilibrium::computePolytopeProjection(Cref_matrix6X v)
     m_h(rowsize + i) = -m_h((int)(*cit));
     m_H(rowsize + i) = -m_H((int)(*cit));
   }
+//  getProfiler().stop("cdd to eigen");
 
   return true;
 }
