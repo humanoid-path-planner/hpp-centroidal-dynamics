@@ -16,7 +16,7 @@ namespace robust_equilibrium
 
 bool StaticEquilibrium::m_is_cdd_initialized = false;
 
-StaticEquilibrium::StaticEquilibrium(double mass, unsigned int generatorsPerContact, SolverLP solver_type)
+StaticEquilibrium::StaticEquilibrium(string name, double mass, unsigned int generatorsPerContact, SolverLP solver_type)
 {
   if(!m_is_cdd_initialized)
   {
@@ -30,6 +30,7 @@ StaticEquilibrium::StaticEquilibrium(double mass, unsigned int generatorsPerCont
     generatorsPerContact = 4;
   }
 
+  m_name = name;
   m_solver = Solver_LP_abstract::getNewSolver(solver_type);
 
   m_generatorsPerContact = generatorsPerContact;
@@ -237,7 +238,7 @@ double StaticEquilibrium::computeEquilibriumRobustness(Cref_vector2 com)
     return -1.0;
   }
 
-  SEND_ERROR_MSG("checkRobustEquilibrium is only implemented for the LP algorithm");
+  SEND_ERROR_MSG("checkRobustEquilibrium is not implemented for the specified algorithm");
   return -1.0;
 }
 
@@ -261,10 +262,84 @@ bool StaticEquilibrium::checkRobustEquilibrium(Cref_vector2 com, double e_max)
   return true;
 }
 
-double StaticEquilibrium::findExtremumOverLine(Cref_vector2 a, double b, double e_max)
+bool StaticEquilibrium::findExtremumOverLine(Cref_vector2 a, Cref_vector2 a0, double e_max, Ref_vector2 com)
 {
-  SEND_ERROR_MSG("findExtremumOverLine not implemented yet");
-  return 0.0;
+  const long m = m_G_centr.cols(); // number of gravito-inertial wrench generators
+
+  if(m_algorithm==STATIC_EQUILIBRIUM_ALGORITHM_LP)
+  {
+    /* Compute the extremum CoM position over the line a*p + a0 that is in robust equilibrium
+     * by solving the following LP:
+          find          b, p
+          minimize      -p
+          subject to    D (a p + a0) + d <= G (b + b0) <= D (a p + a0) + d
+                        0       <= b <= Inf
+        where
+          b0+b      are the coefficient of the contact force generators (f = G (b0+b))
+          b0        is the robustness measure
+          p         is the line parameter
+          G         is the matrix whose columns are the gravito-inertial wrench generators
+    */
+    VectorX b_p(m+1);
+    VectorX c = VectorX::Zero(m+1);
+    c(m) = -1.0;
+    VectorX lb = -VectorX::Zero(m+1);
+    lb(m) = -1e5;
+    VectorX ub = VectorX::Ones(m+1)*1e10;
+    Vector6 Alb = m_D*a0 + m_d - m_G_centr*VectorX::Ones(m)*e_max;
+    Vector6 Aub = Alb;
+    Matrix6X A = Matrix6X::Zero(6, m+1);
+    A.leftCols(m)     = m_G_centr;
+    A.rightCols(1)    = -m_D*a;
+
+    LP_status lpStatus_primal = m_solver->solve(c, lb, ub, A, Alb, Aub, b_p);
+    if(lpStatus_primal==LP_STATUS_OPTIMAL)
+    {
+      com = a0 + a*b_p(m);
+      return true;
+    }
+
+    SEND_ERROR_MSG("Primal LP problem could not be solved: "+toString(lpStatus_primal));
+    return false;
+  }
+
+  if(m_algorithm==STATIC_EQUILIBRIUM_ALGORITHM_DLP)
+  {
+    /* Compute the extremum CoM position over the line a*x + a0 that is in robust equilibrium
+     * by solving the following dual LP:
+          find          v
+          minimize      (D a0 + d -G b0)' v
+          subject to    0  <= G' v    <= Inf
+                        -1 <= a' D' v <= -1
+        where
+          G         is the matrix whose columns are the gravito-inertial wrench generators
+    */
+    Vector6 v;
+    Vector6 c = m_D*a0 + m_d - m_G_centr*VectorX::Ones(m)*e_max;
+    Vector6 lb = Vector6::Ones()*-1e100;
+    Vector6 ub = Vector6::Ones()*1e100;
+    VectorX Alb = VectorX::Zero(m+1);
+    Alb(m) = -1.0;
+    VectorX Aub = VectorX::Ones(m+1)*1e100;
+    Aub(m) = -1.0;
+    MatrixX6 A(m+1,6);
+    A.topRows(m) = m_G_centr.transpose();
+    A.bottomRows<1>() = (m_D*a).transpose();
+
+    LP_status lpStatus_dual = m_solver->solve(c, lb, ub, A, Alb, Aub, v);
+    if(lpStatus_dual==LP_STATUS_OPTIMAL)
+    {
+      double p = m_solver->getObjectiveValue();
+      com = a0 + a*p;
+      return true;
+    }
+
+    SEND_ERROR_MSG("Dual LP problem could not be solved: "+toString(lpStatus_dual));
+    return false;
+  }
+
+  SEND_ERROR_MSG("checkRobustEquilibrium is not implemented for the specified algorithm");
+  return false;
 }
 
 double StaticEquilibrium::findExtremumInDirection(Cref_vector2 direction, double e_max)

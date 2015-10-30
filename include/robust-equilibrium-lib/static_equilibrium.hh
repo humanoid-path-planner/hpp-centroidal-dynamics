@@ -29,6 +29,7 @@ class ROBUST_EQUILIBRIUM_DLLAPI StaticEquilibrium
 private:
   static bool m_is_cdd_initialized;
 
+  std::string                 m_name;
   StaticEquilibriumAlgorithm  m_algorithm;
   Solver_LP_abstract*         m_solver;
 
@@ -58,7 +59,9 @@ private:
   bool computePolytopeProjection(Cref_matrix6X v);
 
 public:
-  StaticEquilibrium(double mass, unsigned int generatorsPerContact, SolverLP solver_type);
+  StaticEquilibrium(std::string name, double mass, unsigned int generatorsPerContact, SolverLP solver_type);
+
+  std::string getName(){ return m_name; }
 
   bool setNewContacts(Cref_matrixX3 contactPoints, Cref_matrixX3 contactNormals,
                       Cref_vectorX frictionCoefficients, StaticEquilibriumAlgorithm alg);
@@ -67,7 +70,25 @@ public:
 
   bool checkRobustEquilibrium(Cref_vector2 com, double e_max=0.0);
 
-  double findExtremumOverLine(Cref_vector2 a, double b, double e_max=0.0);
+  /** Compute the extremum CoM position over the line a*x + a0 that is in robust equilibrium.
+   * This is equivalent to following the following LP:
+   *     find          c, b
+   *     maximize      c
+   *     subject to    G b = D (a c + a0) + d
+   *                   b  >= b0
+   *   where
+   *     b         are the m coefficients of the contact force generators (f = G b)
+   *     b0        is the m-dimensional vector of identical values that are proportional to e_max
+   *     c         is the 1d line parameter
+   *     G         is the 6xm matrix whose columns are the gravito-inertial wrench generators
+   *     D         is the 6x2 matrix mapping the CoM position in gravito-inertial wrench
+   *     d         is the 6d vector containing the gravity part of the gravito-inertial wrench
+   * @param a 2d vector representing the line direction
+   * @param a0 2d vector representing an arbitrary point over the line
+   * @param e_max Desired robustness in terms of the maximum force error tolerated by the system
+   * @return True if the operation succeeded, false otherwise.
+  */
+  bool findExtremumOverLine(Cref_vector2 a, Cref_vector2 a0, double e_max, Ref_vector2 com);
 
   double findExtremumInDirection(Cref_vector2 direction, double e_max=0.0);
 
