@@ -7,12 +7,20 @@
 #include <iostream>
 #include <robust-equilibrium-lib/static_equilibrium.hh>
 #include <robust-equilibrium-lib/logger.hh>
+#include <robust-equilibrium-lib/stop-watch.hh>
 
 using namespace robust_equilibrium;
 using namespace Eigen;
 using namespace std;
 
-
+#define PERF_PP "PP"
+#define PERF_LP_PREPARATION "LP preparation"
+#define PERF_LP_COIN "LP coin"
+#define PERF_LP_OASES "LP oases"
+#define PERF_LP2_COIN "LP2 coin"
+#define PERF_LP2_OASES "LP2 oases"
+#define PERF_DLP_COIN "DLP coin"
+#define PERF_DLP_OASES "DLP oases"
 
 int main()
 {
@@ -30,17 +38,22 @@ int main()
   double LY = 0.5*0.138;         // half foot size in y direction
   RVector3 CONTACT_POINT_LOWER_BOUNDS, CONTACT_POINT_UPPER_BOUNDS;
   CONTACT_POINT_LOWER_BOUNDS << 0.0,  0.0,  0.0;
-  CONTACT_POINT_UPPER_BOUNDS << 0.5,  0.5,  0.0;
+  CONTACT_POINT_UPPER_BOUNDS << 0.5,  0.5,  0.5;
   double gamma = atan(mu);   // half friction cone angle
   RVector3 RPY_LOWER_BOUNDS, RPY_UPPER_BOUNDS;
-  RPY_LOWER_BOUNDS << -0.0*gamma, -0.0*gamma, -M_PI;
-  RPY_UPPER_BOUNDS << +0.0*gamma, +0.0*gamma, +M_PI;
+  RPY_LOWER_BOUNDS << -0*gamma, -0*gamma, -M_PI;
+  RPY_UPPER_BOUNDS << +0*gamma, +0*gamma, +M_PI;
   double X_MARG = 0.07;
   double Y_MARG = 0.07;
-  const int GRID_SIZE = 20;
+  const int GRID_SIZE = 15;
 
   StaticEquilibrium solver_PP(mass, generatorsPerContact, SOLVER_LP_CLP);
-  StaticEquilibrium solver_LP(mass, generatorsPerContact, SOLVER_LP_CLP);
+  StaticEquilibrium solver_LP_coin(mass, generatorsPerContact, SOLVER_LP_CLP);
+  StaticEquilibrium solver_LP_oases(mass, generatorsPerContact, SOLVER_LP_QPOASES);
+  StaticEquilibrium solver_LP2_coin(mass, generatorsPerContact, SOLVER_LP_CLP);
+  StaticEquilibrium solver_LP2_oases(mass, generatorsPerContact, SOLVER_LP_QPOASES);
+  StaticEquilibrium solver_DLP_coin(mass, generatorsPerContact, SOLVER_LP_CLP);
+  StaticEquilibrium solver_DLP_oases(mass, generatorsPerContact, SOLVER_LP_QPOASES);
   MatrixXX contact_pos = MatrixXX::Zero(N_CONTACTS, 3);
   MatrixXX contact_rpy = MatrixXX::Zero(N_CONTACTS, 3);
   MatrixXX p = MatrixXX::Zero(4*N_CONTACTS,3); // contact points
@@ -70,7 +83,7 @@ int main()
         break;
     }
 
-    // generate contact orientation
+//     generate contact orientation
     uniform(RPY_LOWER_BOUNDS, RPY_UPPER_BOUNDS, contact_rpy.row(i));
 
     generate_rectangle_contacts(LX, LY, contact_pos.row(i), contact_rpy.row(i),
@@ -86,13 +99,53 @@ int main()
     printf("Normal (%.3f,%.3f,%.3f)\n", N(i,0), N(i,1), N(i,2));
   }
 
-  if(!solver_LP.setNewContacts(p, N, frictionCoefficients, STATIC_EQUILIBRIUM_ALGORITHM_LP))
+  getProfiler().start(PERF_LP_PREPARATION);
+  if(!solver_LP_coin.setNewContacts(p, N, frictionCoefficients, STATIC_EQUILIBRIUM_ALGORITHM_LP))
   {
     printf("Error while setting new contacts");
     return -1;
   }
+  getProfiler().stop(PERF_LP_PREPARATION);
+  getProfiler().start(PERF_LP_PREPARATION);
+  if(!solver_LP_oases.setNewContacts(p, N, frictionCoefficients, STATIC_EQUILIBRIUM_ALGORITHM_LP))
+  {
+    printf("Error while setting new contacts");
+    return -1;
+  }
+  getProfiler().stop(PERF_LP_PREPARATION);
+  getProfiler().start(PERF_LP_PREPARATION);
+  if(!solver_LP2_coin.setNewContacts(p, N, frictionCoefficients, STATIC_EQUILIBRIUM_ALGORITHM_LP2))
+  {
+    printf("Error while setting new contacts");
+    return -1;
+  }
+  getProfiler().stop(PERF_LP_PREPARATION);
+  getProfiler().start(PERF_LP_PREPARATION);
+  if(!solver_LP2_oases.setNewContacts(p, N, frictionCoefficients, STATIC_EQUILIBRIUM_ALGORITHM_LP2))
+  {
+    printf("Error while setting new contacts");
+    return -1;
+  }
+  getProfiler().stop(PERF_LP_PREPARATION);
+  getProfiler().start(PERF_LP_PREPARATION);
+  if(!solver_DLP_coin.setNewContacts(p, N, frictionCoefficients, STATIC_EQUILIBRIUM_ALGORITHM_DLP))
+  {
+    printf("Error while setting new contacts");
+    return -1;
+  }
+  getProfiler().stop(PERF_LP_PREPARATION);
+  getProfiler().start(PERF_LP_PREPARATION);
+  if(!solver_DLP_oases.setNewContacts(p, N, frictionCoefficients, STATIC_EQUILIBRIUM_ALGORITHM_DLP))
+  {
+    printf("Error while setting new contacts");
+    return -1;
+  }
+  getProfiler().stop(PERF_LP_PREPARATION);
 
-  if(!solver_PP.setNewContacts(p, N, frictionCoefficients, STATIC_EQUILIBRIUM_ALGORITHM_PP))
+  getProfiler().start(PERF_PP);
+  bool res = solver_PP.setNewContacts(p, N, frictionCoefficients, STATIC_EQUILIBRIUM_ALGORITHM_PP);
+  getProfiler().stop(PERF_PP);
+  if(!res)
   {
     printf("Error while setting new contacts");
     return -1;
@@ -121,21 +174,81 @@ int main()
     {
 //      uniform(com_LB, com_UB, com);
       com(0) = x_range(j);
-      double rob = solver_LP.computeEquilibriumRobustness(com);
+
+      getProfiler().start(PERF_LP_COIN);
+      double rob_coin  = solver_LP_coin.computeEquilibriumRobustness(com);
+      getProfiler().stop(PERF_LP_COIN);
+
+      getProfiler().start(PERF_LP_OASES);
+      double rob_oases = solver_LP_oases.computeEquilibriumRobustness(com);
+      getProfiler().stop(PERF_LP_OASES);
+
+      getProfiler().start(PERF_LP2_COIN);
+      double rob_coin2  = solver_LP2_coin.computeEquilibriumRobustness(com);
+      getProfiler().stop(PERF_LP2_COIN);
+
+      getProfiler().start(PERF_LP2_OASES);
+      double rob_oases2 = solver_LP2_oases.computeEquilibriumRobustness(com);
+      getProfiler().stop(PERF_LP2_OASES);
+
+      getProfiler().start(PERF_DLP_COIN);
+      double rob_DLP_coin  = solver_DLP_coin.computeEquilibriumRobustness(com);
+      getProfiler().stop(PERF_DLP_COIN);
+
+      getProfiler().start(PERF_DLP_OASES);
+      double rob_DLP_oases = solver_DLP_oases.computeEquilibriumRobustness(com);
+      getProfiler().stop(PERF_DLP_OASES);
+
+      if(fabs(rob_coin-rob_oases)>1e-5)
+        SEND_ERROR_MSG("LP_coin and LP_oases returned different results: "+toString(rob_coin)+" VS "+toString(rob_oases));
+
+      if(fabs(rob_coin-rob_oases2)>1e-5)
+        SEND_ERROR_MSG("LP_coin and LP2_oases returned different results: "+toString(rob_coin)+" VS "+toString(rob_oases2));
+
+//      if(fabs(rob_coin-rob_coin2)>1e-5)
+//        SEND_ERROR_MSG("LP_coin and LP2_coin returned different results: "+toString(rob_coin)+" VS "+toString(rob_coin2));
+
+      if(fabs(rob_coin-rob_DLP_oases)>1e-5)
+        SEND_ERROR_MSG("LP_coin and DLP_oases returned different results: "+toString(rob_coin)+" VS "+toString(rob_DLP_oases));
+
+      if(fabs(rob_coin-rob_DLP_coin)>1e-5)
+        SEND_ERROR_MSG("LP_coin and DLP_coin returned different results: "+toString(rob_coin)+" VS "+toString(rob_DLP_coin));
+
       if(solver_PP.checkRobustEquilibrium(com, 0.0))
       {
         equilibrium(i,j) = 1.0;
-        if(rob<=0)
-          SEND_ERROR_MSG("PP says com is in equilibrium but LP find negative robustness "+toString(rob));
-        if(rob>9.0)
-          rob = 9.0;
-        printf("%d ", (int)rob);
+        if(rob_coin<=0)
+          SEND_ERROR_MSG("PP says com is in equilibrium but LP_coin find negative robustness "+toString(rob_coin));
+        if(rob_oases<=0)
+          SEND_ERROR_MSG("PP says com is in equilibrium but LP_oases find negative robustness "+toString(rob_oases));
+        if(rob_coin2<=0)
+          SEND_ERROR_MSG("PP says com is in equilibrium but LP_coin2 find negative robustness "+toString(rob_coin2));
+        if(rob_oases2<=0)
+          SEND_ERROR_MSG("PP says com is in equilibrium but LP_oases2 find negative robustness "+toString(rob_oases2));
+        if(rob_DLP_oases<=0)
+          SEND_ERROR_MSG("PP says com is in equilibrium but DLP_oases find negative robustness "+toString(rob_DLP_oases));
+        if(rob_DLP_coin<=0)
+          SEND_ERROR_MSG("PP says com is in equilibrium but DLP_coin negative robustness "+toString(rob_DLP_coin));
+
+        if(rob_coin>9.0)
+          rob_coin = 9.0;
+        printf("%d ", (int)rob_coin);
       }
       else
       {
         equilibrium(i,j) = 0.0;
-        if(rob>0)
-          SEND_ERROR_MSG("PP says com is NOT in equilibrium but LP find positive robustness "+toString(rob));
+        if(rob_coin>0)
+          SEND_ERROR_MSG("PP says com is NOT in equilibrium but LP_coin find positive robustness "+toString(rob_coin));
+        if(rob_oases>0)
+          SEND_ERROR_MSG("PP says com is NOT in equilibrium but LP_oases find positive robustness "+toString(rob_oases));
+        if(rob_coin2>0)
+          SEND_ERROR_MSG("PP says com is NOT in equilibrium but LP_coin2 find positive robustness "+toString(rob_coin2));
+        if(rob_oases2>0)
+          SEND_ERROR_MSG("PP says com is NOT in equilibrium but LP_oases2 find positive robustness "+toString(rob_oases2));
+        if(rob_DLP_coin>0)
+          SEND_ERROR_MSG("PP says com is NOT in equilibrium but DLP_coin find positive robustness "+toString(rob_DLP_coin));
+        if(rob_DLP_oases>0)
+          SEND_ERROR_MSG("PP says com is NOT in equilibrium but DLP_oases find positive robustness "+toString(rob_DLP_oases));
         printf("- ");
       }
 
@@ -154,7 +267,7 @@ int main()
     printf("\n");
   }
 
-  cout<<"Max dist between contact points and grid points "<<minDistContactPoint.maxCoeff()<<"\n";
+//  cout<<"Max dist between contact points and grid points "<<minDistContactPoint.maxCoeff()<<"\n";
 
   cout<<"\nContact point position on the same grid\n";
   bool contactPointDrawn;
@@ -177,6 +290,8 @@ int main()
     }
     printf("\n");
   }
+
+  getProfiler().report_all();
 
   return ret;
 }

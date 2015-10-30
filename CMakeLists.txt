@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 2.6)
 INCLUDE(cmake/base.cmake)
 INCLUDE(cmake/cpack.cmake)
-
+INCLUDE(cmake2/FindqpOASES.cmake)
 
 SET(PROJECT_NAME robust-equilibrium-lib)
 SET(PROJECT_DESCRIPTION
@@ -36,6 +36,7 @@ SET(${PROJECT_NAME}_HEADERS
     include/robust-equilibrium-lib/solver_LP_qpoases.hh
     include/robust-equilibrium-lib/solver_LP_clp.hh
     include/robust-equilibrium-lib/static_equilibrium.hh
+    include/robust-equilibrium-lib/stop-watch.hh
   )
 
 find_package(Eigen3)
@@ -48,6 +49,7 @@ endif()
 
 find_package(CDD REQUIRED)
 find_package(CLP REQUIRED)
+SEARCH_FOR_QPOASES()
 
 add_subdirectory (src)
 add_subdirectory (test)

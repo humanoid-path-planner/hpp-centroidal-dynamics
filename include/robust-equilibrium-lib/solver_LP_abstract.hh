@@ -52,6 +52,10 @@ public:
   /** Get the objective value of the last solved problem. */
   virtual double getObjectiveValue() = 0;
 
+  virtual void getDualSolution(Ref_vectorX res) = 0;
+
+//  virtual void getDualColumnSolution(Ref_vectorX res) = 0;
+
   /** Get the current maximum number of iterations performed
    *  by the solver.
    */

@@ -23,6 +23,12 @@ StaticEquilibrium::StaticEquilibrium(double mass, unsigned int generatorsPerCont
     m_is_cdd_initialized = true;
   }
 
+  if(generatorsPerContact!=4)
+  {
+    SEND_WARNING_MSG("Algorithm currently supports only 4 generators per contact!");
+    generatorsPerContact = 4;
+  }
+
   m_solver = Solver_LP_abstract::getNewSolver(solver_type);
 
   m_generatorsPerContact = generatorsPerContact;
@@ -121,33 +127,96 @@ bool StaticEquilibrium::setNewContacts(Cref_matrixX3 contactPoints, Cref_matrixX
   return true;
 }
 
+
 double StaticEquilibrium::computeEquilibriumRobustness(Cref_vector2 com)
 {
-  /*Compute the robustness measure of the equilibrium of a specified CoM position.
-    The operation amounts to solving the following dual LP:
-      find          v
-      minimize      (d+D*com)' v
-      subject to    G' v >= 0
-                    1' G' v = 1
-    where
-      -(d+D c)' v   is the robustness measure
-      c             is the CoM position
-      G             is the matrix whose columns are the gravito-inertial wrench generators
-   */
-  if(m_algorithm!=STATIC_EQUILIBRIUM_ALGORITHM_LP)
+  const long m = m_G_centr.cols(); // number of gravito-inertial wrench generators
+
+  if(m_algorithm==STATIC_EQUILIBRIUM_ALGORITHM_LP)
   {
-    SEND_ERROR_MSG("checkRobustEquilibrium is only implemented for the LP algorithm");
-    return false;
+    /* Compute the robustness measure of the equilibrium of a specified CoM position
+     * by solving the following LP:
+          find          b, b0
+          minimize      -b0
+          subject to    D c + d <= G b    <= D c + d
+                        0       <= b - b0 <= Inf
+        where
+          b         are the coefficient of the contact force generators (f = V b)
+          b0        is the robustness measure
+          c         is the CoM position
+          G         is the matrix whose columns are the gravito-inertial wrench generators
+    */
+    VectorX b_b0(m+1);
+    VectorX c = VectorX::Zero(m+1);
+    c(m) = -1.0;
+    VectorX lb = -VectorX::Ones(m+1)*1e5;
+    VectorX ub = VectorX::Ones(m+1)*1e10;
+    VectorX Alb = VectorX::Zero(6+m);
+    VectorX Aub = VectorX::Ones(6+m)*1e100;
+    MatrixXX A = MatrixXX::Zero(6+m, m+1);
+    Alb.head<6>() = m_D * com + m_d;
+    Aub.head<6>() = Alb.head<6>();
+    A.topLeftCorner(6,m)      = m_G_centr;
+    A.bottomLeftCorner(m,m)   = MatrixXX::Identity(m,m);
+    A.bottomRightCorner(m,1)  = -VectorX::Ones(m);
+
+    LP_status lpStatus_primal = m_solver->solve(c, lb, ub, A, Alb, Aub, b_b0);
+    if(lpStatus_primal==LP_STATUS_OPTIMAL)
+      return -1.0*m_solver->getObjectiveValue();
+
+    SEND_ERROR_MSG("Primal LP problem could not be solved: "+toString(lpStatus_primal));
+    return -1.0;
   }
 
-  double robustness_dual, robustness_primal;
-  LP_status lpStatus_primal, lpStatus_dual;
-  long m = m_G_centr.cols(); // number of gravito-inertial wrench generators
-  Vector6 v;
-  VectorX b_b0(m+1);
-
+  if(m_algorithm==STATIC_EQUILIBRIUM_ALGORITHM_LP2)
   {
+    /* Compute the robustness measure of the equilibrium of a specified CoM position
+     * by solving the following LP:
+            find          b, b0
+            minimize      -b0
+            subject to    D c + d <= G (b + 1*b0) <= D c + d
+                          0       <= b            <= Inf
+          where
+            b         are the (delta) coefficient of the contact force generators (f = G (b+b0))
+            b0        is the robustness measure
+            c         is the CoM position
+            G         is the matrix whose columns are the gravito-inertial wrench generators
+      */
+    VectorX b_b0(m+1);
+    VectorX c = VectorX::Zero(m+1);
+    c(m) = -1.0;
+    VectorX lb = VectorX::Zero(m+1);
+    lb(m) = -1e10;
+    VectorX ub = VectorX::Ones(m+1)*1e10;
+    MatrixXX A = MatrixXX::Zero(6, m+1);
+    Vector6 Alb = m_D * com + m_d;
+    Vector6 Aub = Alb;
+    A.leftCols(m)  = m_G_centr;
+    A.rightCols(1) = m_G_centr * VectorX::Ones(m);
 
+    LP_status lpStatus_primal = m_solver->solve(c, lb, ub, A, Alb, Aub, b_b0);
+    if(lpStatus_primal==LP_STATUS_OPTIMAL)
+    {
+      return -1.0*m_solver->getObjectiveValue();
+    }
+    SEND_ERROR_MSG("Primal LP problem could not be solved: "+toString(lpStatus_primal));
+    return -1.0;
+  }
+
+  if(m_algorithm==STATIC_EQUILIBRIUM_ALGORITHM_DLP)
+  {
+    /*Compute the robustness measure of the equilibrium of a specified CoM position
+      by solving the following dual LP:
+        find          v
+        minimize      (d+D*com)' v
+        subject to    G' v >= 0
+                      1' G' v = 1
+      where
+        -(d+D c)' v   is the robustness measure
+        c             is the CoM position
+        G             is the matrix whose columns are the gravito-inertial wrench generators
+     */
+    Vector6 v;
     Vector6 c = m_D*com + m_d;
     Vector6 lb = Vector6::Ones()*-1e100;
     Vector6 ub = Vector6::Ones()*1e100;
@@ -159,54 +228,16 @@ double StaticEquilibrium::computeEquilibriumRobustness(Cref_vector2 com)
     A.topRows(m) = m_G_centr.transpose();
     A.bottomRows<1>() = (m_G_centr*VectorX::Ones(m)).transpose();
 
-    lpStatus_dual = m_solver->solve(c, lb, ub, A, Alb, Aub, v);
+    LP_status lpStatus_dual = m_solver->solve(c, lb, ub, A, Alb, Aub, v);
     if(lpStatus_dual==LP_STATUS_OPTIMAL)
-      robustness_dual = m_solver->getObjectiveValue();
-    else
-      SEND_ERROR_MSG("Dual LP problem could not be solved: "+toString(lpStatus_dual));
+      return m_solver->getObjectiveValue();
+
+    SEND_ERROR_MSG("Dual LP problem could not be solved: "+toString(lpStatus_dual));
+    return -1.0;
   }
 
-  {
-    /* The operation amounts to solving the following LP:
-          find          b, b0
-          minimize      -b0
-          subject to    D c + d <= G b    <= D c + d
-                        0       <= b - b0 <= Inf
-        where
-          b         are the coefficient of the contact force generators (f = V b)
-          b0        is the robustness measure
-          c         is the CoM position
-          G         is the matrix whose columns are the gravito-inertial wrench generators
-    */
-    long m = m_G_centr.cols(); // number of gravito-inertial wrench generators
-    VectorX c = VectorX::Zero(m+1);
-    c(m) = -1.0;
-    VectorX lb = -VectorX::Ones(m+1)*1e10;
-    VectorX ub = VectorX::Ones(m+1)*1e10;
-    VectorX Alb = VectorX::Zero(6+m);
-    VectorX Aub = VectorX::Ones(6+m)*1e100;
-    MatrixXX A = MatrixXX::Zero(6+m, m+1);
-    Alb.head<6>() = m_D * com + m_d;
-    Aub.head<6>() = Alb.head<6>();
-    A.topLeftCorner(6,m)      = m_G_centr;
-    A.bottomLeftCorner(m,m)   = MatrixXX::Identity(m,m);
-    A.bottomRightCorner(m,1)  = -VectorX::Ones(m);
-
-    lpStatus_primal = m_solver->solve(c, lb, ub, A, Alb, Aub, b_b0);
-    if(lpStatus_primal==LP_STATUS_OPTIMAL)
-      robustness_primal = -1.0*m_solver->getObjectiveValue();
-    else
-      SEND_ERROR_MSG("Primal LP problem could not be solved: "+toString(lpStatus_primal));
-  }
-
-//  if(lpStatus_primal==LP_STATUS_OPTIMAL && lpStatus_dual==LP_STATUS_OPTIMAL)
-//  {
-//    if(fabs(robustness_dual-robustness_primal)>1e-3)
-//      SEND_ERROR_MSG("Primal and dual solutions differ: "+toString(robustness_primal)+" != "+
-//                     toString(robustness_dual)+" b="+toString(b_b0.transpose()));
-//  }
-
-  return robustness_primal;
+  SEND_ERROR_MSG("checkRobustEquilibrium is only implemented for the LP algorithm");
+  return -1.0;
 }
 
 bool StaticEquilibrium::checkRobustEquilibrium(Cref_vector2 com, double e_max)

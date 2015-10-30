@@ -77,6 +77,20 @@ double Solver_LP_clp::getObjectiveValue()
   return m_model.objectiveValue();
 }
 
+void Solver_LP_clp::getDualSolution(Ref_vectorX res)
+{
+  const double *tmp = m_model.dualRowSolution();
+  for(int i=0; i<res.size(); i++)
+    res(i) = tmp[i];
+}
+
+//void Solver_LP_clp::getDualColumnSolution(Ref_vectorX res)
+//{
+//  const double *tmp = m_model.dualColumnSolution();
+//  for(int i=0; i<res.size(); i++)
+//    res(i) = tmp[i];
+//}
+
 unsigned int Solver_LP_clp::getMaximumIterations()
 {
   int integerValue;

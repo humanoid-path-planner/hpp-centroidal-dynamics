@@ -38,6 +38,10 @@ public:
   /** Get the objective value of the last solved problem. */
   double getObjectiveValue();
 
+  void getDualSolution(Ref_vectorX res);
+
+//  void getDualColumnSolution(Ref_vectorX res);
+
   /** Get the current maximum number of iterations performed
    *  by the solver.
    */

@@ -12,6 +12,7 @@
 
 #include <robust-equilibrium-lib/config.hh>
 #include <sstream>
+#include <Eigen/Dense>
 #include <map>
 #include <initializer_list>
 #include "boost/assign.hpp"
@@ -97,6 +98,16 @@ namespace robust_equilibrium
     for(int i=0; i<v.size()-1; i++)
       ss<<v[i]<<separator;
     ss<<v[v.size()-1];
+    return ss.str();
+  }
+
+  template<typename T, int n>
+  std::string toString(const Eigen::MatrixBase<T>& v, const std::string separator=", ")
+  {
+    if(v.rows()>v.cols())
+      return toString(v.transpose(), separator);
+    std::stringstream ss;
+    ss<<v;
     return ss.str();
   }
 

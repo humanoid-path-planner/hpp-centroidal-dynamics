@@ -5,6 +5,7 @@ include_directories("${INCLUDE_DIR}")
 include_directories("${EIGEN3_INCLUDE_DIR}")
 include_directories("${CDD_INCLUDE_DIR}")
 include_directories("${CLP_INCLUDE_DIR}")
+include_directories("${qpOASES_INCLUDE_DIR}")
 
 SET(LIBRARY_NAME ${PROJECT_NAME})
 
@@ -20,6 +21,7 @@ SET(${LIBRARY_NAME}_SOURCES
     solver_LP_clp.cpp
     util.cpp
     logger.cpp
+    stop-watch.cpp
   )
 
 INCLUDE_DIRECTORIES(${PROJECT_SOURCE_DIR}/src)
@@ -30,6 +32,7 @@ if ( MSVC )
 endif ( MSVC )
 
 TARGET_LINK_LIBRARIES(robust-equilibrium-lib ${CDD_LIBRARY}
+                                             ${qpOASES_LIBRARY}
                                              ${CLP_LIBRARY}
                                               /usr/lib/libCoinUtils.so)
 
