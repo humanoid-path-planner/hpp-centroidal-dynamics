@@ -32,6 +32,7 @@ private:
   std::string                 m_name;
   StaticEquilibriumAlgorithm  m_algorithm;
   Solver_LP_abstract*         m_solver;
+  SolverLP                    m_solver_type;
 
   unsigned int m_generatorsPerContact;
   double m_mass;
@@ -66,9 +67,9 @@ public:
   bool setNewContacts(Cref_matrixX3 contactPoints, Cref_matrixX3 contactNormals,
                       Cref_vectorX frictionCoefficients, StaticEquilibriumAlgorithm alg);
 
-  double computeEquilibriumRobustness(Cref_vector2 com);
+  bool computeEquilibriumRobustness(Cref_vector2 com, double &robustness);
 
-  bool checkRobustEquilibrium(Cref_vector2 com, double e_max=0.0);
+  bool checkRobustEquilibrium(Cref_vector2 com, bool &equilibrium, double e_max=0.0);
 
   /** Compute the extremum CoM position over the line a*x + a0 that is in robust equilibrium.
    * This is equivalent to following the following LP:
@@ -90,7 +91,7 @@ public:
   */
   bool findExtremumOverLine(Cref_vector2 a, Cref_vector2 a0, double e_max, Ref_vector2 com);
 
-  double findExtremumInDirection(Cref_vector2 direction, double e_max=0.0);
+  bool findExtremumInDirection(Cref_vector2 direction, Ref_vector2 com, double e_max=0.0);
 
 };
 

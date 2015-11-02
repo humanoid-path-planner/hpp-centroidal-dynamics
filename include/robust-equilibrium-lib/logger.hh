@@ -21,7 +21,7 @@ namespace robust_equilibrium
 {
 
   //#define LOGGER_VERBOSITY_INFO_WARNING_ERROR
-#define LOGGER_VERBOSITY_ALL
+#define LOGGER_VERBOSITY_INFO_WARNING_ERROR
 
 #define SEND_MSG(msg,type)         getLogger().sendMsg(msg,type,__FILE__,__LINE__)
 

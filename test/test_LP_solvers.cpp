@@ -3,14 +3,15 @@
  * Author: Andrea Del Prete
  */
 
+#ifdef CLP_FOUND
 #include "ClpSimplex.hpp"
 #include "CoinTime.hpp"
 #include "CoinBuild.hpp"
 #include "CoinModel.hpp"
+#include <robust-equilibrium-lib/solver_LP_clp.hh>
+#endif
 
 #include <qpOASES.hpp>
-
-#include <robust-equilibrium-lib/solver_LP_clp.hh>
 #include <robust-equilibrium-lib/solver_LP_qpoases.hh>
 
 #include <iostream>
@@ -20,6 +21,7 @@ using namespace std;
 using namespace robust_equilibrium;
 USING_NAMESPACE_QPOASES
 
+#ifdef CLP_FOUND
 /** Example addRows.cpp */
 void test_addRows()
 {
@@ -364,6 +366,7 @@ void test_small_LP()
   else
     cout << "Didn’t find optimal solution." << endl;
 }
+#endif
 
 int main()
 {
@@ -378,14 +381,6 @@ int main()
     real_t lbA[1] = { -1.0 };
     real_t ubA[1] = { 2.0 };
 
-    /* Setup data of second LP. */
-    real_t g_new[2] = { 1.0, 1.5 };
-    real_t lb_new[2] = { 0.0, -1.0 };
-    real_t ub_new[2] = { 5.0, -0.5 };
-    real_t lbA_new[1] = { -2.0 };
-    real_t ubA_new[1] = { 1.0 };
-
-
     /* Setting up QProblem object with zero Hessian matrix. */
     QProblem example( 2,1,HST_ZERO );
 
@@ -398,7 +393,8 @@ int main()
     example.init( 0,g,A,lb,ub,lbA,ubA, nWSR,0 );
   }
 
-//  test_addRows();
+#ifdef CLP_FOUND
+  test_addRows();
   test_small_LP();
 
   Solver_LP_abstract *solver = Solver_LP_abstract::getNewSolver(SOLVER_LP_CLP);
@@ -419,6 +415,7 @@ int main()
   }
   else
     cout<<"solver_LP_clp failed to solve the problem\n";
+#endif
 
 //  char x[81];
 //  int iRow;

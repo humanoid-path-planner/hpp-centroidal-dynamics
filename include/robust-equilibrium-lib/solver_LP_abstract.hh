@@ -15,7 +15,9 @@ namespace robust_equilibrium
 
 enum ROBUST_EQUILIBRIUM_DLLAPI SolverLP
 {
+#ifdef CLP_FOUND
   SOLVER_LP_CLP,
+#endif
   SOLVER_LP_QPOASES
 };
 

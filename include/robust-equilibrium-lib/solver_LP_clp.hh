@@ -3,6 +3,8 @@
  * Author: Andrea Del Prete
  */
 
+#ifdef CLP_FOUND
+
 #ifndef ROBUST_EQUILIBRIUM_LIB_SOLVER_LP_CLP_HH
 #define ROBUST_EQUILIBRIUM_LIB_SOLVER_LP_CLP_HH
 
@@ -60,3 +62,5 @@ public:
 } // end namespace robust_equilibrium
 
 #endif //ROBUST_EQUILIBRIUM_LIB_SOLVER_LP_CLP_HH
+
+#endif // CLP_FOUND

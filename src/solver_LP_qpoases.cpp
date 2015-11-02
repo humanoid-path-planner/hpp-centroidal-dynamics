@@ -16,7 +16,7 @@ namespace robust_equilibrium
 //    m_options.initialStatusBounds = ST_INACTIVE;
 //    m_options.setToReliable();
     m_options.setToDefault();
-    m_options.printLevel          = PL_LOW; //PL_NONE
+    m_options.printLevel          = PL_NONE; //PL_LOW
     m_options.enableRegularisation = BT_TRUE;
     m_options.enableEqualities = BT_TRUE;
     m_maxIter = 1000;

@@ -3,6 +3,8 @@
  * Author: Andrea Del Prete
  */
 
+#ifdef CLP_FOUND
+
 #include <robust-equilibrium-lib/solver_LP_clp.hh>
 #include "CoinBuild.hpp"
 
@@ -115,3 +117,5 @@ bool Solver_LP_clp::setMaximumTime(double seconds)
 }
 
 } // end namespace robust_equilibrium
+
+#endif //CLP_FOUND
