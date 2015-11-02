@@ -69,6 +69,12 @@ bool StaticEquilibrium::setNewContacts(Cref_matrixX3 contactPoints, Cref_matrixX
   int cg = m_generatorsPerContact;
   long int m = c*cg;           // number of generators
   double muu;
+  /** Tangent directions for all contacts (numberOfContacts*generatorsPerContact X 3) */
+  MatrixX3 m_T1, m_T2;
+  /** Matrix mapping contact forces to gravito-inertial wrench (6 X 3*numberOfContacts) */
+  Matrix6X m_A;
+  /** Lists of contact generators (3 X numberOfContacts*generatorsPerContact) */
+  Matrix3X m_G;
   m_T1.resize(c,3);
   m_T2.resize(c,3);
   m_A.resize(6,3*c);

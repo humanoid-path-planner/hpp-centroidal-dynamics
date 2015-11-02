@@ -88,7 +88,7 @@ int test_computeEquilibriumRobustness_vs_checkEquilibrium(StaticEquilibrium solv
   }
 
   if(verb>1)
-    SEND_INFO_MSG("Test test_computeEquilibriumRobustness_vs_checkEquilibrium "+solver_1.getName()+" VS "+solver_2.getName()+": "+toString(error_counter)+" error(s).");
+    cout<<"Test test_computeEquilibriumRobustness_vs_checkEquilibrium "+solver_1.getName()+" VS "+solver_2.getName()+": "+toString(error_counter)+" error(s).\n";
   return error_counter;
 }
 
@@ -141,7 +141,7 @@ int test_computeEquilibriumRobustness(StaticEquilibrium solver_1, StaticEquilibr
   }
 
   if(verb>0)
-    SEND_INFO_MSG("Test computeEquilibriumRobustness "+solver_1.getName()+" VS "+solver_2.getName()+": "+toString(error_counter)+" error(s).");
+    cout<<"Test computeEquilibriumRobustness "+solver_1.getName()+" VS "+solver_2.getName()+": "+toString(error_counter)+" error(s).\n";
   return error_counter;
 }
 
