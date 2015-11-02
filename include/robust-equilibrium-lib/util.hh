@@ -34,6 +34,7 @@ typedef Eigen::Matrix <value_type, 3, Eigen::Dynamic, Eigen::RowMajor>          
 typedef Eigen::Matrix <value_type, 4, 3, Eigen::RowMajor>                           Matrix43;
 typedef Eigen::Matrix <value_type, 6, Eigen::Dynamic, Eigen::RowMajor>              Matrix6X;
 typedef Eigen::Matrix <value_type, 6, 2, Eigen::RowMajor>                           Matrix62;
+typedef Eigen::Matrix <value_type, 6, 3, Eigen::RowMajor>                           Matrix63;
 typedef Eigen::Matrix <value_type, Eigen::Dynamic, 6, Eigen::RowMajor>              MatrixX6;
 typedef Eigen::Matrix <value_type, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor> MatrixXX;
 

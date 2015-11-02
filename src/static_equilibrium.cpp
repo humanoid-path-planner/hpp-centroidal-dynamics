@@ -67,62 +67,59 @@ bool StaticEquilibrium::setNewContacts(Cref_matrixX3 contactPoints, Cref_matrixX
   // compute tangent directions
   long int c = contactPoints.rows();
   int cg = m_generatorsPerContact;
-  long int m = c*cg;           // number of generators
   double muu;
-  /** Tangent directions for all contacts (numberOfContacts*generatorsPerContact X 3) */
-  MatrixX3 m_T1, m_T2;
-  /** Matrix mapping contact forces to gravito-inertial wrench (6 X 3*numberOfContacts) */
-  Matrix6X m_A;
-  /** Lists of contact generators (3 X numberOfContacts*generatorsPerContact) */
-  Matrix3X m_G;
-  m_T1.resize(c,3);
-  m_T2.resize(c,3);
-  m_A.resize(6,3*c);
-  m_G.resize(3,m);
+  // Tangent directions
+  RVector3 T1, T2;
+  // Matrix mapping contact forces to gravito-inertial wrench (6 X 3)
+  Matrix63 A;
+  A.topRows<3>() = -Matrix3::Identity();
+  // Lists of contact generators (3 X generatorsPerContact)
+  Matrix3X G(3, cg);
+  long int m = c*cg;           // number of generators
   m_G_centr.resize(6,m);
+
 
   for(long int i=0; i<c; i++)
   {
     // check that contact normals have norm 1
     if(fabs(contactNormals.row(i).norm()-1.0)>1e-6)
     {
-      printf("ERROR Contact normals should have norm 1, this has norm %f", contactNormals.row(i).norm());
+      SEND_ERROR_MSG("Contact normals should have norm 1, this has norm %f"+toString(contactNormals.row(i).norm()));
       return false;
     }
     // compute tangent directions
-    m_T1.row(i) = contactNormals.row(i).cross(Vector3::UnitY());
-    if(m_T1.row(i).norm()<1e-5)
-      m_T1.row(i) = contactNormals.row(i).cross(Vector3::UnitX());
-    m_T2.row(i) = contactNormals.row(i).transpose().cross(m_T1.row(i));
-    m_T1.row(i).normalize();
-    m_T2.row(i).normalize();
+    T1 = contactNormals.row(i).cross(Vector3::UnitY());
+    if(T1.norm()<1e-5)
+      T1 = contactNormals.row(i).cross(Vector3::UnitX());
+    T2 = contactNormals.row(i).transpose().cross(T1);
+    T1.normalize();
+    T2.normalize();
 
-//    cout<<"Contact point "<<i<<"\nT1="<<m_T1.row(i)<<"\nT2="<<m_T2.row(i)<<"\n";
+//    cout<<"Contact point "<<i<<"\nT1="<<T1<<"\nT2="<<T2<<"\n";
 
     // compute matrix mapping contact forces to gravito-inertial wrench
-    m_A.block<3,3>(0, 3*i) = -Matrix3::Identity();
-    m_A.block<3,3>(3, 3*i) = crossMatrix(-1.0*contactPoints.row(i).transpose());
-//    cout<<"A:\n"<<m_A.block<6,3>(0,3*i)<<"\n";
+    A.bottomRows<3>() = crossMatrix(-1.0*contactPoints.row(i).transpose());
+//    cout<<"A:\n"<<A<<"\n";
 
     // compute generators
     muu = frictionCoefficients(i)/sqrt(2.0);
-    m_G.col(cg*i+0) =  muu*m_T1.row(i) + muu*m_T2.row(i) + contactNormals.row(i);
-    m_G.col(cg*i+1) =  muu*m_T1.row(i) - muu*m_T2.row(i) + contactNormals.row(i);
-    m_G.col(cg*i+2) = -muu*m_T1.row(i) + muu*m_T2.row(i) + contactNormals.row(i);
-    m_G.col(cg*i+3) = -muu*m_T1.row(i) - muu*m_T2.row(i) + contactNormals.row(i);
+    G.col(0) =  muu*T1 + muu*T2 + contactNormals.row(i);
+    G.col(1) =  muu*T1 - muu*T2 + contactNormals.row(i);
+    G.col(2) = -muu*T1 + muu*T2 + contactNormals.row(i);
+    G.col(3) = -muu*T1 - muu*T2 + contactNormals.row(i);
 
     // normalize generators
-    m_G.col(cg*i+0).normalize();
-    m_G.col(cg*i+1).normalize();
-    m_G.col(cg*i+2).normalize();
-    m_G.col(cg*i+3).normalize();
+    G.col(0).normalize();
+    G.col(1).normalize();
+    G.col(2).normalize();
+    G.col(3).normalize();
 
-//    cout<<"Generators contact "<<i<<"\n"<<m_G.middleCols<4>(cg*i).transpose()<<"\n";
+//    cout<<"Generators contact "<<i<<"\n"<<G.transpose()<<"\n";
+
+    // project generators in 6d centroidal space
+    m_G_centr.block(0,cg*i,6,cg) = A * G;
   }
 
-  // project generators in 6d centroidal space
-  for(unsigned int i=0; i<c; i++)
-    m_G_centr.block(0,cg*i,6,cg) = m_A.block<6,3>(0,3*i) * m_G.block(0,cg*i,3,cg);
 //  cout<<"G_centr:\n"<<m_G_centr.transpose()<<"\n";
 
   if(m_algorithm==STATIC_EQUILIBRIUM_ALGORITHM_PP)
