@@ -25,7 +25,7 @@ endif()
 SETUP_PROJECT()
 
 # Inhibit all warning messages.
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -w")
+#set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -w")
 
 # remove flag that makes all warnings into errors
 string (REPLACE "-Werror" "" CMAKE_CXX_FLAGS ${CMAKE_CXX_FLAGS})

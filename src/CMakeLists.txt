@@ -6,7 +6,7 @@ include_directories("${EIGEN3_INCLUDE_DIR}")
 include_directories("${CDD_INCLUDE_DIR}")
 include_directories("${qpOASES_INCLUDE_DIR}")
 
-if( DEFINED CLP_FOUND)
+if(CLP_FOUND)
   include_directories("${CLP_INCLUDE_DIR}")
 endif()
 
@@ -37,7 +37,7 @@ endif ( MSVC )
 
 TARGET_LINK_LIBRARIES(robust-equilibrium-lib ${CDD_LIBRARY}
                                              ${qpOASES_LIBRARY})
-if( DEFINED CLP_FOUND)
+if(CLP_FOUND)
   TARGET_LINK_LIBRARIES(robust-equilibrium-lib ${CLP_LIBRARY}
                                                /usr/lib/libCoinUtils.so)
 endif()

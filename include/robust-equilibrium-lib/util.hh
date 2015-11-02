@@ -39,7 +39,7 @@ typedef Eigen::Matrix <value_type, Eigen::Dynamic, 6, Eigen::RowMajor>          
 typedef Eigen::Matrix <value_type, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor> MatrixXX;
 
 //define Eigen ref if available
-#if EIGEN_VERSION_AT_LEAST(3,2,0)
+#if EIGEN_VERSION_AT_LEAST(3,2,2)
 typedef Eigen::Ref<Vector2>     Ref_vector2;
 typedef Eigen::Ref<Vector3>     Ref_vector3;
 typedef Eigen::Ref<VectorX>     Ref_vectorX;
