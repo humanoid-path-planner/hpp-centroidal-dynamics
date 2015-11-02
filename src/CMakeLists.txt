@@ -4,8 +4,12 @@ include_directories("${SRC_DIR}")
 include_directories("${INCLUDE_DIR}")
 include_directories("${EIGEN3_INCLUDE_DIR}")
 include_directories("${CDD_INCLUDE_DIR}")
-include_directories("${CLP_INCLUDE_DIR}")
 include_directories("${qpOASES_INCLUDE_DIR}")
+
+if( DEFINED CLP_FOUND)
+  include_directories("${CLP_INCLUDE_DIR}")
+endif()
+
 
 SET(LIBRARY_NAME ${PROJECT_NAME})
 
@@ -32,9 +36,11 @@ if ( MSVC )
 endif ( MSVC )
 
 TARGET_LINK_LIBRARIES(robust-equilibrium-lib ${CDD_LIBRARY}
-                                             ${qpOASES_LIBRARY}
-                                             ${CLP_LIBRARY}
-                                              /usr/lib/libCoinUtils.so)
+                                             ${qpOASES_LIBRARY})
+if( DEFINED CLP_FOUND)
+  TARGET_LINK_LIBRARIES(robust-equilibrium-lib ${CLP_LIBRARY}
+                                               /usr/lib/libCoinUtils.so)
+endif()
 
 SET_TARGET_PROPERTIES(robust-equilibrium-lib PROPERTIES LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}")
 SET_TARGET_PROPERTIES(robust-equilibrium-lib PROPERTIES ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}")

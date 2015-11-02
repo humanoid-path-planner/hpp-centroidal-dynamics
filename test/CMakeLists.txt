@@ -4,8 +4,10 @@ include_directories("${SRC_DIR}")
 include_directories("${INCLUDE_DIR}")
 include_directories("${EIGEN3_INCLUDE_DIR}")
 include_directories("${CDD_INCLUDE_DIR}")
-include_directories("${CLP_INCLUDE_DIR}")
 include_directories("${qpOASES_INCLUDE_DIR}")
+if(DEFINED CLP_FOUND)
+  include_directories("${CLP_INCLUDE_DIR}")
+endif()
 
 PROJECT(robust-equilibrium-lib)
 

@@ -59,7 +59,7 @@ typedef const Eigen::Ref<const MatrixXX>    & Cref_matrixXX;
 #else
 typedef Vector2     & Ref_vector2;
 typedef Vector3     & Ref_vector3;
-typedef VectorX     & Ref_vector;
+typedef VectorX     & Ref_vectorX;
 typedef Rotation    & Ref_rotation;
 typedef MatrixX3    & Ref_matrixX3;
 typedef Matrix43    & Ref_matrix43;

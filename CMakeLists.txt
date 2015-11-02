@@ -24,6 +24,10 @@ endif()
 
 SETUP_PROJECT()
 
+# Inhibit all warning messages.
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -w")
+
+# remove flag that makes all warnings into errors
 string (REPLACE "-Werror" "" CMAKE_CXX_FLAGS ${CMAKE_CXX_FLAGS})
 MESSAGE( STATUS "CMAKE_CXX_FLAGS: " ${CMAKE_CXX_FLAGS} )
 
@@ -48,7 +52,15 @@ else()
 endif()
 
 find_package(CDD REQUIRED)
-find_package(CLP REQUIRED)
+find_package(CLP)
+
+IF("${CLP_LIBRARY}" STREQUAL "CLP_LIBRARY-NOTFOUND")
+  message(STATUS "CLP_LIBRARY equal to CLP_LIBRARY-NOTFOUND so I assume CLP was not found ")
+else()
+  message(STATUS "CLP library found, defining macro CLP_FOUND")
+  add_definitions(-DCLP_FOUND)
+endif()
+
 SEARCH_FOR_QPOASES()
 
 add_subdirectory (src)

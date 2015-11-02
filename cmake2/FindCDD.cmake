@@ -7,11 +7,11 @@
 
 
 find_path(CDD_INCLUDE_DIR cdd/cdd.h
-          HINTS ${CDD_INCLUDEDIR}
+          HINTS ${CDD_INCLUDEDIR} /usr/include
           PATH_SUFFIXES CDD )
 
 find_library(CDD_LIBRARY NAMES libcdd
-             HINTS ${CDD_LIBDIR} ${CDD_LIBRARY_DIRS} )
+             HINTS ${CDD_LIBDIR} ${CDD_LIBRARY_DIRS} /usr/lib/libcdd.so )
 
 set(CDD_LIBRARIES ${CDD_LIBRARY} )
 set(CDD_INCLUDE_DIRS ${CDD_INCLUDE_DIR} )

@@ -217,7 +217,7 @@ int test_findExtremumOverLine(StaticEquilibrium &solver_to_test, StaticEquilibri
   }
 
   if(verb>0)
-    SEND_INFO_MSG("Test findExtremumOverLine "+solver_to_test.getName()+" VS "+solver_ground_truth.getName()+": "+toString(error_counter)+" error(s).");
+    cout<<"Test findExtremumOverLine "+solver_to_test.getName()+" VS "+solver_ground_truth.getName()+": "+toString(error_counter)+" error(s).\n";
   return error_counter;
 }
 
@@ -461,9 +461,9 @@ int main()
   test_computeEquilibriumRobustness(solver_DLP_oases, solver_DLP_coin, comPositions, PERF_DLP_OASES, PERF_DLP_COIN, 1);
   test_computeEquilibriumRobustness(solver_DLP_oases, solver_LP_coin, comPositions, PERF_DLP_OASES, PERF_LP_COIN, 1);
 
-  test_computeEquilibriumRobustness_vs_checkEquilibrium(solver_LP_coin, solver_PP, comPositions, PERF_LP_COIN, 1);
-  test_computeEquilibriumRobustness_vs_checkEquilibrium(solver_LP2_coin, solver_PP, comPositions, PERF_LP2_COIN, 1);
-  test_computeEquilibriumRobustness_vs_checkEquilibrium(solver_DLP_coin, solver_PP, comPositions, PERF_DLP_COIN, 1);
+  test_computeEquilibriumRobustness_vs_checkEquilibrium(solver_LP_coin, solver_PP, comPositions, PERF_LP_COIN, NULL, 1);
+  test_computeEquilibriumRobustness_vs_checkEquilibrium(solver_LP2_coin, solver_PP, comPositions, PERF_LP2_COIN, NULL, 1);
+  test_computeEquilibriumRobustness_vs_checkEquilibrium(solver_DLP_coin, solver_PP, comPositions, PERF_DLP_COIN, NULL, 1);
 #endif
 
 

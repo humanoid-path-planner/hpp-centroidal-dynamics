@@ -1,9 +1,9 @@
 # - Try to find libcdd
 # Once done this will define
-#  CDD_FOUND - System has CDD
-#  CDD_INCLUDE_DIRS - The CDD include directories
-#  CDD_LIBRARIES - The libraries needed to use CDD
-#  CDD_DEFINITIONS - Compiler switches required for using CDD
+#  CLP_FOUND - System has CLP
+#  CLP_INCLUDE_DIRS - The CLP include directories
+#  CLP_LIBRARIES - The libraries needed to use CLP
+#  CLP_DEFINITIONS - Compiler switches required for using CLP
 
 # /usr/include/coin, /usr/lib/libClp.so
 
