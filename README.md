@@ -4,7 +4,7 @@ The main class that collects all the equilibrium-related algorithms is ```Static
 All the algorithms take as input:
 * A list of contact points
 * A list of contact normals
-* A list of friction coefficients
+* The contact friction coefficient
 * The number of generators used for the linear approximations of the friction cones
 * The mass of the system
 
