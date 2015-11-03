@@ -125,7 +125,7 @@ bool StaticEquilibrium::setNewContacts(Cref_matrixX3 contactPoints, Cref_matrixX
 }
 
 
-bool StaticEquilibrium::computeEquilibriumRobustness(Cref_vector2 com, double &robustness)
+LP_status StaticEquilibrium::computeEquilibriumRobustness(Cref_vector2 com, double &robustness)
 {
   const long m = m_G_centr.cols(); // number of gravito-inertial wrench generators
 
@@ -157,15 +157,15 @@ bool StaticEquilibrium::computeEquilibriumRobustness(Cref_vector2 com, double &r
     A.bottomLeftCorner(m,m)   = MatrixXX::Identity(m,m);
     A.bottomRightCorner(m,1)  = -VectorX::Ones(m);
 
-    LP_status lpStatus_primal = m_solver->solve(c, lb, ub, A, Alb, Aub, b_b0);
-    if(lpStatus_primal==LP_STATUS_OPTIMAL)
+    LP_status lpStatus = m_solver->solve(c, lb, ub, A, Alb, Aub, b_b0);
+    if(lpStatus==LP_STATUS_OPTIMAL)
     {
       robustness = -1.0*m_solver->getObjectiveValue();
-      return true;
+      return lpStatus;
     }
 
-    SEND_ERROR_MSG("Primal LP problem could not be solved: "+toString(lpStatus_primal));
-    return false;
+    SEND_DEBUG_MSG("Primal LP problem could not be solved: "+toString(lpStatus));
+    return lpStatus;
   }
 
   if(m_algorithm==STATIC_EQUILIBRIUM_ALGORITHM_LP2)
@@ -198,11 +198,11 @@ bool StaticEquilibrium::computeEquilibriumRobustness(Cref_vector2 com, double &r
     if(lpStatus_primal==LP_STATUS_OPTIMAL)
     {
       robustness = -1.0*m_solver->getObjectiveValue();
-      return true;
+      return lpStatus_primal;
     }
 
-    SEND_ERROR_MSG("Primal LP problem could not be solved: "+toString(lpStatus_primal));
-    return false;
+    SEND_DEBUG_MSG("Primal LP problem could not be solved: "+toString(lpStatus_primal));
+    return lpStatus_primal;
   }
 
   if(m_algorithm==STATIC_EQUILIBRIUM_ALGORITHM_DLP)
@@ -234,28 +234,28 @@ bool StaticEquilibrium::computeEquilibriumRobustness(Cref_vector2 com, double &r
     if(lpStatus_dual==LP_STATUS_OPTIMAL)
     {
       robustness = m_solver->getObjectiveValue();
-      return true;
+      return lpStatus_dual;
     }
 
-    SEND_ERROR_MSG("Dual LP problem for com position "+toString(com.transpose())+" could not be solved: "+toString(lpStatus_dual));
-    return false;
+    SEND_DEBUG_MSG("Dual LP problem for com position "+toString(com.transpose())+" could not be solved: "+toString(lpStatus_dual));
+    return lpStatus_dual;
   }
 
   SEND_ERROR_MSG("checkRobustEquilibrium is not implemented for the specified algorithm");
-  return false;
+  return LP_STATUS_ERROR;
 }
 
-bool StaticEquilibrium::checkRobustEquilibrium(Cref_vector2 com, bool &equilibrium, double e_max)
+LP_status StaticEquilibrium::checkRobustEquilibrium(Cref_vector2 com, bool &equilibrium, double e_max)
 {
   if(e_max!=0.0)
   {
     SEND_ERROR_MSG("checkRobustEquilibrium with e_max!=0 not implemented yet");
-    return false;
+    return LP_STATUS_ERROR;
   }
   if(m_algorithm!=STATIC_EQUILIBRIUM_ALGORITHM_PP)
   {
     SEND_ERROR_MSG("checkRobustEquilibrium is only implemented for the PP algorithm");
-    return false;
+    return LP_STATUS_ERROR;
   }
 
   VectorX res = m_HD * com + m_Hd;
@@ -263,14 +263,14 @@ bool StaticEquilibrium::checkRobustEquilibrium(Cref_vector2 com, bool &equilibri
     if(res(i)>0.0)
     {
       equilibrium = false;
-      return true;
+      return LP_STATUS_OPTIMAL;
     }
 
   equilibrium = true;
-  return true;
+  return LP_STATUS_OPTIMAL;
 }
 
-bool StaticEquilibrium::findExtremumOverLine(Cref_vector2 a, Cref_vector2 a0, double e_max, Ref_vector2 com)
+LP_status StaticEquilibrium::findExtremumOverLine(Cref_vector2 a, Cref_vector2 a0, double e_max, Ref_vector2 com)
 {
   const long m = m_G_centr.cols(); // number of gravito-inertial wrench generators
 
@@ -316,14 +316,14 @@ bool StaticEquilibrium::findExtremumOverLine(Cref_vector2 a, Cref_vector2 a0, do
         SEND_ERROR_MSG("Error while writing LP solution to file "+filename);
 #endif
 
-      return true;
+      return lpStatus_primal;
     }
 
     com = a0;
     SEND_DEBUG_MSG("Primal LP problem could not be solved suggesting that no equilibrium position with robustness "+
                      toString(e_max)+" exists over the line starting from "+toString(a0.transpose())+
                      " in direction "+toString(a.transpose())+", solver error code: "+toString(lpStatus_primal));
-    return false;
+    return lpStatus_primal;
   }
 
   if(m_algorithm==STATIC_EQUILIBRIUM_ALGORITHM_DLP)
@@ -369,29 +369,29 @@ bool StaticEquilibrium::findExtremumOverLine(Cref_vector2 a, Cref_vector2 a0, do
       if(m_solver_type==SOLVER_LP_QPOASES && p<-1e7)
       {
         SEND_DEBUG_MSG("Dual LP problem with robustness "+toString(e_max)+
-                         " over the line starting from "+toString(a0.transpose())+
+                       " over the line starting from "+toString(a0.transpose())+
                        " in direction "+toString(a.transpose())+" has large negative objective value: "+toString(p)+
-                         " suggesting it is probably unbounded.");
-        return false;
+                       " suggesting it is probably unbounded.");
+        return LP_STATUS_UNBOUNDED;
       }
-      return true;
+      return lpStatus_dual;
     }
 
     com = a0;
-    SEND_WARNING_MSG("Dual LP problem could not be solved suggesting that no equilibrium position with robustness "+
+    SEND_DEBUG_MSG("Dual LP problem could not be solved suggesting that no equilibrium position with robustness "+
                      toString(e_max)+" exists over the line starting from "+toString(a0.transpose())+
                      " in direction "+toString(a.transpose())+", solver error code: "+toString(lpStatus_dual));
-    return false;
+    return lpStatus_dual;
   }
 
   SEND_ERROR_MSG("checkRobustEquilibrium is not implemented for the specified algorithm");
-  return false;
+  return LP_STATUS_ERROR;
 }
 
-bool StaticEquilibrium::findExtremumInDirection(Cref_vector2 direction, Ref_vector2 com, double e_max)
+LP_status StaticEquilibrium::findExtremumInDirection(Cref_vector2 direction, Ref_vector2 com, double e_max)
 {
   SEND_ERROR_MSG("findExtremumInDirection not implemented yet");
-  return false;
+  return LP_STATUS_ERROR;
 }
 
 bool StaticEquilibrium::computePolytopeProjection(Cref_matrix6X v)

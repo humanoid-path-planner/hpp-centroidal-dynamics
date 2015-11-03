@@ -101,9 +101,9 @@ public:
    *     d         is the 6d vector containing the gravity part of the gravito-inertial wrench
    * @param com The 2d center of mass position to test.
    * @param robustness The computed measure of robustness.
-   * @return True if the operation succeeded, false otherwise.
+   * @return The status of the LP solver.
    */
-  bool computeEquilibriumRobustness(Cref_vector2 com, double &robustness);
+  LP_status computeEquilibriumRobustness(Cref_vector2 com, double &robustness);
 
   /**
    * @brief Check whether the specified com position is in robust equilibrium.
@@ -122,9 +122,9 @@ public:
    * @param com The 2d center of mass position to test.
    * @param equilibrium True if com is in robust equilibrium, false otherwise.
    * @param e_max Desired robustness level.
-   * @return True if the operation succeeded, false otherwise.
+   * @return The status of the LP solver.
    */
-  bool checkRobustEquilibrium(Cref_vector2 com, bool &equilibrium, double e_max=0.0);
+  LP_status checkRobustEquilibrium(Cref_vector2 com, bool &equilibrium, double e_max=0.0);
 
   /**
    * @brief Compute the extremum CoM position over the line a*x + a0 that is in robust equilibrium.
@@ -143,9 +143,9 @@ public:
    * @param a 2d vector representing the line direction
    * @param a0 2d vector representing an arbitrary point over the line
    * @param e_max Desired robustness in terms of the maximum force error tolerated by the system
-   * @return True if the operation succeeded, false otherwise.
+   * @return The status of the LP solver.
   */
-  bool findExtremumOverLine(Cref_vector2 a, Cref_vector2 a0, double e_max, Ref_vector2 com);
+  LP_status findExtremumOverLine(Cref_vector2 a, Cref_vector2 a0, double e_max, Ref_vector2 com);
 
   /**
    * @brief Find the extremum com position that is in robust equilibrium in the specified direction.
@@ -165,9 +165,9 @@ public:
    * @param direction Desired 2d direction.
    * @param com Output 2d com position.
    * @param e_max Desired robustness level.
-   * @return True if the operation succeeded, false otherwise.
+   * @return The status of the LP solver.
    */
-  bool findExtremumInDirection(Cref_vector2 direction, Ref_vector2 com, double e_max=0.0);
+  LP_status findExtremumInDirection(Cref_vector2 direction, Ref_vector2 com, double e_max=0.0);
 
 };
 

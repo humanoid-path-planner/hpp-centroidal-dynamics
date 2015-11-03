@@ -13,6 +13,9 @@
 namespace robust_equilibrium
 {
 
+/**
+  * Available LP solvers.
+  */
 enum ROBUST_EQUILIBRIUM_DLLAPI SolverLP
 {
 #ifdef CLP_FOUND
@@ -21,22 +24,35 @@ enum ROBUST_EQUILIBRIUM_DLLAPI SolverLP
   SOLVER_LP_QPOASES
 };
 
+
+/**
+  * Possible states of an LP solver.
+  */
 enum ROBUST_EQUILIBRIUM_DLLAPI LP_status
 {
-  LP_STATUS_UNKNOWN=-1, //before solve or if postSolve says not optimal
+  LP_STATUS_UNKNOWN=-1,
   LP_STATUS_OPTIMAL=0,
   LP_STATUS_INFEASIBLE=1,
-  LP_STATUS_DUAL_INFEASIBLE=2,
+  LP_STATUS_UNBOUNDED=2,
   LP_STATUS_MAX_ITER_REACHED=3,
   LP_STATUS_ERROR=4
 };
 
+
+/**
+ * @brief Abstract interface for a Linear Program (LP) solver.
+ */
 class ROBUST_EQUILIBRIUM_DLLAPI Solver_LP_abstract
 {
 public:
 
   Solver_LP_abstract(){}
 
+  /**
+   * @brief Create a new LP solver of the specified type.
+   * @param solverType Type of LP solver.
+   * @return A pointer to the new solver.
+   */
   static Solver_LP_abstract* getNewSolver(SolverLP solverType);
 
   /** Solve the linear program
@@ -100,8 +116,6 @@ public:
   virtual double getObjectiveValue() = 0;
 
   virtual void getDualSolution(Ref_vectorX res) = 0;
-
-//  virtual void getDualColumnSolution(Ref_vectorX res) = 0;
 
   /** Get the current maximum number of iterations performed
    *  by the solver.

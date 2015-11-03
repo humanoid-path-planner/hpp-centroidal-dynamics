@@ -42,7 +42,8 @@ int test_computeEquilibriumRobustness_vs_checkEquilibrium(StaticEquilibrium solv
 {
   int error_counter = 0;
   double rob;
-  bool status, equilibrium;
+  LP_status status;
+  bool equilibrium;
   for(unsigned int i=0; i<comPositions.rows(); i++)
   {
     if(PERF_STRING_1!=NULL)
@@ -51,7 +52,7 @@ int test_computeEquilibriumRobustness_vs_checkEquilibrium(StaticEquilibrium solv
     if(PERF_STRING_1!=NULL)
       getProfiler().stop(PERF_STRING_1);
 
-    if(status==false)
+    if(status!=LP_STATUS_OPTIMAL)
     {
       if(verb>1)
         SEND_ERROR_MSG(solver_1.getName()+" failed to compute robustness of com position "+toString(comPositions.row(i)));
@@ -65,7 +66,7 @@ int test_computeEquilibriumRobustness_vs_checkEquilibrium(StaticEquilibrium solv
     if(PERF_STRING_2!=NULL)
       getProfiler().stop(PERF_STRING_2);
 
-    if(status==false)
+    if(status!=LP_STATUS_OPTIMAL)
     {
       if(verb>1)
         SEND_ERROR_MSG(solver_2.getName()+" failed to check equilibrium of com position "+toString(comPositions.row(i)));
@@ -105,14 +106,14 @@ int test_computeEquilibriumRobustness(StaticEquilibrium solver_1, StaticEquilibr
 {
   int error_counter = 0;
   double rob_1, rob_2;
-  bool status;
+  LP_status status;
   for(unsigned int i=0; i<comPositions.rows(); i++)
   {
     getProfiler().start(PERF_STRING_1);
     status = solver_1.computeEquilibriumRobustness(comPositions.row(i), rob_1);
     getProfiler().stop(PERF_STRING_1);
 
-    if(status==false)
+    if(status!=LP_STATUS_OPTIMAL)
     {
       if(verb>1)
         SEND_ERROR_MSG(solver_1.getName()+" failed to compute robustness of com position "+toString(comPositions.row(i)));
@@ -124,7 +125,7 @@ int test_computeEquilibriumRobustness(StaticEquilibrium solver_1, StaticEquilibr
     status = solver_2.computeEquilibriumRobustness(comPositions.row(i), rob_2);
     getProfiler().stop(PERF_STRING_2);
 
-    if(status==false)
+    if(status!=LP_STATUS_OPTIMAL)
     {
       if(verb>1)
         SEND_ERROR_MSG(solver_2.getName()+" failed to compute robustness of com position "+toString(comPositions.row(i)));
@@ -164,7 +165,7 @@ int test_findExtremumOverLine(StaticEquilibrium &solver_to_test, StaticEquilibri
 {
   int error_counter = 0;
   Vector2 a, com;
-  bool status;
+  LP_status status;
   double desired_robustness, robustness;
   for(unsigned int i=0; i<N_TESTS; i++)
   {
@@ -178,10 +179,10 @@ int test_findExtremumOverLine(StaticEquilibrium &solver_to_test, StaticEquilibri
     status  = solver_to_test.findExtremumOverLine(a, a0, desired_robustness, com);
     getProfiler().stop(PERF_STRING_TEST);
 
-    if(status==false)
+    if(status!=LP_STATUS_OPTIMAL)
     {
       status = solver_ground_truth.computeEquilibriumRobustness(a0, robustness);
-      if(status==false)
+      if(status!=LP_STATUS_OPTIMAL)
       {
         error_counter++;
         if(verb>1)
@@ -202,7 +203,7 @@ int test_findExtremumOverLine(StaticEquilibrium &solver_to_test, StaticEquilibri
     status = solver_ground_truth.computeEquilibriumRobustness(com, robustness);
     getProfiler().stop(PERF_STRING_GROUND_TRUTH);
 
-    if(status==false)
+    if(status!=LP_STATUS_OPTIMAL)
     {
       error_counter++;
       if(verb>1)
@@ -233,10 +234,16 @@ void drawRobustnessGrid(StaticEquilibrium &solver, Cref_matrixXX comPositions)
 {
   int grid_size = (int)sqrt(comPositions.rows());
   double rob ;
-  bool status;
+  LP_status status;
   for(unsigned int i=0; i<comPositions.rows(); i++)
   {
     status = solver.computeEquilibriumRobustness(comPositions.row(i), rob);
+    if(status!=LP_STATUS_OPTIMAL)
+    {
+      SEND_ERROR_MSG("Faild to compute equilibrium robustness of com position "+toString(comPositions.row(i))+", error code "+toString(status));
+      rob = -1.0;
+    }
+
     if(rob>=0.0)
     {
       if(rob>9.0)
@@ -298,9 +305,6 @@ int main()
   MatrixXX N = MatrixXX::Zero(4*N_CONTACTS,3); // contact normals
   VectorX frictionCoefficients(4*N_CONTACTS);
   frictionCoefficients.fill(mu);
-
-//  contact_pos << 0.122,  0.361,  0.071, 0.243,  0.029,  0.112;
-//  contact_rpy << 0.205, -0.005, -1.335, -0.02 ,  0.206,  0.506;
 
   // Generate contact positions and orientations
   bool collision;
@@ -477,10 +481,10 @@ int main()
   const int N_TESTS = 100;
   Vector2 a0 = 0.5*(com_LB+com_UB);
   double e_max;
-  bool status = solver_LP_oases.computeEquilibriumRobustness(a0, e_max);
-  if(status==false)
+  LP_status status = solver_LP_oases.computeEquilibriumRobustness(a0, e_max);
+  if(status!=LP_STATUS_OPTIMAL)
   {
-    SEND_ERROR_MSG(solver_LP_oases.getName()+" failed to compute robustness of com position "+toString(a0.transpose()));
+    SEND_ERROR_MSG(solver_LP_oases.getName()+" failed to compute robustness of com position "+toString(a0.transpose())+", error code: "+toString(status));
   }
   else
   {

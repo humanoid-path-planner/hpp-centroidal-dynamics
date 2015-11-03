@@ -80,7 +80,7 @@ namespace robust_equilibrium
     if(ss==-2)
        return LP_STATUS_INFEASIBLE;
     if(ss==-3)
-      return LP_STATUS_DUAL_INFEASIBLE;
+      return LP_STATUS_UNBOUNDED;
     return LP_STATUS_ERROR;
   }
 
