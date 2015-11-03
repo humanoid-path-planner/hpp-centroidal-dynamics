@@ -32,6 +32,66 @@ Solver_LP_abstract* Solver_LP_abstract::getNewSolver(SolverLP solverType)
   return NULL;
 }
 
+bool Solver_LP_abstract::writeLpToFile(const char* filename,
+                                       Cref_vectorX c, Cref_vectorX lb, Cref_vectorX ub,
+                                       Cref_matrixXX A, Cref_vectorX Alb, Cref_vectorX Aub)
+{
+  MatrixXX::Index n=c.size(), m=A.rows();
+  assert(lb.size()==n);
+  assert(ub.size()==n);
+  assert(A.cols()==n);
+  assert(Alb.size()==m);
+  assert(Aub.size()==m);
+
+  std::ofstream out(filename, std::ios::out | std::ios::binary | std::ios::trunc);
+  out.write((char*) (&n), sizeof(typename MatrixXX::Index));
+  out.write((char*) (&m), sizeof(typename MatrixXX::Index));
+  out.write((char*) c.data(), n*sizeof(typename MatrixXX::Scalar) );
+  out.write((char*) lb.data(), n*sizeof(typename MatrixXX::Scalar) );
+  out.write((char*) ub.data(), n*sizeof(typename MatrixXX::Scalar) );
+  out.write((char*) A.data(), m*n*sizeof(typename MatrixXX::Scalar) );
+  out.write((char*) Alb.data(), m*sizeof(typename MatrixXX::Scalar) );
+  out.write((char*) Aub.data(), m*sizeof(typename MatrixXX::Scalar) );
+  out.close();
+  return true;
+}
+
+bool Solver_LP_abstract::readLpFromFile(const char* filename,
+                                        VectorX &c, VectorX &lb, VectorX &ub,
+                                        MatrixXX &A, VectorX &Alb, VectorX &Aub)
+{
+  std::ifstream in(filename, std::ios::in | std::ios::binary);
+  typename MatrixXX::Index n=0, m=0;
+  in.read((char*) (&n),sizeof(typename MatrixXX::Index));
+  in.read((char*) (&m),sizeof(typename MatrixXX::Index));
+  c.resize(n);
+  lb.resize(n);
+  ub.resize(n);
+  A.resize(m,n);
+  Alb.resize(m);
+  Aub.resize(m);
+  in.read( (char *) c.data() , n*sizeof(typename MatrixXX::Scalar) );
+  in.read( (char *) lb.data() , n*sizeof(typename MatrixXX::Scalar) );
+  in.read( (char *) ub.data() , n*sizeof(typename MatrixXX::Scalar) );
+  in.read( (char *) A.data() , m*n*sizeof(typename MatrixXX::Scalar) );
+  in.read( (char *) Alb.data() , m*sizeof(typename MatrixXX::Scalar) );
+  in.read( (char *) Aub.data() , m*sizeof(typename MatrixXX::Scalar) );
+  in.close();
+  return true;
+}
+
+LP_status Solver_LP_abstract::solve(const char* filename, Ref_vectorX sol)
+{
+  VectorX c, lb, ub, Alb, Aub;
+  MatrixXX A;
+  if(!readLpFromFile(filename, c, lb, ub, A, Alb, Aub))
+  {
+    SEND_ERROR_MSG("Error while reading LP from file "+string(filename));
+    return LP_STATUS_ERROR;
+  }
+  return solve(c, lb, ub, A, Alb, Aub, sol);
+}
+
 
 
 } // end namespace robust_equilibrium

@@ -13,6 +13,7 @@
 
 #include <qpOASES.hpp>
 #include <robust-equilibrium-lib/solver_LP_qpoases.hh>
+#include <robust-equilibrium-lib/logger.hh>
 
 #include <iostream>
 #include <iomanip>
@@ -370,9 +371,10 @@ void test_small_LP()
 
 int main()
 {
-  cout <<"Test LP Solvers\n";
+  cout <<"Test LP Solvers\n\n";
 
   {
+    cout<<"TEST QP OASES ON A SMALL 2-VARIABLE LP\n";
     /* Setup data of first LP. */
     real_t A[1*2] = { 1.0, 1.0 };
     real_t g[2] = { 1.5, 1.0 };
@@ -392,6 +394,45 @@ int main()
     int nWSR = 10;
     example.init( 0,g,A,lb,ub,lbA,ubA, nWSR,0 );
   }
+
+  {
+    cout<<"\nTEST READ-WRITE METHODS OF SOLVER_LP_ABSTRACT\n";
+    Solver_LP_abstract *solverOases = Solver_LP_abstract::getNewSolver(SOLVER_LP_QPOASES);
+    const int n = 3;
+    const int m = 4;
+    const char* filename = "small_3_x_4_LP.dat";
+    VectorX c = VectorX::Random(n);
+    VectorX lb = -100*VectorX::Ones(n);
+    VectorX ub = 100*VectorX::Ones(n);
+    MatrixXX A = MatrixXX::Random(m,n);
+    VectorX Alb = -100*VectorX::Ones(m);
+    VectorX Aub = 100*VectorX::Ones(m);
+    if(!solverOases->writeLpToFile(filename, c, lb, ub, A, Alb, Aub))
+    {
+      SEND_ERROR_MSG("Error while writing LP to file");
+      return -1;
+    }
+    VectorX c2, lb2, ub2, Alb2, Aub2;
+    MatrixXX A2;
+    if(!solverOases->readLpFromFile(filename, c2, lb2, ub2, A2, Alb2, Aub2))
+    {
+      SEND_ERROR_MSG("Error while reading LP from file");
+      return -1;
+    }
+
+    cout<<"Check number of variables: "<<(c.size()==c2.size())<<endl;
+    cout<<"Check number of constraints: "<<(A.rows()==A2.rows())<<endl;
+    cout<<"Check gradient vector c: "<<c.isApprox(c2)<<endl;
+    cout<<"Check lower bound vector lb: "<<lb.isApprox(lb2)<<endl;
+    cout<<"Check upper bound vector ub: "<<ub.isApprox(ub2)<<endl;
+    cout<<"Check constraint matrix A: "<<A.isApprox(A2)<<endl;
+    cout<<"Check constraint lower bound vector Alb: "<<Alb.isApprox(Alb2)<<endl;
+    cout<<"Check constraint upper bound vector Aub: "<<Aub.isApprox(Aub2)<<endl;
+
+    return 0;
+  }
+
+
 
 #ifdef CLP_FOUND
   test_addRows();
@@ -416,40 +457,6 @@ int main()
   else
     cout<<"solver_LP_clp failed to solve the problem\n";
 #endif
-
-//  char x[81];
-//  int iRow;
-//  // get row copy
-//  CoinPackedMatrix rowCopy = *model.matrix();
-//  rowCopy.reverseOrdering();
-//  const int * column = rowCopy.getIndices();
-//  const int * rowLength = rowCopy.getVectorLengths();
-//  const CoinBigIndex * rowStart = rowCopy.getVectorStarts();
-//  x[n] = '\0';
-//  for (iRow = 0; iRow < m; iRow++) {
-//    memset(x, ' ', n);
-//    for (int k = rowStart[iRow]; k < rowStart[iRow] + rowLength[iRow]; k++) {
-//      int iColumn = column[k];
-//      x[iColumn] = 'x';
-//    }
-//    cout<<x<<endl;
-//  }
-//  cout<<endl;
-
-//  // Now matrix
-//  CoinPackedMatrix * matrix = model.matrix();
-//  const double * element = matrix->getElements();
-//  const int * row = matrix->getIndices();
-//  const int * start = matrix->getVectorStarts();
-//  const int * length = matrix->getVectorLengths();
-//  for (int iColumn = 0; iColumn < n; iColumn++)
-//  {
-//       cout << "Column " << iColumn;
-//       int j;
-//       for (j = start[iColumn]; j < start[iColumn] + length[iColumn]; j++)
-//            cout << " ( " << row[j] << ", " << element[j] << ")";
-//       cout << endl;
-//  }
 
   return 1;
 }
