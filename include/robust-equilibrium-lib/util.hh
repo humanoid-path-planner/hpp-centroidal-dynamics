@@ -57,24 +57,6 @@ typedef const Eigen::Ref<const MatrixX3>    & Cref_matrixX3;
 typedef const Eigen::Ref<const Matrix43>    & Cref_matrix43;
 typedef const Eigen::Ref<const Matrix6X>    & Cref_matrix6X;
 typedef const Eigen::Ref<const MatrixXX>    & Cref_matrixXX;
-#else
-typedef Vector2     & Ref_vector2;
-typedef Vector3     & Ref_vector3;
-typedef VectorX     & Ref_vectorX;
-typedef Rotation    & Ref_rotation;
-typedef MatrixX3    & Ref_matrixX3;
-typedef Matrix43    & Ref_matrix43;
-typedef Matrix6X    & Ref_matrix6X;
-typedef MatrixXX    & Ref_matrixXX;
-
-typedef const Vector2     & Cref_vector2;
-typedef const Vector3     & Cref_vector3;
-typedef const VectorX     & Cref_vectorX;
-typedef const Rotation    & Cref_rotation;
-typedef const MatrixX3    & Cref_matrixX3;
-typedef const Matrix43    & Cref_matrix43;
-typedef const Matrix6X    & Cref_matrix6X;
-typedef const MatrixXX    & Cref_matrixXX;
 #endif
 
 /**

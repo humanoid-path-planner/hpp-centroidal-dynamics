@@ -24,10 +24,10 @@ StaticEquilibrium::StaticEquilibrium(string name, double mass, unsigned int gene
     m_is_cdd_initialized = true;
   }
 
-  if(generatorsPerContact!=4)
+  if(generatorsPerContact<3)
   {
-    SEND_WARNING_MSG("Algorithm currently supports only 4 generators per contact!");
-    generatorsPerContact = 4;
+    SEND_WARNING_MSG("Algorithm cannot work with less than 3 generators per contact!");
+    generatorsPerContact = 3;
   }
 
   m_name = name;
@@ -66,18 +66,16 @@ bool StaticEquilibrium::setNewContacts(Cref_matrixX3 contactPoints, Cref_matrixX
 
   // compute tangent directions
   long int c = contactPoints.rows();
-  int cg = m_generatorsPerContact;
-  double muu;
+  unsigned int &cg = m_generatorsPerContact;
+  double theta, delta_theta=2*M_PI/cg;
   // Tangent directions
-  RVector3 T1, T2;
-  // Matrix mapping contact forces to gravito-inertial wrench (6 X 3)
+  Vector3 T1, T2;
+  // Matrix mapping a 3d contact force to gravito-inertial wrench (6 X 3)
   Matrix63 A;
   A.topRows<3>() = -Matrix3::Identity();
   // Lists of contact generators (3 X generatorsPerContact)
   Matrix3X G(3, cg);
-  long int m = c*cg;           // number of generators
-  m_G_centr.resize(6,m);
-
+  m_G_centr.resize(6,c*cg);
 
   for(long int i=0; i<c; i++)
   {
@@ -95,32 +93,24 @@ bool StaticEquilibrium::setNewContacts(Cref_matrixX3 contactPoints, Cref_matrixX
     T1.normalize();
     T2.normalize();
 
-//    cout<<"Contact point "<<i<<"\nT1="<<T1<<"\nT2="<<T2<<"\n";
-
     // compute matrix mapping contact forces to gravito-inertial wrench
     A.bottomRows<3>() = crossMatrix(-1.0*contactPoints.row(i).transpose());
-//    cout<<"A:\n"<<A<<"\n";
 
     // compute generators
-    muu = frictionCoefficients(i)/sqrt(2.0);
-    G.col(0) =  muu*T1 + muu*T2 + contactNormals.row(i);
-    G.col(1) =  muu*T1 - muu*T2 + contactNormals.row(i);
-    G.col(2) = -muu*T1 + muu*T2 + contactNormals.row(i);
-    G.col(3) = -muu*T1 - muu*T2 + contactNormals.row(i);
-
-    // normalize generators
-    G.col(0).normalize();
-    G.col(1).normalize();
-    G.col(2).normalize();
-    G.col(3).normalize();
-
-//    cout<<"Generators contact "<<i<<"\n"<<G.transpose()<<"\n";
+    theta = 0.0;
+    for(int j=0; j<cg; j++)
+    {
+      G.col(j) = frictionCoefficients(i)*sin(theta)*T1
+                + frictionCoefficients(i)*cos(theta)*T2
+                + contactNormals.row(i).transpose();
+      G.col(j).normalize();
+//      SEND_DEBUG_MSG("Contact "+toString(i)+" generator "+toString(j)+" = "+toString(G.col(j).transpose()));
+      theta += delta_theta;
+    }
 
     // project generators in 6d centroidal space
     m_G_centr.block(0,cg*i,6,cg) = A * G;
   }
-
-//  cout<<"G_centr:\n"<<m_G_centr.transpose()<<"\n";
 
   if(m_algorithm==STATIC_EQUILIBRIUM_ALGORITHM_PP)
   {

@@ -75,19 +75,19 @@ int test_computeEquilibriumRobustness_vs_checkEquilibrium(StaticEquilibrium solv
 
     if(equilibrium==true && rob<0.0)
     {
-      if(verb>0)
-        SEND_ERROR_MSG(solver_1.getName()+" says com is in equilibrium while "+solver_2.getName()+" computed a negative robustness measure "+toString(rob));
+      if(verb>1)
+        SEND_ERROR_MSG(solver_2.getName()+" says com is in equilibrium while "+solver_1.getName()+" computed a negative robustness measure "+toString(rob));
       error_counter++;
     }
     else if(equilibrium==false && rob>0.0)
     {
-      if(verb>0)
-        SEND_ERROR_MSG(solver_1.getName()+" says com is not in equilibrium while "+solver_2.getName()+" computed a positive robustness measure "+toString(rob));
+      if(verb>1)
+        SEND_ERROR_MSG(solver_2.getName()+" says com is not in equilibrium while "+solver_1.getName()+" computed a positive robustness measure "+toString(rob));
       error_counter++;
     }
   }
 
-  if(verb>1)
+  if(verb>0)
     cout<<"Test test_computeEquilibriumRobustness_vs_checkEquilibrium "+solver_1.getName()+" VS "+solver_2.getName()+": "+toString(error_counter)+" error(s).\n";
   return error_counter;
 }
@@ -260,20 +260,23 @@ int main()
   /************************************** USER PARAMETERS *******************************/
   double mass = 70.0;
   double mu = 0.3;  // friction coefficient
-  unsigned int generatorsPerContact = 4;
+  unsigned int generatorsPerContact = 8;
   unsigned int N_CONTACTS = 2;
   double MIN_FEET_DISTANCE = 0.3;
-  double LX = 0.5*0.2172;        // half foot size in x direction
-  double LY = 0.5*0.138;         // half foot size in y direction
+  double LX = 0.5*0.2172;        // half contact surface size in x direction
+  double LY = 0.5*0.138;         // half contact surface size in y direction
   CONTACT_POINT_LOWER_BOUNDS << 0.0,  0.0,  0.0;
   CONTACT_POINT_UPPER_BOUNDS << 0.5,  0.5,  0.5;
   double gamma = atan(mu);   // half friction cone angle
-  RPY_LOWER_BOUNDS << -1*gamma, -1*gamma, -M_PI;
-  RPY_UPPER_BOUNDS << +1*gamma, +1*gamma, +M_PI;
+  RPY_LOWER_BOUNDS << -0*gamma, -0*gamma, -M_PI;
+  RPY_UPPER_BOUNDS << +0*gamma, +0*gamma, +M_PI;
   double X_MARG = 0.07;
   double Y_MARG = 0.07;
   const int GRID_SIZE = 15;
   /************************************ END USER PARAMETERS *****************************/
+
+  cout<<"Number of contacts: "<<N_CONTACTS<<endl;
+  cout<<"Number of generators per contact: "<<generatorsPerContact<<endl;
 
   StaticEquilibrium solver_PP("PP", mass, generatorsPerContact, SOLVER_LP_QPOASES);
   StaticEquilibrium solver_LP_oases("LP oases", mass, generatorsPerContact, SOLVER_LP_QPOASES);
@@ -447,6 +450,7 @@ int main()
 #endif
 
 
+  cout<<"\nRobustness grid computed with DLP oases\n";
   drawRobustnessGrid(solver_DLP_oases, comPositions);
 
   test_computeEquilibriumRobustness(solver_DLP_oases, solver_LP_oases, comPositions, PERF_DLP_OASES, PERF_LP_OASES, 1);
