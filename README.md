@@ -1,11 +1,37 @@
 # RobustEquilibriumLib
 Utility classes to check the (robust) equilibrium of a system in contact with the environment.
+The main class that collects all the equilibrium-related algorithms is ```StaticEquilibrium```.
+All the algorithms take as input:
+* A list of contact points
+* A list of contact normals
+* A list of friction coefficients
+* The number of generators used for the linear approximations of the friction cones
+* The mass of the system
+
+Once these input parameters have been specified the user has access to four main algorithms:
+* computeEquilibriumRobustness: compute the robustness of the equilibrium of a given a CoM (center of mass) position (negative values mean the system can not be in equilibrium).
+* checkRobustEquilibrium: checks whether the system can be in equilibrium in a specified CoM position and with a specified robustness level.
+* findExtremumOverLine: Find the extremum com position that is in robust equilibrium along the specified line.
+* findExtremumInDirection: Find the extremum com position that is in robust equilibrium in the specified direction.
+
+All these problems boil down to solving Linear Programs.
+Different formulations are implemented and tested in ```test_static_equilibrium```.
+More details can be found in the code documentation.
+In the end, we found the dual LP formulation (DLP) to be the fastest.
+
+The test ```test_LP_solvers``` tries to solve some LP problems using qpOases and checks that the results are correct.
 
 ## Dependencies
-Eigen (at least version 3.2.2), cdd lib, qpOases.
+* [Eigen (version >= 3.2.2)](http://eigen.tuxfamily.org/index.php?title=Main_Page)
+* [cdd lib](https://www.inf.ethz.ch/personal/fukudak/cdd_home/)
+* [qpOases (version >= 3.0beta)](https://projects.coin-or.org/qpOASES)
+
 You can install cdd lib under Ubuntu 12.04 with the following command:
 ```
 sudo apt-get install libcdd-dev
 ```
-To install qpOases follow the instructions you can find at this page: https://projects.coin-or.org/qpOASES
-For Eigen follow the instructions you can find at this page: http://eigen.tuxfamily.org/index.php?title=Main_Page
+For Eigen and qpOases follow the instructions at the relative webpage (links in the list above).
+
+### Optional
+As an alternative to qpOases you can use [CLP](https://projects.coin-or.org/Clp) to solve linear programs.
+However, we found qpOases to be faster and more reliable, so we suggest you to stick with qpOases.

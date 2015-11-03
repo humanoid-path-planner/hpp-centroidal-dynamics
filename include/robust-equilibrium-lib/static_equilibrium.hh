@@ -74,6 +74,8 @@ public:
 
   /**
    * @brief Specify a new set of contacts.
+   * All 3d vectors are expressed in a reference frame having the z axis aligned with gravity.
+   * In other words the gravity vecotr is (0, 0, -9.81).
    * @param contactPoints List of N 3d contact points as an Nx3 matrix.
    * @param contactNormals List of N 3d contact normal directions as an Nx3 matrix.
    * @param frictionCoefficients List of N friction coefficients.
