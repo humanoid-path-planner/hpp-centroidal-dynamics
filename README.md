@@ -8,11 +8,11 @@ All the algorithms take as input:
 * The number of generators used for the linear approximations of the friction cones
 * The mass of the system
 
-Once these input parameters have been specified the user has access to four main algorithms:
-* computeEquilibriumRobustness: compute the robustness of the equilibrium of a given a CoM (center of mass) position (negative values mean the system can not be in equilibrium).
-* checkRobustEquilibrium: checks whether the system can be in equilibrium in a specified CoM position and with a specified robustness level.
-* findExtremumOverLine: Find the extremum com position that is in robust equilibrium along the specified line.
-* findExtremumInDirection: Find the extremum com position that is in robust equilibrium in the specified direction.
+Once these input parameters have been specified, the user has access to four algorithms implemented in the following four methods of the class ```StaticEquilibrium```:
+* ```computeEquilibriumRobustness```: compute the robustness of the equilibrium of a given a CoM (center of mass) position (negative values mean the system can not be in equilibrium).
+* ```checkRobustEquilibrium```: checks whether the system can be in equilibrium in a specified CoM position and with a specified robustness level.
+* ```findExtremumOverLine```: Find the extremum com position that is in robust equilibrium along the specified line.
+* ```findExtremumInDirection```: Find the extremum com position that is in robust equilibrium in the specified direction.
 
 All these problems boil down to solving Linear Programs.
 Different formulations are implemented and tested in ```test_static_equilibrium```.
