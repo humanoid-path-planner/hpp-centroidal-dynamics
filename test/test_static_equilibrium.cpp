@@ -260,8 +260,8 @@ int main()
   /************************************** USER PARAMETERS *******************************/
   double mass = 70.0;
   double mu = 0.3;  // friction coefficient
-  unsigned int generatorsPerContact = 8;
-  unsigned int N_CONTACTS = 2;
+  unsigned int generatorsPerContact = 4;
+  unsigned int N_CONTACTS = 1;
   double MIN_FEET_DISTANCE = 0.3;
   double LX = 0.5*0.2172;        // half contact surface size in x direction
   double LY = 0.5*0.138;         // half contact surface size in y direction
@@ -272,7 +272,7 @@ int main()
   RPY_UPPER_BOUNDS << +0*gamma, +0*gamma, +M_PI;
   double X_MARG = 0.07;
   double Y_MARG = 0.07;
-  const int GRID_SIZE = 15;
+  const int GRID_SIZE = 5;
   /************************************ END USER PARAMETERS *****************************/
 
   cout<<"Number of contacts: "<<N_CONTACTS<<endl;

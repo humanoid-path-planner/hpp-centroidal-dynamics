@@ -54,7 +54,7 @@ public:
    * @param sol Output solution of the LP.
    * @return A flag describing the final status of the solver.
    */
-  virtual LP_status solve(const char* filename, Ref_vectorX sol);
+  virtual LP_status solve(const std::string& filename, Ref_vectorX sol);
 
   /**
    * @brief Write the specified Linear Program to binary file.
@@ -70,7 +70,7 @@ public:
    * @param Aub
    * @return True if the operation succeeded, false otherwise.
    */
-  virtual bool writeLpToFile(const char* filename,
+  virtual bool writeLpToFile(const std::string& filename,
                              Cref_vectorX c, Cref_vectorX lb, Cref_vectorX ub,
                              Cref_matrixXX A, Cref_vectorX Alb, Cref_vectorX Aub);
 
@@ -89,7 +89,7 @@ public:
    * @param Aub
    * @return True if the operation succeeded, false otherwise.
    */
-  virtual bool readLpFromFile(const char* filename,
+  virtual bool readLpFromFile(const std::string& filename,
                               VectorX &c, VectorX &lb, VectorX &ub,
                               MatrixXX &A, VectorX &Alb, VectorX &Aub);
 

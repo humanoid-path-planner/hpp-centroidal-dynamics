@@ -7,6 +7,7 @@
 #define _ROBUST_EQUILIBRIUM_LIB_CONFIG_HH
 
 #include <robust-equilibrium-lib/util.hh>
+#include <ctime>
 
 namespace robust_equilibrium
 {
@@ -128,6 +129,17 @@ Rotation crossMatrix(Cref_vector3 x)
     res(1,0) =   x(2); res(1,2) = - x(0);
     res(2,0) = - x(1); res(2,1) =   x(0);
     return res;
+}
+
+std::string getDateAndTimeAsString()
+{
+  time_t rawtime;
+  struct tm * timeinfo;
+  char buffer[80];
+  time (&rawtime);
+  timeinfo = localtime(&rawtime);
+  strftime(buffer,80,"%Y%m%d_%I%M%S",timeinfo);
+  return std::string(buffer);
 }
 
 } //namespace robust_equilibrium

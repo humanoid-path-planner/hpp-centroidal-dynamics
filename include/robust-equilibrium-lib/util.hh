@@ -66,29 +66,31 @@ namespace robust_equilibrium
    * Write the specified matrix to a binary file with the specified name.
    */
   template<class Matrix>
-  void writeMatrixToFile(const char* filename, const Matrix& matrix)
+  bool writeMatrixToFile(const std::string &filename, const Matrix& matrix)
   {
-    std::ofstream out(filename, std::ios::out | std::ios::binary | std::ios::trunc);
+    std::ofstream out(filename.c_str(), std::ios::out | std::ios::binary | std::ios::trunc);
     typename Matrix::Index rows=matrix.rows(), cols=matrix.cols();
     out.write((char*) (&rows), sizeof(typename Matrix::Index));
     out.write((char*) (&cols), sizeof(typename Matrix::Index));
     out.write((char*) matrix.data(), rows*cols*sizeof(typename Matrix::Scalar) );
     out.close();
+    return true;
   }
 
   /**
    * Read a matrix from the specified input binary file.
    */
   template<class Matrix>
-  void readMatrixFromFile(const char* filename, Matrix& matrix)
+  bool readMatrixFromFile(const std::string &filename, Matrix& matrix)
   {
-    std::ifstream in(filename, std::ios::in | std::ios::binary);
+    std::ifstream in(filename.c_str(), std::ios::in | std::ios::binary);
     typename Matrix::Index rows=0, cols=0;
     in.read((char*) (&rows),sizeof(typename Matrix::Index));
     in.read((char*) (&cols),sizeof(typename Matrix::Index));
     matrix.resize(rows, cols);
     in.read( (char *) matrix.data() , rows*cols*sizeof(typename Matrix::Scalar) );
     in.close();
+    return true;
   }
 
   /**
@@ -115,6 +117,8 @@ namespace robust_equilibrium
 
   bool generate_rectangle_contacts(double lx, double ly, Cref_vector3 pos, Cref_vector3 rpy,
                                    Ref_matrix43 p, Ref_matrix43 N);
+
+  std::string getDateAndTimeAsString();
 
 } //namespace robust_equilibrium
 

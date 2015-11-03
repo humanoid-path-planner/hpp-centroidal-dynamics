@@ -8,6 +8,7 @@
 #include <robust-equilibrium-lib/stop-watch.hh>
 #include <iostream>
 #include <vector>
+#include <ctime>
 
 using namespace std;
 
@@ -303,6 +304,18 @@ bool StaticEquilibrium::findExtremumOverLine(Cref_vector2 a, Cref_vector2 a0, do
     if(lpStatus_primal==LP_STATUS_OPTIMAL)
     {
       com = a0 + a*b_p(m);
+
+#define WRITE_LPS_TO_FILE
+#ifdef WRITE_LPS_TO_FILE
+      string date_time = getDateAndTimeAsString();
+      string filename = "LP_findExtremumOverLine"+date_time+".dat";
+      if(!m_solver->writeLpToFile(filename.c_str(), c, lb, ub, A, Alb, Aub))
+        SEND_ERROR_MSG("Error while writing LP to file "+filename);
+      filename = "LP_findExtremumOverLine"+date_time+"_solution.dat";
+      if(!writeMatrixToFile(filename.c_str(), b_p))
+        SEND_ERROR_MSG("Error while writing LP solution to file "+filename);
+#endif
+
       return true;
     }
 
@@ -341,6 +354,16 @@ bool StaticEquilibrium::findExtremumOverLine(Cref_vector2 a, Cref_vector2 a0, do
     {
       double p = m_solver->getObjectiveValue();
       com = a0 + a*p;
+
+#ifdef WRITE_LPS_TO_FILE
+      string date_time = getDateAndTimeAsString();
+      string filename = "DLP_findExtremumOverLine"+date_time+".dat";
+      if(!m_solver->writeLpToFile(filename.c_str(), c, lb, ub, A, Alb, Aub))
+        SEND_ERROR_MSG("Error while writing LP to file "+filename);
+      filename = "DLP_findExtremumOverLine"+date_time+"_solution.dat";
+      if(!writeMatrixToFile(filename.c_str(), v))
+        SEND_ERROR_MSG("Error while writing LP solution to file "+filename);
+#endif
 
       // since QP oases cannot detect unboundedness we check here whether the objective value is a large negative value
       if(m_solver_type==SOLVER_LP_QPOASES && p<-1e7)

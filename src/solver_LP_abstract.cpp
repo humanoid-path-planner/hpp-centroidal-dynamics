@@ -32,7 +32,7 @@ Solver_LP_abstract* Solver_LP_abstract::getNewSolver(SolverLP solverType)
   return NULL;
 }
 
-bool Solver_LP_abstract::writeLpToFile(const char* filename,
+bool Solver_LP_abstract::writeLpToFile(const std::string& filename,
                                        Cref_vectorX c, Cref_vectorX lb, Cref_vectorX ub,
                                        Cref_matrixXX A, Cref_vectorX Alb, Cref_vectorX Aub)
 {
@@ -43,7 +43,7 @@ bool Solver_LP_abstract::writeLpToFile(const char* filename,
   assert(Alb.size()==m);
   assert(Aub.size()==m);
 
-  std::ofstream out(filename, std::ios::out | std::ios::binary | std::ios::trunc);
+  std::ofstream out(filename.c_str(), std::ios::out | std::ios::binary | std::ios::trunc);
   out.write((char*) (&n), sizeof(typename MatrixXX::Index));
   out.write((char*) (&m), sizeof(typename MatrixXX::Index));
   out.write((char*) c.data(), n*sizeof(typename MatrixXX::Scalar) );
@@ -56,11 +56,11 @@ bool Solver_LP_abstract::writeLpToFile(const char* filename,
   return true;
 }
 
-bool Solver_LP_abstract::readLpFromFile(const char* filename,
+bool Solver_LP_abstract::readLpFromFile(const std::string& filename,
                                         VectorX &c, VectorX &lb, VectorX &ub,
                                         MatrixXX &A, VectorX &Alb, VectorX &Aub)
 {
-  std::ifstream in(filename, std::ios::in | std::ios::binary);
+  std::ifstream in(filename.c_str(), std::ios::in | std::ios::binary);
   typename MatrixXX::Index n=0, m=0;
   in.read((char*) (&n),sizeof(typename MatrixXX::Index));
   in.read((char*) (&m),sizeof(typename MatrixXX::Index));
@@ -80,7 +80,7 @@ bool Solver_LP_abstract::readLpFromFile(const char* filename,
   return true;
 }
 
-LP_status Solver_LP_abstract::solve(const char* filename, Ref_vectorX sol)
+LP_status Solver_LP_abstract::solve(const std::string& filename, Ref_vectorX sol)
 {
   VectorX c, lb, ub, Alb, Aub;
   MatrixXX A;

@@ -22,6 +22,8 @@ using namespace std;
 using namespace robust_equilibrium;
 USING_NAMESPACE_QPOASES
 
+#define EPS 1e-6
+
 #ifdef CLP_FOUND
 /** Example addRows.cpp */
 void test_addRows()
@@ -428,10 +430,56 @@ int main()
     cout<<"Check constraint matrix A: "<<A.isApprox(A2)<<endl;
     cout<<"Check constraint lower bound vector Alb: "<<Alb.isApprox(Alb2)<<endl;
     cout<<"Check constraint upper bound vector Aub: "<<Aub.isApprox(Aub2)<<endl;
+  }
+
+  {
+    cout<<"\nTEST QP OASES ON SOME LP PROBLEMS\n";
+    string file_path = "../test_data/";
+    Solver_LP_abstract *solverOases = Solver_LP_abstract::getNewSolver(SOLVER_LP_QPOASES);
+    const int PROBLEM_NUMBER = 4;
+    string problem_filenames[PROBLEM_NUMBER] = {"DLP_findExtremumOverLine20151103_112611",
+                                                "DLP_findExtremumOverLine20151103_115627",
+                                                "LP_findExtremumOverLine20151103_112610",
+                                                "LP_findExtremumOverLine20151103_112611"};
+    VectorX c, lb, ub, Alb, Aub, realSol, sol;
+    MatrixXX A;
+    for(int i=0; i<PROBLEM_NUMBER; i++)
+    {
+      string &problem_filename = problem_filenames[i];
+      if(!solverOases->readLpFromFile(file_path+problem_filename+".dat", c, lb, ub, A, Alb, Aub))
+      {
+        SEND_ERROR_MSG("Error while reading LP from file "+problem_filename);
+        return -1;
+      }
+      string solution_filename = problem_filename+"_solution";
+      if(!readMatrixFromFile(file_path+solution_filename+".dat", realSol))
+      {
+        SEND_ERROR_MSG("Error while reading LP solution from file "+solution_filename);
+        return -1;
+      }
+      sol.resize(c.size());
+      solverOases->solve(c, lb, ub, A, Alb, Aub, sol);
+      if(sol.isApprox(realSol, EPS))
+      {
+        cout<<"[INFO] Solution of problem "<<problem_filename<<" is equal to the expected value!\n";
+      }
+      else
+      {
+        if(fabs(c.dot(sol)-c.dot(realSol))<EPS)
+          cout<<"[WARNING] Solution of problem "<<problem_filename<<" is different from expected but it has the same cost\n";
+        else
+        {
+          cout<<"[ERROR] Solution of problem "<<problem_filename<<" is different from the expected value:\n";
+          cout<<"\tSolution found    "<<sol.transpose()<<endl;
+          cout<<"\tExpected solution "<<realSol.transpose()<<endl;
+          cout<<"\tCost found    "<<(c.dot(sol))<<endl;
+          cout<<"\tCost expected "<<(c.dot(realSol))<<endl;
+        }
+      }
+    }
 
     return 0;
   }
-
 
 
 #ifdef CLP_FOUND
