@@ -303,8 +303,6 @@ int main()
   MatrixXX contact_rpy = MatrixXX::Zero(N_CONTACTS, 3);
   MatrixXX p = MatrixXX::Zero(4*N_CONTACTS,3); // contact points
   MatrixXX N = MatrixXX::Zero(4*N_CONTACTS,3); // contact normals
-  VectorX frictionCoefficients(4*N_CONTACTS);
-  frictionCoefficients.fill(mu);
 
   // Generate contact positions and orientations
   bool collision;
@@ -398,7 +396,7 @@ int main()
   }
 
   getProfiler().start(PERF_LP_PREPARATION);
-  if(!solver_LP_oases.setNewContacts(p, N, frictionCoefficients, STATIC_EQUILIBRIUM_ALGORITHM_LP))
+  if(!solver_LP_oases.setNewContacts(p, N, mu, STATIC_EQUILIBRIUM_ALGORITHM_LP))
   {
     printf("Error while setting new contacts");
     return -1;
@@ -406,7 +404,7 @@ int main()
   getProfiler().stop(PERF_LP_PREPARATION);
 
   getProfiler().start(PERF_LP_PREPARATION);
-  if(!solver_LP2_oases.setNewContacts(p, N, frictionCoefficients, STATIC_EQUILIBRIUM_ALGORITHM_LP2))
+  if(!solver_LP2_oases.setNewContacts(p, N, mu, STATIC_EQUILIBRIUM_ALGORITHM_LP2))
   {
     printf("Error while setting new contacts");
     return -1;
@@ -414,7 +412,7 @@ int main()
   getProfiler().stop(PERF_LP_PREPARATION);
 
   getProfiler().start(PERF_LP_PREPARATION);
-  if(!solver_DLP_oases.setNewContacts(p, N, frictionCoefficients, STATIC_EQUILIBRIUM_ALGORITHM_DLP))
+  if(!solver_DLP_oases.setNewContacts(p, N, mu, STATIC_EQUILIBRIUM_ALGORITHM_DLP))
   {
     printf("Error while setting new contacts");
     return -1;
@@ -422,7 +420,7 @@ int main()
   getProfiler().stop(PERF_LP_PREPARATION);
 
   getProfiler().start(PERF_PP);
-  bool res = solver_PP.setNewContacts(p, N, frictionCoefficients, STATIC_EQUILIBRIUM_ALGORITHM_PP);
+  bool res = solver_PP.setNewContacts(p, N, mu, STATIC_EQUILIBRIUM_ALGORITHM_PP);
   getProfiler().stop(PERF_PP);
   if(!res)
   {
@@ -432,7 +430,7 @@ int main()
 
 #ifdef CLP_FOUND
   getProfiler().start(PERF_LP_PREPARATION);
-  if(!solver_LP_coin.setNewContacts(p, N, frictionCoefficients, STATIC_EQUILIBRIUM_ALGORITHM_LP))
+  if(!solver_LP_coin.setNewContacts(p, N, mu, STATIC_EQUILIBRIUM_ALGORITHM_LP))
   {
     printf("Error while setting new contacts");
     return -1;
@@ -440,7 +438,7 @@ int main()
   getProfiler().stop(PERF_LP_PREPARATION);
 
   getProfiler().start(PERF_LP_PREPARATION);
-  if(!solver_LP2_coin.setNewContacts(p, N, frictionCoefficients, STATIC_EQUILIBRIUM_ALGORITHM_LP2))
+  if(!solver_LP2_coin.setNewContacts(p, N, mu, STATIC_EQUILIBRIUM_ALGORITHM_LP2))
   {
     printf("Error while setting new contacts");
     return -1;
@@ -448,7 +446,7 @@ int main()
   getProfiler().stop(PERF_LP_PREPARATION);
 
   getProfiler().start(PERF_LP_PREPARATION);
-  if(!solver_DLP_coin.setNewContacts(p, N, frictionCoefficients, STATIC_EQUILIBRIUM_ALGORITHM_DLP))
+  if(!solver_DLP_coin.setNewContacts(p, N, mu, STATIC_EQUILIBRIUM_ALGORITHM_DLP))
   {
     printf("Error while setting new contacts");
     return -1;

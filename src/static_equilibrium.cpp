@@ -47,10 +47,9 @@ StaticEquilibrium::StaticEquilibrium(string name, double mass, unsigned int gene
 }
 
 bool StaticEquilibrium::setNewContacts(Cref_matrixX3 contactPoints, Cref_matrixX3 contactNormals,
-                                       Cref_vectorX frictionCoefficients, StaticEquilibriumAlgorithm alg)
+                                       double frictionCoefficient, StaticEquilibriumAlgorithm alg)
 {
   assert(contactPoints.rows()==contactNormals.rows());
-  assert(contactPoints.rows()==frictionCoefficients.rows());
 
   if(alg==STATIC_EQUILIBRIUM_ALGORITHM_IP)
   {
@@ -65,7 +64,6 @@ bool StaticEquilibrium::setNewContacts(Cref_matrixX3 contactPoints, Cref_matrixX
 
   m_algorithm = alg;
 
-  // compute tangent directions
   long int c = contactPoints.rows();
   unsigned int &cg = m_generatorsPerContact;
   double theta, delta_theta=2*M_PI/cg;
@@ -101,8 +99,8 @@ bool StaticEquilibrium::setNewContacts(Cref_matrixX3 contactPoints, Cref_matrixX
     theta = 0.0;
     for(int j=0; j<cg; j++)
     {
-      G.col(j) = frictionCoefficients(i)*sin(theta)*T1
-                + frictionCoefficients(i)*cos(theta)*T2
+      G.col(j) = frictionCoefficient*sin(theta)*T1
+                + frictionCoefficient*cos(theta)*T2
                 + contactNormals.row(i).transpose();
       G.col(j).normalize();
 //      SEND_DEBUG_MSG("Contact "+toString(i)+" generator "+toString(j)+" = "+toString(G.col(j).transpose()));
@@ -112,6 +110,16 @@ bool StaticEquilibrium::setNewContacts(Cref_matrixX3 contactPoints, Cref_matrixX
     // project generators in 6d centroidal space
     m_G_centr.block(0,cg*i,6,cg) = A * G;
   }
+
+  // Compute the coefficient to convert b0 to e_max
+  Vector3 f0 = Vector3::Zero();
+  for(int j=0; j<cg; j++)
+    f0 += G.col(j); // sum of the contact generators
+  // Compute the distance between the friction cone boundaries and
+  // the sum of the contact generators, which is e_max when b0=1.
+  // When b0!=1 we just multiply b0 times this value.
+  // This value depends only on the number of generators and the friction coefficient
+  m_b0_to_emax_coefficient = (f0.cross(G.col(0))).norm();
 
   if(m_algorithm==STATIC_EQUILIBRIUM_ALGORITHM_PP)
   {
@@ -160,7 +168,7 @@ LP_status StaticEquilibrium::computeEquilibriumRobustness(Cref_vector2 com, doub
     LP_status lpStatus = m_solver->solve(c, lb, ub, A, Alb, Aub, b_b0);
     if(lpStatus==LP_STATUS_OPTIMAL)
     {
-      robustness = -1.0*m_solver->getObjectiveValue();
+      robustness = convert_b0_to_emax(-1.0*m_solver->getObjectiveValue());
       return lpStatus;
     }
 
@@ -197,7 +205,7 @@ LP_status StaticEquilibrium::computeEquilibriumRobustness(Cref_vector2 com, doub
     LP_status lpStatus_primal = m_solver->solve(c, lb, ub, A, Alb, Aub, b_b0);
     if(lpStatus_primal==LP_STATUS_OPTIMAL)
     {
-      robustness = -1.0*m_solver->getObjectiveValue();
+      robustness = convert_b0_to_emax(-1.0*m_solver->getObjectiveValue());
       return lpStatus_primal;
     }
 
@@ -233,7 +241,7 @@ LP_status StaticEquilibrium::computeEquilibriumRobustness(Cref_vector2 com, doub
     LP_status lpStatus_dual = m_solver->solve(c, lb, ub, A, Alb, Aub, v);
     if(lpStatus_dual==LP_STATUS_OPTIMAL)
     {
-      robustness = m_solver->getObjectiveValue();
+      robustness = convert_b0_to_emax(m_solver->getObjectiveValue());
       return lpStatus_dual;
     }
 
@@ -273,6 +281,7 @@ LP_status StaticEquilibrium::checkRobustEquilibrium(Cref_vector2 com, bool &equi
 LP_status StaticEquilibrium::findExtremumOverLine(Cref_vector2 a, Cref_vector2 a0, double e_max, Ref_vector2 com)
 {
   const long m = m_G_centr.cols(); // number of gravito-inertial wrench generators
+  double b0 = convert_emax_to_b0(e_max);
 
   if(m_algorithm==STATIC_EQUILIBRIUM_ALGORITHM_LP)
   {
@@ -294,7 +303,7 @@ LP_status StaticEquilibrium::findExtremumOverLine(Cref_vector2 a, Cref_vector2 a
     VectorX lb = -VectorX::Zero(m+1);
     lb(m) = -1e5;
     VectorX ub = VectorX::Ones(m+1)*1e10;
-    Vector6 Alb = m_D*a0 + m_d - m_G_centr*VectorX::Ones(m)*e_max;
+    Vector6 Alb = m_D*a0 + m_d - m_G_centr*VectorX::Ones(m)*b0;
     Vector6 Aub = Alb;
     Matrix6X A = Matrix6X::Zero(6, m+1);
     A.leftCols(m)     = m_G_centr;
@@ -338,7 +347,7 @@ LP_status StaticEquilibrium::findExtremumOverLine(Cref_vector2 a, Cref_vector2 a
           G         is the matrix whose columns are the gravito-inertial wrench generators
     */
     Vector6 v;
-    Vector6 c = m_D*a0 + m_d - m_G_centr*VectorX::Ones(m)*e_max;
+    Vector6 c = m_D*a0 + m_d - m_G_centr*VectorX::Ones(m)*b0;
     Vector6 lb = Vector6::Ones()*-1e10;
     Vector6 ub = Vector6::Ones()*1e10;
     VectorX Alb = VectorX::Zero(m+1);
@@ -439,6 +448,16 @@ bool StaticEquilibrium::computePolytopeProjection(Cref_matrix6X v)
 //  getProfiler().stop("cdd to eigen");
 
   return true;
+}
+
+double StaticEquilibrium::convert_b0_to_emax(double b0)
+{
+  return (b0*m_b0_to_emax_coefficient);
+}
+
+double StaticEquilibrium::convert_emax_to_b0(double emax)
+{
+  return (emax/m_b0_to_emax_coefficient);
 }
 
 } // end namespace robust_equilibrium

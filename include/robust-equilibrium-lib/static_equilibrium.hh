@@ -53,7 +53,22 @@ private:
   Matrix62 m_D;
   Vector6 m_d;
 
+  /** Coefficient used for converting the robustness measure in Newtons */
+  double m_b0_to_emax_coefficient;
+
   bool computePolytopeProjection(Cref_matrix6X v);
+
+  /**
+   * @brief Given the minimum coefficient of the contact force generators it computes
+   * the minimum norm of force error necessary to result in a contact force being on
+   * the friction cone boundaries.
+   * @param b0 Minimum coefficient of the contact force generators.
+   * @return Minimum norm of the force error necessary to result in a contact force being
+   * on the friction cone boundaries.
+   */
+  double convert_b0_to_emax(double b0);
+
+  double convert_emax_to_b0(double emax);
 
 public:
 
@@ -78,12 +93,12 @@ public:
    * In other words the gravity vecotr is (0, 0, -9.81).
    * @param contactPoints List of N 3d contact points as an Nx3 matrix.
    * @param contactNormals List of N 3d contact normal directions as an Nx3 matrix.
-   * @param frictionCoefficients List of N friction coefficients.
+   * @param frictionCoefficient The contact friction coefficient.
    * @param alg Algorithm to use for testing equilibrium.
    * @return True if the operation succeeded, false otherwise.
    */
   bool setNewContacts(Cref_matrixX3 contactPoints, Cref_matrixX3 contactNormals,
-                      Cref_vectorX frictionCoefficients, StaticEquilibriumAlgorithm alg);
+                      double frictionCoefficient, StaticEquilibriumAlgorithm alg);
 
   /**
    * @brief Compute a measure of the robustness of the equilibrium of the specified com position.
