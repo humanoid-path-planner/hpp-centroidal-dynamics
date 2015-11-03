@@ -1,3 +1,7 @@
+/*
+ * Copyright 2015, LAAS-CNRS
+ * Author: Andrea Del Prete
+ */
 #ifndef _ROBUST_EQUILIBRIUM_LIB_UTIL_HH
 #define _ROBUST_EQUILIBRIUM_LIB_UTIL_HH
 
@@ -41,8 +45,6 @@ namespace robust_equilibrium
   typedef Eigen::Matrix <value_type, Eigen::Dynamic, 6, Eigen::RowMajor>              MatrixX6;
   typedef Eigen::Matrix <value_type, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor> MatrixXX;
 
-  //define Eigen ref if available
-#if EIGEN_VERSION_AT_LEAST(3,2,2)
   typedef Eigen::Ref<Vector2>     Ref_vector2;
   typedef Eigen::Ref<Vector3>     Ref_vector3;
   typedef Eigen::Ref<VectorX>     Ref_vectorX;
@@ -60,7 +62,6 @@ namespace robust_equilibrium
   typedef const Eigen::Ref<const Matrix43>    & Cref_matrix43;
   typedef const Eigen::Ref<const Matrix6X>    & Cref_matrix6X;
   typedef const Eigen::Ref<const MatrixXX>    & Cref_matrixXX;
-#endif
 
   /**
    * Write the specified matrix to a binary file with the specified name.

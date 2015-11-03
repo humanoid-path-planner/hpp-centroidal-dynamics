@@ -373,10 +373,10 @@ void test_small_LP()
 
 int main()
 {
-  cout <<"Test LP Solvers\n\n";
+  cout <<"Test LP Solvers (1 means ok, 0 means error)\n\n";
 
   {
-    cout<<"TEST QP OASES ON A SMALL 2-VARIABLE LP\n";
+    cout<<"TEST QP OASES ON A SMALL 2-VARIABLE LP";
     /* Setup data of first LP. */
     real_t A[1*2] = { 1.0, 1.0 };
     real_t g[2] = { 1.5, 1.0 };
@@ -394,7 +394,11 @@ int main()
 
     /* Solve first LP. */
     int nWSR = 10;
-    example.init( 0,g,A,lb,ub,lbA,ubA, nWSR,0 );
+    int res = example.init( 0,g,A,lb,ub,lbA,ubA, nWSR,0 );
+    if(res==0)
+      cout<<"[INFO] LP solved correctly\n";
+    else
+      cout<<"[ERROR] QpOases could not solve the LP problem, error code: "<<res<<endl;
   }
 
   {
@@ -436,11 +440,21 @@ int main()
     cout<<"\nTEST QP OASES ON SOME LP PROBLEMS\n";
     string file_path = "../test_data/";
     Solver_LP_abstract *solverOases = Solver_LP_abstract::getNewSolver(SOLVER_LP_QPOASES);
-    const int PROBLEM_NUMBER = 4;
+    const int PROBLEM_NUMBER = 14;
     string problem_filenames[PROBLEM_NUMBER] = {"DLP_findExtremumOverLine20151103_112611",
                                                 "DLP_findExtremumOverLine20151103_115627",
+                                                "DLP_findExtremumOverLine20151103_014022",
+                                                "DLP_findExtremumOverLine_32_generators",
+                                                "DLP_findExtremumOverLine_64_generators",
+                                                "DLP_findExtremumOverLine_128_generators",
+                                                "DLP_findExtremumOverLine_128_generators_bis",
                                                 "LP_findExtremumOverLine20151103_112610",
-                                                "LP_findExtremumOverLine20151103_112611"};
+                                                "LP_findExtremumOverLine20151103_112611",
+                                                "LP_findExtremumOverLine20151103_014022",
+                                                "LP_findExtremumOverLine_32_generators",
+                                                "LP_findExtremumOverLine_64_generators",
+                                                "LP_findExtremumOverLine_128_generators",
+                                                "LP_findExtremumOverLine_128_generators_bis"};
     VectorX c, lb, ub, Alb, Aub, realSol, sol;
     MatrixXX A;
     for(int i=0; i<PROBLEM_NUMBER; i++)
@@ -461,15 +475,15 @@ int main()
       solverOases->solve(c, lb, ub, A, Alb, Aub, sol);
       if(sol.isApprox(realSol, EPS))
       {
-        cout<<"[INFO] Solution of problem "<<problem_filename<<" is equal to the expected value!\n";
+        cout<<"[INFO] Solution of problem "<<problem_filename<<" ("<<c.size()<<" var, "<<A.rows()<<" constr) is equal to the expected value!\n";
       }
       else
       {
         if(fabs(c.dot(sol)-c.dot(realSol))<EPS)
-          cout<<"[WARNING] Solution of problem "<<problem_filename<<" is different from expected but it has the same cost\n";
+          cout<<"[WARNING] Solution of problem "<<problem_filename<<" ("<<c.size()<<" var, "<<A.rows()<<" constr) is different from expected but it has the same cost\n";
         else
         {
-          cout<<"[ERROR] Solution of problem "<<problem_filename<<" is different from the expected value:\n";
+          cout<<"[ERROR] Solution of problem "<<problem_filename<<" ("<<c.size()<<" var, "<<A.rows()<<" constr) is different from the expected value:\n";
           cout<<"\tSolution found    "<<sol.transpose()<<endl;
           cout<<"\tExpected solution "<<realSol.transpose()<<endl;
           cout<<"\tCost found    "<<(c.dot(sol))<<endl;

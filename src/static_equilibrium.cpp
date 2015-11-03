@@ -305,7 +305,7 @@ bool StaticEquilibrium::findExtremumOverLine(Cref_vector2 a, Cref_vector2 a0, do
     {
       com = a0 + a*b_p(m);
 
-#define WRITE_LPS_TO_FILE
+//#define WRITE_LPS_TO_FILE
 #ifdef WRITE_LPS_TO_FILE
       string date_time = getDateAndTimeAsString();
       string filename = "LP_findExtremumOverLine"+date_time+".dat";

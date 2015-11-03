@@ -46,9 +46,6 @@ namespace robust_equilibrium
       m_H = MatrixXX::Zero(n,n);
     }
 
-//    m_status = m_solver.init(NULL, c.data(), A.data(), lb.data(), ub.data(),
-//                             Alb.data(), Aub.data(), iters, &solutionTime);
-
     if(!m_init_succeeded)
     {
       m_status = m_solver.init(NULL, c.data(), A.data(), lb.data(), ub.data(),
@@ -69,8 +66,6 @@ namespace robust_equilibrium
     {
       m_solver.getPrimalSolution(sol.data());
     }
-    else
-      SEND_DEBUG_MSG("QPoases solver failed with code "+toString(m_status));
 
     return getStatus();
   }

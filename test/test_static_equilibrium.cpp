@@ -169,7 +169,10 @@ int test_findExtremumOverLine(StaticEquilibrium &solver_to_test, StaticEquilibri
   for(unsigned int i=0; i<N_TESTS; i++)
   {
     uniform(-1.0*Vector2::Ones(), Vector2::Ones(), a);
-    desired_robustness = (rand()/ value_type(RAND_MAX))*e_max;
+    if(e_max>=0.0)
+      desired_robustness = (rand()/ value_type(RAND_MAX))*e_max;
+    else
+      desired_robustness = e_max - EPS;
 
     getProfiler().start(PERF_STRING_TEST);
     status  = solver_to_test.findExtremumOverLine(a, a0, desired_robustness, com);
@@ -250,9 +253,9 @@ void drawRobustnessGrid(StaticEquilibrium &solver, Cref_matrixXX comPositions)
 int main()
 {
   unsigned int seed = (unsigned int)(time(NULL));
-//  seed = 1446456544;
+//  seed = 1446555515;
   srand (seed);
-  cout<<"Initialize random number generator with seed "<<seed<<endl;
+  cout<<"Initialize random number generator with seed "<<seed<<" (in case you wanna repeat the same test later)\n";
 
   RVector3 CONTACT_POINT_LOWER_BOUNDS, CONTACT_POINT_UPPER_BOUNDS;
   RVector3 RPY_LOWER_BOUNDS, RPY_UPPER_BOUNDS;
@@ -260,19 +263,19 @@ int main()
   /************************************** USER PARAMETERS *******************************/
   double mass = 70.0;
   double mu = 0.3;  // friction coefficient
-  unsigned int generatorsPerContact = 4;
-  unsigned int N_CONTACTS = 1;
+  unsigned int generatorsPerContact = 8;
+  unsigned int N_CONTACTS = 3;
   double MIN_FEET_DISTANCE = 0.3;
   double LX = 0.5*0.2172;        // half contact surface size in x direction
   double LY = 0.5*0.138;         // half contact surface size in y direction
   CONTACT_POINT_LOWER_BOUNDS << 0.0,  0.0,  0.0;
   CONTACT_POINT_UPPER_BOUNDS << 0.5,  0.5,  0.5;
   double gamma = atan(mu);   // half friction cone angle
-  RPY_LOWER_BOUNDS << -0*gamma, -0*gamma, -M_PI;
-  RPY_UPPER_BOUNDS << +0*gamma, +0*gamma, +M_PI;
+  RPY_LOWER_BOUNDS << -2*gamma, -2*gamma, -M_PI;
+  RPY_UPPER_BOUNDS << +2*gamma, +2*gamma, +M_PI;
   double X_MARG = 0.07;
   double Y_MARG = 0.07;
-  const int GRID_SIZE = 5;
+  const int GRID_SIZE = 10;
   /************************************ END USER PARAMETERS *****************************/
 
   cout<<"Number of contacts: "<<N_CONTACTS<<endl;
