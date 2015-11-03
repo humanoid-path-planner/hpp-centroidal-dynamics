@@ -46,11 +46,11 @@ private:
   VectorX m_h;
 
   /** Inequality matrix and vector defining the CoM support polygon HD com + Hd <= h */
-  MatrixX2 m_HD;
+  MatrixX3 m_HD;
   VectorX  m_Hd;
 
   /** Matrix and vector mapping 2d com position to GIW */
-  Matrix62 m_D;
+  Matrix63 m_D;
   Vector6 m_d;
 
   /** Coefficient used for converting the robustness measure in Newtons */
@@ -112,13 +112,13 @@ public:
    *     b0        is a parameter proportional to the robustness measure
    *     c         is the specified CoM position
    *     G         is the 6xm matrix whose columns are the gravito-inertial wrench generators
-   *     D         is the 6x2 matrix mapping the CoM position in gravito-inertial wrench
+   *     D         is the 6x3 matrix mapping the CoM position in gravito-inertial wrench
    *     d         is the 6d vector containing the gravity part of the gravito-inertial wrench
-   * @param com The 2d center of mass position to test.
+   * @param com The 3d center of mass position to test.
    * @param robustness The computed measure of robustness.
    * @return The status of the LP solver.
    */
-  LP_status computeEquilibriumRobustness(Cref_vector2 com, double &robustness);
+  LP_status computeEquilibriumRobustness(Cref_vector3 com, double &robustness);
 
   /**
    * @brief Check whether the specified com position is in robust equilibrium.
@@ -132,14 +132,14 @@ public:
    *     b0        is a parameter proportional to the specified robustness measure
    *     c         is the specified CoM position
    *     G         is the 6xm matrix whose columns are the gravito-inertial wrench generators
-   *     D         is the 6x2 matrix mapping the CoM position in gravito-inertial wrench
+   *     D         is the 6x3 matrix mapping the CoM position in gravito-inertial wrench
    *     d         is the 6d vector containing the gravity part of the gravito-inertial wrench
-   * @param com The 2d center of mass position to test.
+   * @param com The 3d center of mass position to test.
    * @param equilibrium True if com is in robust equilibrium, false otherwise.
    * @param e_max Desired robustness level.
    * @return The status of the LP solver.
    */
-  LP_status checkRobustEquilibrium(Cref_vector2 com, bool &equilibrium, double e_max=0.0);
+  LP_status checkRobustEquilibrium(Cref_vector3 com, bool &equilibrium, double e_max=0.0);
 
   /**
    * @brief Compute the extremum CoM position over the line a*x + a0 that is in robust equilibrium.
@@ -153,14 +153,14 @@ public:
    *     b0        is an m-dimensional vector of identical values that are proportional to e_max
    *     c         is the 1d line parameter
    *     G         is the 6xm matrix whose columns are the gravito-inertial wrench generators
-   *     D         is the 6x2 matrix mapping the CoM position in gravito-inertial wrench
+   *     D         is the 6x3 matrix mapping the CoM position in gravito-inertial wrench
    *     d         is the 6d vector containing the gravity part of the gravito-inertial wrench
    * @param a 2d vector representing the line direction
    * @param a0 2d vector representing an arbitrary point over the line
    * @param e_max Desired robustness in terms of the maximum force error tolerated by the system
    * @return The status of the LP solver.
   */
-  LP_status findExtremumOverLine(Cref_vector2 a, Cref_vector2 a0, double e_max, Ref_vector2 com);
+  LP_status findExtremumOverLine(Cref_vector3 a, Cref_vector3 a0, double e_max, Ref_vector3 com);
 
   /**
    * @brief Find the extremum com position that is in robust equilibrium in the specified direction.
@@ -173,16 +173,16 @@ public:
    *     a         is the specified 2d direction
    *     b         are the m coefficients of the contact force generators (f = G b)
    *     b0        is an m-dimensional vector of identical values that are proportional to e_max
-   *     c         is the 2d com position
+   *     c         is the 3d com position
    *     G         is the 6xm matrix whose columns are the gravito-inertial wrench generators
-   *     D         is the 6x2 matrix mapping the CoM position in gravito-inertial wrench
+   *     D         is the 6x3 matrix mapping the CoM position in gravito-inertial wrench
    *     d         is the 6d vector containing the gravity part of the gravito-inertial wrench
-   * @param direction Desired 2d direction.
-   * @param com Output 2d com position.
+   * @param direction Desired 3d direction.
+   * @param com Output 3d com position.
    * @param e_max Desired robustness level.
    * @return The status of the LP solver.
    */
-  LP_status findExtremumInDirection(Cref_vector2 direction, Ref_vector2 com, double e_max=0.0);
+  LP_status findExtremumInDirection(Cref_vector3 direction, Ref_vector3 com, double e_max=0.0);
 
 };
 

@@ -160,16 +160,16 @@ int test_computeEquilibriumRobustness(StaticEquilibrium solver_1, StaticEquilibr
  * @param verb Verbosity level, 0 print nothing, 1 print summary, 2 print everything
  */
 int test_findExtremumOverLine(StaticEquilibrium &solver_to_test, StaticEquilibrium &solver_ground_truth,
-                              Cref_vector2 a0, int N_TESTS, double e_max,
+                              Cref_vector3 a0, int N_TESTS, double e_max,
                               const char* PERF_STRING_TEST, const char* PERF_STRING_GROUND_TRUTH, int verb=0)
 {
   int error_counter = 0;
-  Vector2 a, com;
+  Vector3 a, com;
   LP_status status;
   double desired_robustness, robustness;
   for(unsigned int i=0; i<N_TESTS; i++)
   {
-    uniform(-1.0*Vector2::Ones(), Vector2::Ones(), a);
+    uniform(-1.0*Vector3::Ones(), Vector3::Ones(), a);
     if(e_max>=0.0)
       desired_robustness = (rand()/ value_type(RAND_MAX))*e_max;
     else
@@ -349,7 +349,7 @@ int main()
   VectorX x_range(GRID_SIZE), y_range(GRID_SIZE);
   x_range.setLinSpaced(GRID_SIZE,com_LB(0),com_UB(0));
   y_range.setLinSpaced(GRID_SIZE,com_LB(1),com_UB(1));
-  MatrixXX comPositions(GRID_SIZE*GRID_SIZE, 2);
+  MatrixXX comPositions(GRID_SIZE*GRID_SIZE, 3);
   cout<<"Gonna test equilibrium on a 2d grid of "<<GRID_SIZE<<"X"<<GRID_SIZE<<" points ";
   cout<<"ranging from "<<com_LB<<" to "<<com_UB<<endl;
   for(unsigned int i=0; i<GRID_SIZE; i++)
@@ -358,11 +358,12 @@ int main()
     {
       comPositions(i*GRID_SIZE+j, 1) = y_range(GRID_SIZE-1-i);
       comPositions(i*GRID_SIZE+j, 0) = x_range(j);
+      comPositions(i*GRID_SIZE+j, 2) = 0.0;
 
       // look for contact point positions on grid
       for(long k=0; k<4*N_CONTACTS; k++)
       {
-        double dist = (p.block<1,2>(k,0) - comPositions.row(i*GRID_SIZE+j)).norm();
+        double dist = (p.block<1,2>(k,0) - comPositions.block<1,2>(i*GRID_SIZE+j,0)).norm();
         if(dist < minDistContactPoint(k))
         {
           minDistContactPoint(k) = dist;
@@ -477,7 +478,8 @@ int main()
 
 
   const int N_TESTS = 100;
-  Vector2 a0 = 0.5*(com_LB+com_UB);
+  Vector3 a0 = Vector3::Zero();
+  a0.head<2>() = 0.5*(com_LB+com_UB);
   double e_max;
   LP_status status = solver_LP_oases.computeEquilibriumRobustness(a0, e_max);
   if(status!=LP_STATUS_OPTIMAL)

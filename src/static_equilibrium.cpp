@@ -43,7 +43,7 @@ StaticEquilibrium::StaticEquilibrium(string name, double mass, unsigned int gene
   m_d.setZero();
   m_d.head<3>() = m_mass*m_gravity;
   m_D.setZero();
-  m_D.block<3,2>(3,0) = crossMatrix(-m_mass*m_gravity).leftCols<2>();
+  m_D.block<3,3>(3,0) = crossMatrix(-m_mass*m_gravity);
 }
 
 bool StaticEquilibrium::setNewContacts(Cref_matrixX3 contactPoints, Cref_matrixX3 contactNormals,
@@ -133,7 +133,7 @@ bool StaticEquilibrium::setNewContacts(Cref_matrixX3 contactPoints, Cref_matrixX
 }
 
 
-LP_status StaticEquilibrium::computeEquilibriumRobustness(Cref_vector2 com, double &robustness)
+LP_status StaticEquilibrium::computeEquilibriumRobustness(Cref_vector3 com, double &robustness)
 {
   const long m = m_G_centr.cols(); // number of gravito-inertial wrench generators
 
@@ -253,7 +253,7 @@ LP_status StaticEquilibrium::computeEquilibriumRobustness(Cref_vector2 com, doub
   return LP_STATUS_ERROR;
 }
 
-LP_status StaticEquilibrium::checkRobustEquilibrium(Cref_vector2 com, bool &equilibrium, double e_max)
+LP_status StaticEquilibrium::checkRobustEquilibrium(Cref_vector3 com, bool &equilibrium, double e_max)
 {
   if(e_max!=0.0)
   {
@@ -278,7 +278,7 @@ LP_status StaticEquilibrium::checkRobustEquilibrium(Cref_vector2 com, bool &equi
   return LP_STATUS_OPTIMAL;
 }
 
-LP_status StaticEquilibrium::findExtremumOverLine(Cref_vector2 a, Cref_vector2 a0, double e_max, Ref_vector2 com)
+LP_status StaticEquilibrium::findExtremumOverLine(Cref_vector3 a, Cref_vector3 a0, double e_max, Ref_vector3 com)
 {
   const long m = m_G_centr.cols(); // number of gravito-inertial wrench generators
   double b0 = convert_emax_to_b0(e_max);
@@ -397,7 +397,7 @@ LP_status StaticEquilibrium::findExtremumOverLine(Cref_vector2 a, Cref_vector2 a
   return LP_STATUS_ERROR;
 }
 
-LP_status StaticEquilibrium::findExtremumInDirection(Cref_vector2 direction, Ref_vector2 com, double e_max)
+LP_status StaticEquilibrium::findExtremumInDirection(Cref_vector3 direction, Ref_vector3 com, double e_max)
 {
   SEND_ERROR_MSG("findExtremumInDirection not implemented yet");
   return LP_STATUS_ERROR;
