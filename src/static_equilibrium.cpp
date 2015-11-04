@@ -17,7 +17,8 @@ namespace robust_equilibrium
 
 bool StaticEquilibrium::m_is_cdd_initialized = false;
 
-StaticEquilibrium::StaticEquilibrium(string name, double mass, unsigned int generatorsPerContact, SolverLP solver_type)
+StaticEquilibrium::StaticEquilibrium(string name, double mass, unsigned int generatorsPerContact,
+                                     SolverLP solver_type, bool useWarmStart)
 {
   if(!m_is_cdd_initialized)
   {
@@ -34,6 +35,7 @@ StaticEquilibrium::StaticEquilibrium(string name, double mass, unsigned int gene
   m_name = name;
   m_solver_type = solver_type;
   m_solver = Solver_LP_abstract::getNewSolver(solver_type);
+  m_solver->setUseWarmStart(useWarmStart);
 
   m_generatorsPerContact = generatorsPerContact;
   m_mass = mass;

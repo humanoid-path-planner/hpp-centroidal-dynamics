@@ -23,8 +23,6 @@ private:
   MatrixXX              m_H;              // Hessian matrix
   bool                  m_init_succeeded; // true if solver has been successfully initialized
   qpOASES::returnValue  m_status;         // status code returned by the solver
-  int                   m_maxIter;        // max number of iterations
-  double                m_maxTime;        // max time to solve the LP [s]
 
 public:
 
@@ -40,27 +38,12 @@ public:
                   Ref_vectorX sol);
 
   /** Get the status of the solver. */
-  LP_status getStatus();
+  virtual LP_status getStatus();
 
   /** Get the objective value of the last solved problem. */
-  double getObjectiveValue();
+  virtual double getObjectiveValue(){ return m_solver.getObjVal(); }
 
-  void getDualSolution(Ref_vectorX res);
-
-//  void getDualColumnSolution(Ref_vectorX res);
-
-  /** Get the current maximum number of iterations performed
-   *  by the solver.
-   */
-  unsigned int getMaximumIterations();
-
-  /** Set the current maximum number of iterations performed
-   *  by the solver.
-   */
-  bool setMaximumIterations(unsigned int maxIter);
-
-  /** Set the maximum time allowed to solve a problem. */
-  bool setMaximumTime(double seconds);
+  virtual void getDualSolution(Ref_vectorX res){ m_solver.getDualSolution(res.data()); }
 
 };
 

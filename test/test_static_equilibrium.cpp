@@ -22,7 +22,7 @@ using namespace std;
 #define PERF_DLP_COIN "Compute Equilibrium Robustness with DLP coin"
 #define PERF_DLP_OASES "Compute Equilibrium Robustness with DLP oases"
 
-#define EPS 1e-4  // required precision
+#define EPS 1e-3  // required precision
 
 /** Check the coherence between the method StaticEquilibrium::computeEquilibriumRobustness
  * and the method StaticEquilibrium::checkRobustEquilibrium.
@@ -257,8 +257,67 @@ void drawRobustnessGrid(StaticEquilibrium &solver, Cref_matrixXX comPositions)
   }
 }
 
+void testWithLoadedData()
+{
+  cout<<"*** TEST WITH LOADED DATA ***\n";
+
+  double mass = 55.8836;
+  double mu = 0.5;  // friction coefficient
+  unsigned int generatorsPerContact = 4;
+  string file_path = "../test_data/";
+  double expected_robustness = 17.1222;
+
+  const int N_SOLVERS = 3;
+  string solverNames[] = {"LP oases", "LP2 oases", "DLP oases"};
+  StaticEquilibriumAlgorithm algorithms[] = {STATIC_EQUILIBRIUM_ALGORITHM_LP,
+                                             STATIC_EQUILIBRIUM_ALGORITHM_LP2,
+                                             STATIC_EQUILIBRIUM_ALGORITHM_DLP};
+
+  MatrixXX contactPoints, contactNormals;
+  Vector3 com;
+  if(!readMatrixFromFile(file_path+"positions.dat", contactPoints))
+  {
+    SEND_ERROR_MSG("Impossible to read positions from file");
+    return;
+  }
+  if(!readMatrixFromFile(file_path+"normals.dat", contactNormals))
+  {
+    SEND_ERROR_MSG("Impossible to read normals from file");
+    return;
+  }
+  if(!readMatrixFromFile(file_path+"com.dat", com))
+  {
+    SEND_ERROR_MSG("Impossible to read com from file");
+    return;
+  }
+
+  StaticEquilibrium* solvers[N_SOLVERS];
+  double robustness[N_SOLVERS];
+  for(int s=0; s<N_SOLVERS; s++)
+  {
+    solvers[s] = new StaticEquilibrium(solverNames[s], mass, generatorsPerContact, SOLVER_LP_QPOASES);
+    if(!solvers[s]->setNewContacts(contactPoints, contactNormals, mu, algorithms[s]))
+    {
+      SEND_ERROR_MSG("Error while setting new contacts for solver "+solvers[s]->getName());
+      continue;
+    }
+    LP_status status = solvers[s]->computeEquilibriumRobustness(com, robustness[s]);
+    if(status==LP_STATUS_OPTIMAL)
+    {
+      if(fabs(expected_robustness-robustness[s])>EPS)
+        cout<<"[ERROR] Solver "<<solvers[s]->getName()<<" computed robustness "<<robustness[s]<<" rather than "<<expected_robustness<<endl;
+    }
+    else
+      SEND_ERROR_MSG("Solver "+solvers[s]->getName()+" failed to compute robustness, error code "+toString(status));
+  }
+  cout<<"*** END TEST WITH LOADED DATA ***\n\n";
+}
+
 int main()
 {
+  testWithLoadedData();
+
+  cout<<"*** TEST WITH RANDOMLY GENERATED DATA ***\n";
   unsigned int seed = (unsigned int)(time(NULL));
 //  seed = 1446555515;
   srand (seed);
@@ -268,10 +327,10 @@ int main()
   RVector3 RPY_LOWER_BOUNDS, RPY_UPPER_BOUNDS;
 
   /************************************** USER PARAMETERS *******************************/
-  double mass = 70.0;
+  double mass = 55.0;
   double mu = 0.3;  // friction coefficient
-  unsigned int generatorsPerContact = 8;
-  unsigned int N_CONTACTS = 3;
+  unsigned int generatorsPerContact = 4;
+  unsigned int N_CONTACTS = 2;
   double MIN_FEET_DISTANCE = 0.3;
   double LX = 0.5*0.2172;        // half contact surface size in x direction
   double LY = 0.5*0.138;         // half contact surface size in y direction
@@ -477,7 +536,7 @@ int main()
 #endif
 
 
-  const int N_TESTS = 100;
+  const int N_TESTS = 1000;
   Vector3 a0 = Vector3::Zero();
   a0.head<2>() = 0.5*(com_LB+com_UB);
   double e_max;
@@ -490,9 +549,15 @@ int main()
   {
     test_findExtremumOverLine(solver_LP_oases, solver_DLP_oases, a0, N_TESTS, e_max, "EXTREMUM OVER LINE LP OASES", PERF_DLP_OASES, 2);
     test_findExtremumOverLine(solver_DLP_oases, solver_DLP_oases, a0, N_TESTS, e_max, "EXTREMUM OVER LINE DLP OASES", PERF_DLP_OASES, 2);
+#ifdef CLP_FOUND
+    test_findExtremumOverLine(solver_LP_coin, solver_LP_coin, a0, N_TESTS, e_max, "EXTREMUM OVER LINE LP COIN", PERF_LP_COIN, 2);
+    test_findExtremumOverLine(solver_DLP_coin, solver_LP_coin, a0, N_TESTS, e_max, "EXTREMUM OVER LINE DLP COIN", PERF_LP_COIN, 2);
+#endif
   }
 
   getProfiler().report_all();
+
+  cout<<"*** END TEST WITH RANDOMLY GENERATED DATA ***\n";
 
   return 0;
 }

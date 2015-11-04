@@ -19,8 +19,6 @@ namespace robust_equilibrium
     m_options.printLevel          = PL_NONE; //PL_LOW
     m_options.enableRegularisation = BT_TRUE;
     m_options.enableEqualities = BT_TRUE;
-    m_maxIter = 1000;
-    m_maxTime = 100.0;
   }
 
   LP_status Solver_LP_qpoases::solve(Cref_vectorX c, Cref_vectorX lb, Cref_vectorX ub,
@@ -46,7 +44,7 @@ namespace robust_equilibrium
       m_H = MatrixXX::Zero(n,n);
     }
 
-    if(!m_init_succeeded)
+    if(!m_useWarmStart || !m_init_succeeded)
     {
       m_status = m_solver.init(NULL, c.data(), A.data(), lb.data(), ub.data(),
                                Alb.data(), Aub.data(), iters, &solutionTime);
@@ -82,37 +80,6 @@ namespace robust_equilibrium
     if(ss==-3)
       return LP_STATUS_UNBOUNDED;
     return LP_STATUS_ERROR;
-  }
-
-  double Solver_LP_qpoases::getObjectiveValue()
-  {
-    return m_solver.getObjVal();
-  }
-
-  void Solver_LP_qpoases::getDualSolution(Ref_vectorX res)
-  {
-    m_solver.getDualSolution(res.data());
-  }
-
-  unsigned int Solver_LP_qpoases::getMaximumIterations()
-  {
-    return m_maxIter;
-  }
-
-  bool Solver_LP_qpoases::setMaximumIterations(unsigned int maxIter)
-  {
-    if(maxIter==0)
-      return false;
-    m_maxIter = maxIter;
-    return true;
-  }
-
-  bool Solver_LP_qpoases::setMaximumTime(double seconds)
-  {
-    if(seconds<=0.0)
-      return false;
-    m_maxTime = seconds;
-    return true;
   }
 
 } // end namespace robust_equilibrium

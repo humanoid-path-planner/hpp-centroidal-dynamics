@@ -92,6 +92,20 @@ LP_status Solver_LP_abstract::solve(const std::string& filename, Ref_vectorX sol
   return solve(c, lb, ub, A, Alb, Aub, sol);
 }
 
+bool Solver_LP_abstract::setMaximumIterations(unsigned int maxIter)
+{
+  if(maxIter==0)
+    return false;
+  m_maxIter = maxIter;
+  return true;
+}
 
+bool Solver_LP_abstract::setMaximumTime(double seconds)
+{
+  if(seconds<=0.0)
+    return false;
+  m_maxTime = seconds;
+  return true;
+}
 
 } // end namespace robust_equilibrium

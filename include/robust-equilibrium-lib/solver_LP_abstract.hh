@@ -18,10 +18,10 @@ namespace robust_equilibrium
   */
 enum ROBUST_EQUILIBRIUM_DLLAPI SolverLP
 {
+  SOLVER_LP_QPOASES = 0
 #ifdef CLP_FOUND
-  SOLVER_LP_CLP,
+  ,SOLVER_LP_CLP = 1
 #endif
-  SOLVER_LP_QPOASES
 };
 
 
@@ -44,9 +44,19 @@ enum ROBUST_EQUILIBRIUM_DLLAPI LP_status
  */
 class ROBUST_EQUILIBRIUM_DLLAPI Solver_LP_abstract
 {
+protected:
+  bool                  m_useWarmStart;   // true if the solver is allowed to warm start
+  int                   m_maxIter;        // max number of iterations
+  double                m_maxTime;        // max time to solve the LP [s]
+
 public:
 
-  Solver_LP_abstract(){}
+  Solver_LP_abstract()
+  {
+    m_maxIter = 1000;
+    m_maxTime = 100.0;
+    m_useWarmStart = true;
+  }
 
   /**
    * @brief Create a new LP solver of the specified type.
@@ -115,20 +125,25 @@ public:
   /** Get the objective value of the last solved problem. */
   virtual double getObjectiveValue() = 0;
 
+  /** Get the value of the dual variables. */
   virtual void getDualSolution(Ref_vectorX res) = 0;
 
-  /** Get the current maximum number of iterations performed
-   *  by the solver.
-   */
-  unsigned int getMaximumIterations();
 
-  /** Set the current maximum number of iterations performed
-   *  by the solver.
-   */
-  bool setMaximumIterations(unsigned int maxIter);
+  /** Return true if the solver is allowed to warm start, false otherwise. */
+  virtual bool getUseWarmStart(){ return m_useWarmStart; }
+  /** Specify whether the solver is allowed to use warm-start techniques. */
+  virtual void setUseWarmStart(bool useWarmStart){ m_useWarmStart = useWarmStart; }
 
+  /** Get the current maximum number of iterations performed by the solver. */
+  virtual unsigned int getMaximumIterations(){ return m_maxIter; }
+  /** Set the current maximum number of iterations performed by the solver. */
+  virtual bool setMaximumIterations(unsigned int maxIter);
+
+
+  /** Get the maximum time allowed to solve a problem. */
+  virtual double getMaximumTime(){ return m_maxTime; }
   /** Set the maximum time allowed to solve a problem. */
-  bool setMaximumTime(double seconds);
+  virtual bool setMaximumTime(double seconds);
 
 };
 

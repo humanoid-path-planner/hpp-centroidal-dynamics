@@ -59,9 +59,9 @@ private:
   bool computePolytopeProjection(Cref_matrix6X v);
 
   /**
-   * @brief Given the minimum coefficient of the contact force generators it computes
-   * the minimum norm of force error necessary to result in a contact force being on
-   * the friction cone boundaries.
+   * @brief Given the smallest coefficient of the contact force generators it computes
+   * the minimum norm of force error necessary to have a contact force on
+   * the associated friction cone boundaries.
    * @param b0 Minimum coefficient of the contact force generators.
    * @return Minimum norm of the force error necessary to result in a contact force being
    * on the friction cone boundaries.
@@ -78,8 +78,22 @@ public:
    * @param mass Mass of the system for which to test equilibrium.
    * @param generatorsPerContact Number of generators used to approximate the friction cone per contact point.
    * @param solver_type Type of LP solver to use.
+   * @param useWarmStart Whether the LP solver can warm start the resolution.
    */
-  StaticEquilibrium(std::string name, double mass, unsigned int generatorsPerContact, SolverLP solver_type);
+  StaticEquilibrium(std::string name, double mass, unsigned int generatorsPerContact,
+                    SolverLP solver_type, bool useWarmStart=true);
+
+  /**
+   * @brief Returns the useWarmStart flag.
+   * @return True if the LP solver is allowed to use warm start, false otherwise.
+   */
+  bool useWarmStart(){ return m_solver->getUseWarmStart(); }
+
+  /**
+   * @brief Specifies whether the LP solver is allowed to use warm start.
+   * @param uws True if the LP solver is allowed to use warm start, false otherwise.
+   */
+  void useWarmStart(bool uws){ m_solver->setUseWarmStart(uws); }
 
   /**
    * @brief Get the name of this object.

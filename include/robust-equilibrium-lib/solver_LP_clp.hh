@@ -30,33 +30,24 @@ public:
    *  subject to  Alb <= A x <= Aub
    *              lb <= x <= ub
    */
-  LP_status solve(Cref_vectorX c, Cref_vectorX lb, Cref_vectorX ub,
-                  Cref_matrixXX A, Cref_vectorX Alb, Cref_vectorX Aub,
-                  Ref_vectorX sol);
+  virtual LP_status solve(Cref_vectorX c, Cref_vectorX lb, Cref_vectorX ub,
+                          Cref_matrixXX A, Cref_vectorX Alb, Cref_vectorX Aub,
+                          Ref_vectorX sol);
 
   /** Get the status of the solver. */
-  LP_status getStatus();
+  virtual LP_status getStatus();
 
   /** Get the objective value of the last solved problem. */
-  double getObjectiveValue();
+  virtual double getObjectiveValue();
 
-  void getDualSolution(Ref_vectorX res);
+  /** Get the value of the dual variables. */
+  virtual void getDualSolution(Ref_vectorX res);
 
-//  void getDualColumnSolution(Ref_vectorX res);
+  virtual unsigned int getMaximumIterations();
 
-  /** Get the current maximum number of iterations performed
-   *  by the solver.
-   */
-  unsigned int getMaximumIterations();
+  virtual bool setMaximumIterations(unsigned int maxIter);
 
-  /** Set the current maximum number of iterations performed
-   *  by the solver.
-   */
-  bool setMaximumIterations(unsigned int maxIter);
-
-  /** Set the maximum time allowed to solve a problem. */
-  bool setMaximumTime(double seconds);
-
+  virtual bool setMaximumTime(double seconds);
 };
 
 } // end namespace robust_equilibrium

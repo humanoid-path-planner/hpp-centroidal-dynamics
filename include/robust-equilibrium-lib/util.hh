@@ -70,6 +70,8 @@ namespace robust_equilibrium
   bool writeMatrixToFile(const std::string &filename, const Matrix& matrix)
   {
     std::ofstream out(filename.c_str(), std::ios::out | std::ios::binary | std::ios::trunc);
+    if(!out.is_open())
+      return false;
     typename Matrix::Index rows=matrix.rows(), cols=matrix.cols();
     out.write((char*) (&rows), sizeof(typename Matrix::Index));
     out.write((char*) (&cols), sizeof(typename Matrix::Index));
@@ -85,6 +87,8 @@ namespace robust_equilibrium
   bool readMatrixFromFile(const std::string &filename, Matrix& matrix)
   {
     std::ifstream in(filename.c_str(), std::ios::in | std::ios::binary);
+    if(!in.is_open())
+      return false;
     typename Matrix::Index rows=0, cols=0;
     in.read((char*) (&rows),sizeof(typename Matrix::Index));
     in.read((char*) (&cols),sizeof(typename Matrix::Index));
