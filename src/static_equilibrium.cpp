@@ -138,6 +138,8 @@ bool StaticEquilibrium::setNewContacts(Cref_matrixX3 contactPoints, Cref_matrixX
 LP_status StaticEquilibrium::computeEquilibriumRobustness(Cref_vector3 com, double &robustness)
 {
   const long m = m_G_centr.cols(); // number of gravito-inertial wrench generators
+  if(m==0)
+    return LP_STATUS_INFEASIBLE;
 
   if(m_algorithm==STATIC_EQUILIBRIUM_ALGORITHM_LP)
   {
@@ -246,8 +248,14 @@ LP_status StaticEquilibrium::computeEquilibriumRobustness(Cref_vector3 com, doub
       robustness = convert_b0_to_emax(m_solver->getObjectiveValue());
       return lpStatus_dual;
     }
-
     SEND_DEBUG_MSG("Dual LP problem for com position "+toString(com.transpose())+" could not be solved: "+toString(lpStatus_dual));
+
+    // switch UNFEASIBLE and UNBOUNDED flags because we are solving dual problem
+    if(lpStatus_dual==LP_STATUS_INFEASIBLE)
+      lpStatus_dual = LP_STATUS_UNBOUNDED;
+    else if(lpStatus_dual==LP_STATUS_UNBOUNDED)
+      lpStatus_dual = LP_STATUS_INFEASIBLE;
+
     return lpStatus_dual;
   }
 
@@ -257,6 +265,11 @@ LP_status StaticEquilibrium::computeEquilibriumRobustness(Cref_vector3 com, doub
 
 LP_status StaticEquilibrium::checkRobustEquilibrium(Cref_vector3 com, bool &equilibrium, double e_max)
 {
+  if(m_G_centr.cols()==0)
+  {
+    equilibrium=false;
+    return LP_STATUS_OPTIMAL;
+  }
   if(e_max!=0.0)
   {
     SEND_ERROR_MSG("checkRobustEquilibrium with e_max!=0 not implemented yet");
@@ -283,6 +296,9 @@ LP_status StaticEquilibrium::checkRobustEquilibrium(Cref_vector3 com, bool &equi
 LP_status StaticEquilibrium::findExtremumOverLine(Cref_vector3 a, Cref_vector3 a0, double e_max, Ref_vector3 com)
 {
   const long m = m_G_centr.cols(); // number of gravito-inertial wrench generators
+  if(m_G_centr.cols()==0)
+    return LP_STATUS_INFEASIBLE;
+
   double b0 = convert_emax_to_b0(e_max);
 
   if(m_algorithm==STATIC_EQUILIBRIUM_ALGORITHM_LP)
@@ -383,8 +399,9 @@ LP_status StaticEquilibrium::findExtremumOverLine(Cref_vector3 a, Cref_vector3 a
                        " over the line starting from "+toString(a0.transpose())+
                        " in direction "+toString(a.transpose())+" has large negative objective value: "+toString(p)+
                        " suggesting it is probably unbounded.");
-        return LP_STATUS_UNBOUNDED;
+        lpStatus_dual = LP_STATUS_UNBOUNDED;
       }
+
       return lpStatus_dual;
     }
 
@@ -392,15 +409,24 @@ LP_status StaticEquilibrium::findExtremumOverLine(Cref_vector3 a, Cref_vector3 a
     SEND_DEBUG_MSG("Dual LP problem could not be solved suggesting that no equilibrium position with robustness "+
                      toString(e_max)+" exists over the line starting from "+toString(a0.transpose())+
                      " in direction "+toString(a.transpose())+", solver error code: "+toString(lpStatus_dual));
+
+    // switch UNFEASIBLE and UNBOUNDED flags because we are solving dual problem
+    if(lpStatus_dual==LP_STATUS_INFEASIBLE)
+      lpStatus_dual = LP_STATUS_UNBOUNDED;
+    else if(lpStatus_dual==LP_STATUS_UNBOUNDED)
+      lpStatus_dual = LP_STATUS_INFEASIBLE;
+
     return lpStatus_dual;
   }
 
-  SEND_ERROR_MSG("checkRobustEquilibrium is not implemented for the specified algorithm");
+  SEND_ERROR_MSG("findExtremumOverLine is not implemented for the specified algorithm");
   return LP_STATUS_ERROR;
 }
 
 LP_status StaticEquilibrium::findExtremumInDirection(Cref_vector3 direction, Ref_vector3 com, double e_max)
 {
+  if(m_G_centr.cols()==0)
+    return LP_STATUS_INFEASIBLE;
   SEND_ERROR_MSG("findExtremumInDirection not implemented yet");
   return LP_STATUS_ERROR;
 }

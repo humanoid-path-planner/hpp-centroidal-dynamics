@@ -33,11 +33,11 @@ using namespace std;
  * @param PERF_STRING_2 String to use for logging the computation times of solver_2
  * @param verb Verbosity level, 0 print nothing, 1 print summary, 2 print everything
  */
-int test_computeEquilibriumRobustness_vs_checkEquilibrium(StaticEquilibrium solver_1,
-                                                          StaticEquilibrium solver_2,
+int test_computeEquilibriumRobustness_vs_checkEquilibrium(StaticEquilibrium *solver_1,
+                                                          StaticEquilibrium *solver_2,
                                                           Cref_matrixXX comPositions,
-                                                          const char* PERF_STRING_1=NULL,
-                                                          const char* PERF_STRING_2=NULL,
+                                                          const string& PERF_STRING_1="",
+                                                          const string& PERF_STRING_2="",
                                                           int verb=0)
 {
   int error_counter = 0;
@@ -46,30 +46,30 @@ int test_computeEquilibriumRobustness_vs_checkEquilibrium(StaticEquilibrium solv
   bool equilibrium;
   for(unsigned int i=0; i<comPositions.rows(); i++)
   {
-    if(PERF_STRING_1!=NULL)
+    if(!PERF_STRING_1.empty())
       getProfiler().start(PERF_STRING_1);
-    status = solver_1.computeEquilibriumRobustness(comPositions.row(i), rob);
-    if(PERF_STRING_1!=NULL)
+    status = solver_1->computeEquilibriumRobustness(comPositions.row(i), rob);
+    if(!PERF_STRING_1.empty())
       getProfiler().stop(PERF_STRING_1);
 
     if(status!=LP_STATUS_OPTIMAL)
     {
       if(verb>1)
-        SEND_ERROR_MSG(solver_1.getName()+" failed to compute robustness of com position "+toString(comPositions.row(i)));
+        SEND_ERROR_MSG(solver_1->getName()+" failed to compute robustness of com position "+toString(comPositions.row(i)));
       error_counter++;
       continue;
     }
 
-    if(PERF_STRING_2!=NULL)
+    if(!PERF_STRING_2.empty())
       getProfiler().start(PERF_STRING_2);
-    status= solver_2.checkRobustEquilibrium(comPositions.row(i), equilibrium);
-    if(PERF_STRING_2!=NULL)
+    status= solver_2->checkRobustEquilibrium(comPositions.row(i), equilibrium);
+    if(!PERF_STRING_2.empty())
       getProfiler().stop(PERF_STRING_2);
 
     if(status!=LP_STATUS_OPTIMAL)
     {
       if(verb>1)
-        SEND_ERROR_MSG(solver_2.getName()+" failed to check equilibrium of com position "+toString(comPositions.row(i)));
+        SEND_ERROR_MSG(solver_2->getName()+" failed to check equilibrium of com position "+toString(comPositions.row(i)));
       error_counter++;
       continue;
     }
@@ -77,19 +77,19 @@ int test_computeEquilibriumRobustness_vs_checkEquilibrium(StaticEquilibrium solv
     if(equilibrium==true && rob<0.0)
     {
       if(verb>1)
-        SEND_ERROR_MSG(solver_2.getName()+" says com is in equilibrium while "+solver_1.getName()+" computed a negative robustness measure "+toString(rob));
+        SEND_ERROR_MSG(solver_2->getName()+" says com is in equilibrium while "+solver_1->getName()+" computed a negative robustness measure "+toString(rob));
       error_counter++;
     }
     else if(equilibrium==false && rob>0.0)
     {
       if(verb>1)
-        SEND_ERROR_MSG(solver_2.getName()+" says com is not in equilibrium while "+solver_1.getName()+" computed a positive robustness measure "+toString(rob));
+        SEND_ERROR_MSG(solver_2->getName()+" says com is not in equilibrium while "+solver_1->getName()+" computed a positive robustness measure "+toString(rob));
       error_counter++;
     }
   }
 
   if(verb>0)
-    cout<<"Test test_computeEquilibriumRobustness_vs_checkEquilibrium "+solver_1.getName()+" VS "+solver_2.getName()+": "+toString(error_counter)+" error(s).\n";
+    cout<<"Test test_computeEquilibriumRobustness_vs_checkEquilibrium "+solver_1->getName()+" VS "+solver_2->getName()+": "+toString(error_counter)+" error(s).\n";
   return error_counter;
 }
 
@@ -101,8 +101,8 @@ int test_computeEquilibriumRobustness_vs_checkEquilibrium(StaticEquilibrium solv
  * @param PERF_STRING_2 String to use for logging the computation times of solver_2
  * @param verb Verbosity level, 0 print nothing, 1 print summary, 2 print everything
  */
-int test_computeEquilibriumRobustness(StaticEquilibrium solver_1, StaticEquilibrium solver_2, Cref_matrixXX comPositions,
-                                      const char* PERF_STRING_1, const char* PERF_STRING_2, int verb=0)
+int test_computeEquilibriumRobustness(StaticEquilibrium *solver_1, StaticEquilibrium *solver_2, Cref_matrixXX comPositions,
+                                      const string& PERF_STRING_1, const string& PERF_STRING_2, int verb=0)
 {
   int error_counter = 0;
   double rob_1, rob_2;
@@ -110,25 +110,25 @@ int test_computeEquilibriumRobustness(StaticEquilibrium solver_1, StaticEquilibr
   for(unsigned int i=0; i<comPositions.rows(); i++)
   {
     getProfiler().start(PERF_STRING_1);
-    status = solver_1.computeEquilibriumRobustness(comPositions.row(i), rob_1);
+    status = solver_1->computeEquilibriumRobustness(comPositions.row(i), rob_1);
     getProfiler().stop(PERF_STRING_1);
 
     if(status!=LP_STATUS_OPTIMAL)
     {
       if(verb>1)
-        SEND_ERROR_MSG(solver_1.getName()+" failed to compute robustness of com position "+toString(comPositions.row(i)));
+        SEND_ERROR_MSG(solver_1->getName()+" failed to compute robustness of com position "+toString(comPositions.row(i)));
       error_counter++;
       continue;
     }
 
     getProfiler().start(PERF_STRING_2);
-    status = solver_2.computeEquilibriumRobustness(comPositions.row(i), rob_2);
+    status = solver_2->computeEquilibriumRobustness(comPositions.row(i), rob_2);
     getProfiler().stop(PERF_STRING_2);
 
     if(status!=LP_STATUS_OPTIMAL)
     {
       if(verb>1)
-        SEND_ERROR_MSG(solver_2.getName()+" failed to compute robustness of com position "+toString(comPositions.row(i)));
+        SEND_ERROR_MSG(solver_2->getName()+" failed to compute robustness of com position "+toString(comPositions.row(i)));
       error_counter++;
       continue;
     }
@@ -136,13 +136,13 @@ int test_computeEquilibriumRobustness(StaticEquilibrium solver_1, StaticEquilibr
     if(fabs(rob_1-rob_2)>EPS)
     {
       if(verb>1)
-        SEND_ERROR_MSG(solver_1.getName()+" and "+solver_2.getName()+" returned different results: "+toString(rob_1)+" VS "+toString(rob_2));
+        SEND_ERROR_MSG(solver_1->getName()+" and "+solver_2->getName()+" returned different results: "+toString(rob_1)+" VS "+toString(rob_2));
       error_counter++;
     }
   }
 
   if(verb>0)
-    cout<<"Test computeEquilibriumRobustness "+solver_1.getName()+" VS "+solver_2.getName()+": "+toString(error_counter)+" error(s).\n";
+    cout<<"Test computeEquilibriumRobustness "+solver_1->getName()+" VS "+solver_2->getName()+": "+toString(error_counter)+" error(s).\n";
   return error_counter;
 }
 
@@ -159,9 +159,9 @@ int test_computeEquilibriumRobustness(StaticEquilibrium solver_1, StaticEquilibr
  * @param PERF_STRING_GROUND_TRUTH String to use for logging the computation times of solver_ground_truth
  * @param verb Verbosity level, 0 print nothing, 1 print summary, 2 print everything
  */
-int test_findExtremumOverLine(StaticEquilibrium &solver_to_test, StaticEquilibrium &solver_ground_truth,
+int test_findExtremumOverLine(StaticEquilibrium *solver_to_test, StaticEquilibrium *solver_ground_truth,
                               Cref_vector3 a0, int N_TESTS, double e_max,
-                              const char* PERF_STRING_TEST, const char* PERF_STRING_GROUND_TRUTH, int verb=0)
+                              const string& PERF_STRING_TEST, const string& PERF_STRING_GROUND_TRUTH, int verb=0)
 {
   int error_counter = 0;
   Vector3 a, com;
@@ -176,43 +176,43 @@ int test_findExtremumOverLine(StaticEquilibrium &solver_to_test, StaticEquilibri
       desired_robustness = e_max - EPS;
 
     getProfiler().start(PERF_STRING_TEST);
-    status  = solver_to_test.findExtremumOverLine(a, a0, desired_robustness, com);
+    status  = solver_to_test->findExtremumOverLine(a, a0, desired_robustness, com);
     getProfiler().stop(PERF_STRING_TEST);
 
     if(status!=LP_STATUS_OPTIMAL)
     {
-      status = solver_ground_truth.computeEquilibriumRobustness(a0, robustness);
+      status = solver_ground_truth->computeEquilibriumRobustness(a0, robustness);
       if(status!=LP_STATUS_OPTIMAL)
       {
         error_counter++;
         if(verb>1)
-          SEND_ERROR_MSG(solver_ground_truth.getName()+" failed to compute equilibrium robustness of com position "+toString(a0.transpose()));
+          SEND_ERROR_MSG(solver_ground_truth->getName()+" failed to compute equilibrium robustness of com position "+toString(a0.transpose()));
       }
       else if(robustness>desired_robustness)
       {
         error_counter++;
         if(verb>1)
-          SEND_ERROR_MSG(solver_to_test.getName()+" failed to find extremum over line starting from "+
+          SEND_ERROR_MSG(solver_to_test->getName()+" failed to find extremum over line starting from "+
                          toString(a0.transpose())+" with robustness "+toString(desired_robustness)+" while "+
-                         solver_ground_truth.getName()+" says this position has robustness "+toString(robustness));
+                         solver_ground_truth->getName()+" says this position has robustness "+toString(robustness));
       }
       continue;
     }
 
     getProfiler().start(PERF_STRING_GROUND_TRUTH);
-    status = solver_ground_truth.computeEquilibriumRobustness(com, robustness);
+    status = solver_ground_truth->computeEquilibriumRobustness(com, robustness);
     getProfiler().stop(PERF_STRING_GROUND_TRUTH);
 
     if(status!=LP_STATUS_OPTIMAL)
     {
       error_counter++;
       if(verb>1)
-        SEND_ERROR_MSG(solver_ground_truth.getName()+" failed to compute equilibrium robustness of com posiiton "+toString(com.transpose()));
+        SEND_ERROR_MSG(solver_ground_truth->getName()+" failed to compute equilibrium robustness of com posiiton "+toString(com.transpose()));
     }
     else if(fabs(robustness-desired_robustness)>EPS)
     {
       if(verb>1)
-        SEND_ERROR_MSG(solver_to_test.getName()+" found this extremum: "+toString(com.transpose())+
+        SEND_ERROR_MSG(solver_to_test->getName()+" found this extremum: "+toString(com.transpose())+
                        " over the line starting at "+toString(a0.transpose())+" in direction "+toString(a.transpose())+
                        " which should have robustness "+toString(desired_robustness)+
                        " but actually has robustness "+toString(robustness));
@@ -221,7 +221,7 @@ int test_findExtremumOverLine(StaticEquilibrium &solver_to_test, StaticEquilibri
   }
 
   if(verb>0)
-    cout<<"Test findExtremumOverLine "+solver_to_test.getName()+" VS "+solver_ground_truth.getName()+": "+toString(error_counter)+" error(s).\n";
+    cout<<"Test findExtremumOverLine "+solver_to_test->getName()+" VS "+solver_ground_truth->getName()+": "+toString(error_counter)+" error(s).\n";
   return error_counter;
 }
 
@@ -230,14 +230,60 @@ int test_findExtremumOverLine(StaticEquilibrium &solver_to_test, StaticEquilibri
  * @param solver The solver to use for computing the equilibrium robustness.
  * @param comPositions Grid of CoM positions in the form of an Nx2 matrix.
  */
-void drawRobustnessGrid(StaticEquilibrium &solver, Cref_matrixXX comPositions)
+void drawRobustnessGrid(int N_CONTACTS, int GRID_SIZE, StaticEquilibrium *solver,
+                        Cref_matrixXX comPositions, Cref_matrixXX p)
 {
+  MatrixXi contactPointCoord(4*N_CONTACTS,2);
+  VectorX minDistContactPoint = 1e10*VectorX::Ones(4*N_CONTACTS);
+
+  // create grid of com positions to test
+  for(unsigned int i=0; i<GRID_SIZE; i++)
+  {
+    for(unsigned int j=0; j<GRID_SIZE; j++)
+    {
+      // look for contact point positions on grid
+      for(long k=0; k<4*N_CONTACTS; k++)
+      {
+        double dist = (p.block<1,2>(k,0) - comPositions.block<1,2>(i*GRID_SIZE+j,0)).norm();
+        if(dist < minDistContactPoint(k))
+        {
+          minDistContactPoint(k) = dist;
+          contactPointCoord(k,0) = i;
+          contactPointCoord(k,1) = j;
+        }
+      }
+    }
+  }
+
+  cout<<"\nContact point positions\n";
+  bool contactPointDrawn;
+  for(unsigned int i=0; i<GRID_SIZE; i++)
+  {
+    for(unsigned int j=0; j<GRID_SIZE; j++)
+    {
+      contactPointDrawn = false;
+      for(long k=0; k<4*N_CONTACTS; k++)
+      {
+        if(contactPointCoord(k,0)==i && contactPointCoord(k,1)==j)
+        {
+          cout<<"X ";
+          contactPointDrawn = true;
+          break;
+        }
+      }
+      if(contactPointDrawn==false)
+        cout<<"- ";
+    }
+    printf("\n");
+  }
+
+  cout<<"\nRobustness grid computed with solver "<<solver->getName()<<endl;
   int grid_size = (int)sqrt(comPositions.rows());
   double rob ;
   LP_status status;
   for(unsigned int i=0; i<comPositions.rows(); i++)
   {
-    status = solver.computeEquilibriumRobustness(comPositions.row(i), rob);
+    status = solver->computeEquilibriumRobustness(comPositions.row(i), rob);
     if(status!=LP_STATUS_OPTIMAL)
     {
       SEND_ERROR_MSG("Faild to compute equilibrium robustness of com position "+toString(comPositions.row(i))+", error code "+toString(status));
@@ -255,6 +301,50 @@ void drawRobustnessGrid(StaticEquilibrium &solver, Cref_matrixXX comPositions)
     if((i+1)%grid_size==0)
       printf("\n");
   }
+}
+
+void generateContacts(unsigned int N_CONTACTS, double MIN_CONTACT_DISTANCE, double LX, double LY,
+                      RVector3 &CONTACT_POINT_LOWER_BOUNDS,
+                      RVector3 &CONTACT_POINT_UPPER_BOUNDS,
+                      RVector3 &RPY_LOWER_BOUNDS,
+                      RVector3 &RPY_UPPER_BOUNDS,
+                      MatrixXX& p, MatrixXX& N)
+{
+  MatrixXX contact_pos = MatrixXX::Zero(N_CONTACTS, 3);
+  MatrixXX contact_rpy = MatrixXX::Zero(N_CONTACTS, 3);
+  p.setZero(4*N_CONTACTS,3); // contact points
+  N.setZero(4*N_CONTACTS,3); // contact normals
+
+  // Generate contact positions and orientations
+  bool collision;
+  for(unsigned int i=0; i<N_CONTACTS; i++)
+  {
+    while(true) // generate contact position
+    {
+      uniform(CONTACT_POINT_LOWER_BOUNDS, CONTACT_POINT_UPPER_BOUNDS, contact_pos.row(i));
+      if(i==0)
+        break;
+      collision = false;
+      for(unsigned int j=0; j<i-1; j++)
+        if((contact_pos.row(i)-contact_pos.row(j)).norm() < MIN_CONTACT_DISTANCE)
+          collision = true;
+      if(collision==false)
+        break;
+    }
+
+//     generate contact orientation
+    uniform(RPY_LOWER_BOUNDS, RPY_UPPER_BOUNDS, contact_rpy.row(i));
+    generate_rectangle_contacts(LX, LY, contact_pos.row(i), contact_rpy.row(i),
+                                p.middleRows<4>(i*4), N.middleRows<4>(i*4));
+//    printf("Contact surface %d position (%.3f,%.3f,%.3f) ", i, contact_pos(i,0), contact_pos(i,1), contact_pos(i,2));
+//    printf("Orientation (%.3f,%.3f,%.3f)\n", contact_rpy(i,0), contact_rpy(i,1), contact_rpy(i,2));
+  }
+
+//  for(int i=0; i<p.rows(); i++)
+//  {
+//    printf("Contact point %d position (%.3f,%.3f,%.3f) ", i, p(i,0), p(i,1), p(i,2));
+//    printf("Normal (%.3f,%.3f,%.3f)\n", N(i,0), N(i,1), N(i,2));
+//  }
 }
 
 void testWithLoadedData()
@@ -327,11 +417,12 @@ int main()
   RVector3 RPY_LOWER_BOUNDS, RPY_UPPER_BOUNDS;
 
   /************************************** USER PARAMETERS *******************************/
+  unsigned int N_TESTS = 10;
   double mass = 55.0;
   double mu = 0.3;  // friction coefficient
   unsigned int generatorsPerContact = 4;
   unsigned int N_CONTACTS = 2;
-  double MIN_FEET_DISTANCE = 0.3;
+  double MIN_CONTACT_DISTANCE = 0.3;
   double LX = 0.5*0.2172;        // half contact surface size in x direction
   double LY = 0.5*0.138;         // half contact surface size in y direction
   CONTACT_POINT_LOWER_BOUNDS << 0.0,  0.0,  0.0;
@@ -342,217 +433,122 @@ int main()
   double X_MARG = 0.07;
   double Y_MARG = 0.07;
   const int GRID_SIZE = 10;
+  bool DRAW_CONTACT_POINTS = false;
   /************************************ END USER PARAMETERS *****************************/
+
+#ifdef CLP_FOUND
+  const int N_SOLVERS = 6;
+  string solverNames[] = {"LP oases", "LP2 oases", "DLP oases",
+                          "LP coin", "LP2 coin", "DLP coin"};
+  StaticEquilibriumAlgorithm algorithms[] = {STATIC_EQUILIBRIUM_ALGORITHM_LP,
+                                             STATIC_EQUILIBRIUM_ALGORITHM_LP2,
+                                             STATIC_EQUILIBRIUM_ALGORITHM_DLP,
+                                             STATIC_EQUILIBRIUM_ALGORITHM_LP,
+                                             STATIC_EQUILIBRIUM_ALGORITHM_LP2,
+                                             STATIC_EQUILIBRIUM_ALGORITHM_DLP};
+  SolverLP lp_solver_types[] = {SOLVER_LP_QPOASES, SOLVER_LP_QPOASES, SOLVER_LP_QPOASES,
+                        SOLVER_LP_CLP, SOLVER_LP_CLP, SOLVER_LP_CLP};
+#else
+  const int N_SOLVERS = 3;
+  string solverNames[] = {"LP oases", "LP2 oases", "DLP oases"};
+  StaticEquilibriumAlgorithm algorithms[] = {STATIC_EQUILIBRIUM_ALGORITHM_LP,
+                                             STATIC_EQUILIBRIUM_ALGORITHM_LP2,
+                                             STATIC_EQUILIBRIUM_ALGORITHM_DLP};
+  SolverLP lp_solver_types[] = {SOLVER_LP_QPOASES, SOLVER_LP_QPOASES, SOLVER_LP_QPOASES};
+#endif
 
   cout<<"Number of contacts: "<<N_CONTACTS<<endl;
   cout<<"Number of generators per contact: "<<generatorsPerContact<<endl;
+  cout<<"Gonna test equilibrium on a 2d grid of "<<GRID_SIZE<<"X"<<GRID_SIZE<<" points "<<endl;
 
-  StaticEquilibrium solver_PP("PP", mass, generatorsPerContact, SOLVER_LP_QPOASES);
-  StaticEquilibrium solver_LP_oases("LP oases", mass, generatorsPerContact, SOLVER_LP_QPOASES);
-  StaticEquilibrium solver_LP2_oases("LP2 oases", mass, generatorsPerContact, SOLVER_LP_QPOASES);
-  StaticEquilibrium solver_DLP_oases("DLP oases", mass, generatorsPerContact, SOLVER_LP_QPOASES);
+  StaticEquilibrium* solver_PP = new StaticEquilibrium("PP", mass, generatorsPerContact, SOLVER_LP_QPOASES);
+  StaticEquilibrium* solvers[N_SOLVERS];
+  for(int s=0; s<N_SOLVERS; s++)
+    solvers[s] = new StaticEquilibrium(solverNames[s], mass, generatorsPerContact, lp_solver_types[s]);
 
-#ifdef CLP_FOUND
-  StaticEquilibrium solver_LP_coin("LP coin", mass, generatorsPerContact, SOLVER_LP_CLP);
-  StaticEquilibrium solver_LP2_coin("LP2 coin", mass, generatorsPerContact, SOLVER_LP_CLP);
-  StaticEquilibrium solver_DLP_coin("DLP coin", mass, generatorsPerContact, SOLVER_LP_CLP);
-#endif
-
-  MatrixXX contact_pos = MatrixXX::Zero(N_CONTACTS, 3);
-  MatrixXX contact_rpy = MatrixXX::Zero(N_CONTACTS, 3);
-  MatrixXX p = MatrixXX::Zero(4*N_CONTACTS,3); // contact points
-  MatrixXX N = MatrixXX::Zero(4*N_CONTACTS,3); // contact normals
-
-  // Generate contact positions and orientations
-  bool collision;
-  for(unsigned int i=0; i<N_CONTACTS; i++)
-  {
-    while(true) // generate contact position
-    {
-      uniform(CONTACT_POINT_LOWER_BOUNDS, CONTACT_POINT_UPPER_BOUNDS, contact_pos.row(i));
-      if(i==0)
-        break;
-      collision = false;
-      for(unsigned int j=0; j<i-1; j++)
-        if((contact_pos.row(i)-contact_pos.row(j)).norm() < MIN_FEET_DISTANCE)
-          collision = true;
-      if(collision==false)
-        break;
-    }
-
-//     generate contact orientation
-    uniform(RPY_LOWER_BOUNDS, RPY_UPPER_BOUNDS, contact_rpy.row(i));
-    generate_rectangle_contacts(LX, LY, contact_pos.row(i), contact_rpy.row(i),
-                                p.middleRows<4>(i*4), N.middleRows<4>(i*4));
-    printf("Contact surface %d position (%.3f,%.3f,%.3f) ", i, contact_pos(i,0), contact_pos(i,1), contact_pos(i,2));
-    printf("Orientation (%.3f,%.3f,%.3f)\n", contact_rpy(i,0), contact_rpy(i,1), contact_rpy(i,2));
-  }
-
-  for(int i=0; i<p.rows(); i++)
-  {
-    printf("Contact point %d position (%.3f,%.3f,%.3f) ", i, p(i,0), p(i,1), p(i,2));
-    printf("Normal (%.3f,%.3f,%.3f)\n", N(i,0), N(i,1), N(i,2));
-  }
-
-  // compute upper and lower bounds of com positions to test
+  MatrixXX p, N;
   RVector2 com_LB, com_UB;
-  com_LB(0) = p.col(0).minCoeff()-X_MARG;
-  com_UB(0) = p.col(0).maxCoeff()+X_MARG;
-  com_LB(1) = p.col(1).minCoeff()-Y_MARG;
-  com_UB(1) = p.col(1).maxCoeff()+Y_MARG;
-
-  MatrixXi contactPointCoord(4*N_CONTACTS,2);
-  VectorX minDistContactPoint = 1e10*VectorX::Ones(4*N_CONTACTS);
-
-  // create grid of com positions to test
   VectorX x_range(GRID_SIZE), y_range(GRID_SIZE);
-  x_range.setLinSpaced(GRID_SIZE,com_LB(0),com_UB(0));
-  y_range.setLinSpaced(GRID_SIZE,com_LB(1),com_UB(1));
   MatrixXX comPositions(GRID_SIZE*GRID_SIZE, 3);
-  cout<<"Gonna test equilibrium on a 2d grid of "<<GRID_SIZE<<"X"<<GRID_SIZE<<" points ";
-  cout<<"ranging from "<<com_LB<<" to "<<com_UB<<endl;
-  for(unsigned int i=0; i<GRID_SIZE; i++)
+  for(unsigned n_test=0; n_test<N_TESTS; n_test++)
   {
-    for(unsigned int j=0; j<GRID_SIZE; j++)
-    {
-      comPositions(i*GRID_SIZE+j, 1) = y_range(GRID_SIZE-1-i);
-      comPositions(i*GRID_SIZE+j, 0) = x_range(j);
-      comPositions(i*GRID_SIZE+j, 2) = 0.0;
+    generateContacts(N_CONTACTS, MIN_CONTACT_DISTANCE, LX, LY,
+                     CONTACT_POINT_LOWER_BOUNDS, CONTACT_POINT_UPPER_BOUNDS,
+                     RPY_LOWER_BOUNDS, RPY_UPPER_BOUNDS, p, N);
 
-      // look for contact point positions on grid
-      for(long k=0; k<4*N_CONTACTS; k++)
+    for(int s=0; s<N_SOLVERS; s++)
+    {
+      getProfiler().start(PERF_LP_PREPARATION);
+      if(!solvers[s]->setNewContacts(p, N, mu, algorithms[s]))
       {
-        double dist = (p.block<1,2>(k,0) - comPositions.block<1,2>(i*GRID_SIZE+j,0)).norm();
-        if(dist < minDistContactPoint(k))
-        {
-          minDistContactPoint(k) = dist;
-          contactPointCoord(k,0) = i;
-          contactPointCoord(k,1) = j;
-        }
+        SEND_ERROR_MSG("Error while setting new contacts for solver "+solvers[s]->getName());
+        return -1;
+      }
+      getProfiler().stop(PERF_LP_PREPARATION);
+    }
+    getProfiler().start(PERF_PP);
+    if(!solver_PP->setNewContacts(p, N, mu, STATIC_EQUILIBRIUM_ALGORITHM_PP))
+    {
+      SEND_ERROR_MSG("Error while setting new contacts for solver "+solver_PP->getName());
+      return -1;
+    }
+    getProfiler().stop(PERF_PP);
+
+    // compute upper and lower bounds of com positions to test
+    com_LB(0) = p.col(0).minCoeff()-X_MARG;
+    com_UB(0) = p.col(0).maxCoeff()+X_MARG;
+    com_LB(1) = p.col(1).minCoeff()-Y_MARG;
+    com_UB(1) = p.col(1).maxCoeff()+Y_MARG;
+
+    // create grid of com positions to test
+
+    x_range.setLinSpaced(GRID_SIZE,com_LB(0),com_UB(0));
+    y_range.setLinSpaced(GRID_SIZE,com_LB(1),com_UB(1));
+//    cout<<"ranging from "<<com_LB<<" to "<<com_UB<<endl;
+    for(unsigned int i=0; i<GRID_SIZE; i++)
+    {
+      for(unsigned int j=0; j<GRID_SIZE; j++)
+      {
+        comPositions(i*GRID_SIZE+j, 1) = y_range(GRID_SIZE-1-i);
+        comPositions(i*GRID_SIZE+j, 0) = x_range(j);
+        comPositions(i*GRID_SIZE+j, 2) = 0.0;
       }
     }
-  }
 
-  cout<<"\nContact point positions\n";
-  bool contactPointDrawn;
-  for(unsigned int i=0; i<GRID_SIZE; i++)
-  {
-    for(unsigned int j=0; j<GRID_SIZE; j++)
+    if(DRAW_CONTACT_POINTS)
+      drawRobustnessGrid(N_CONTACTS, GRID_SIZE, solvers[0], comPositions, p);
+
+    string test_name = "Compute equilibrium robustness ";
+    for(int s=1; s<N_SOLVERS; s++)
     {
-      contactPointDrawn = false;
-      for(long k=0; k<4*N_CONTACTS; k++)
-      {
-        if(contactPointCoord(k,0)==i && contactPointCoord(k,1)==j)
-        {
-          cout<<"X ";
-          contactPointDrawn = true;
-          break;
-        }
-      }
-      if(contactPointDrawn==false)
-        cout<<"- ";
+      test_computeEquilibriumRobustness(solvers[0], solvers[s], comPositions, test_name+solvers[0]->getName(),
+          test_name+solvers[s]->getName(), 1);
     }
-    printf("\n");
-  }
 
-  getProfiler().start(PERF_LP_PREPARATION);
-  if(!solver_LP_oases.setNewContacts(p, N, mu, STATIC_EQUILIBRIUM_ALGORITHM_LP))
-  {
-    printf("Error while setting new contacts");
-    return -1;
-  }
-  getProfiler().stop(PERF_LP_PREPARATION);
+    for(int s=0; s<N_SOLVERS; s++)
+    {
+      test_computeEquilibriumRobustness_vs_checkEquilibrium(solvers[s], solver_PP, comPositions,
+          test_name+solvers[s]->getName(), "", 1);
+    }
 
-  getProfiler().start(PERF_LP_PREPARATION);
-  if(!solver_LP2_oases.setNewContacts(p, N, mu, STATIC_EQUILIBRIUM_ALGORITHM_LP2))
-  {
-    printf("Error while setting new contacts");
-    return -1;
-  }
-  getProfiler().stop(PERF_LP_PREPARATION);
-
-  getProfiler().start(PERF_LP_PREPARATION);
-  if(!solver_DLP_oases.setNewContacts(p, N, mu, STATIC_EQUILIBRIUM_ALGORITHM_DLP))
-  {
-    printf("Error while setting new contacts");
-    return -1;
-  }
-  getProfiler().stop(PERF_LP_PREPARATION);
-
-  getProfiler().start(PERF_PP);
-  bool res = solver_PP.setNewContacts(p, N, mu, STATIC_EQUILIBRIUM_ALGORITHM_PP);
-  getProfiler().stop(PERF_PP);
-  if(!res)
-  {
-    printf("Error while setting new contacts");
-    return -1;
-  }
-
-#ifdef CLP_FOUND
-  getProfiler().start(PERF_LP_PREPARATION);
-  if(!solver_LP_coin.setNewContacts(p, N, mu, STATIC_EQUILIBRIUM_ALGORITHM_LP))
-  {
-    printf("Error while setting new contacts");
-    return -1;
-  }
-  getProfiler().stop(PERF_LP_PREPARATION);
-
-  getProfiler().start(PERF_LP_PREPARATION);
-  if(!solver_LP2_coin.setNewContacts(p, N, mu, STATIC_EQUILIBRIUM_ALGORITHM_LP2))
-  {
-    printf("Error while setting new contacts");
-    return -1;
-  }
-  getProfiler().stop(PERF_LP_PREPARATION);
-
-  getProfiler().start(PERF_LP_PREPARATION);
-  if(!solver_DLP_coin.setNewContacts(p, N, mu, STATIC_EQUILIBRIUM_ALGORITHM_DLP))
-  {
-    printf("Error while setting new contacts");
-    return -1;
-  }
-  getProfiler().stop(PERF_LP_PREPARATION);
-#endif
-
-
-  cout<<"\nRobustness grid computed with DLP oases\n";
-  drawRobustnessGrid(solver_DLP_oases, comPositions);
-
-  test_computeEquilibriumRobustness(solver_DLP_oases, solver_LP_oases, comPositions, PERF_DLP_OASES, PERF_LP_OASES, 1);
-  test_computeEquilibriumRobustness(solver_DLP_oases, solver_LP2_oases, comPositions, PERF_DLP_OASES, PERF_LP2_OASES, 1);
-
-  test_computeEquilibriumRobustness_vs_checkEquilibrium(solver_LP_oases, solver_PP, comPositions, PERF_LP_OASES, NULL, 1);
-  test_computeEquilibriumRobustness_vs_checkEquilibrium(solver_LP2_oases, solver_PP, comPositions, PERF_LP2_OASES, NULL, 1);
-  test_computeEquilibriumRobustness_vs_checkEquilibrium(solver_DLP_oases, solver_PP, comPositions, PERF_DLP_OASES, NULL, 1);
-
-#ifdef CLP_FOUND
-  test_computeEquilibriumRobustness(solver_DLP_oases, solver_LP2_coin, comPositions, PERF_DLP_OASES, PERF_LP2_COIN, 1);
-  test_computeEquilibriumRobustness(solver_DLP_oases, solver_DLP_coin, comPositions, PERF_DLP_OASES, PERF_DLP_COIN, 1);
-  test_computeEquilibriumRobustness(solver_DLP_oases, solver_LP_coin, comPositions, PERF_DLP_OASES, PERF_LP_COIN, 1);
-
-  test_computeEquilibriumRobustness_vs_checkEquilibrium(solver_LP_coin, solver_PP, comPositions, PERF_LP_COIN, NULL, 1);
-  test_computeEquilibriumRobustness_vs_checkEquilibrium(solver_LP2_coin, solver_PP, comPositions, PERF_LP2_COIN, NULL, 1);
-  test_computeEquilibriumRobustness_vs_checkEquilibrium(solver_DLP_coin, solver_PP, comPositions, PERF_DLP_COIN, NULL, 1);
-#endif
-
-
-  const int N_TESTS = 1000;
-  Vector3 a0 = Vector3::Zero();
-  a0.head<2>() = 0.5*(com_LB+com_UB);
-  double e_max;
-  LP_status status = solver_LP_oases.computeEquilibriumRobustness(a0, e_max);
-  if(status!=LP_STATUS_OPTIMAL)
-  {
-    SEND_ERROR_MSG(solver_LP_oases.getName()+" failed to compute robustness of com position "+toString(a0.transpose())+", error code: "+toString(status));
-  }
-  else
-  {
-    test_findExtremumOverLine(solver_LP_oases, solver_DLP_oases, a0, N_TESTS, e_max, "EXTREMUM OVER LINE LP OASES", PERF_DLP_OASES, 2);
-    test_findExtremumOverLine(solver_DLP_oases, solver_DLP_oases, a0, N_TESTS, e_max, "EXTREMUM OVER LINE DLP OASES", PERF_DLP_OASES, 2);
-#ifdef CLP_FOUND
-    test_findExtremumOverLine(solver_LP_coin, solver_LP_coin, a0, N_TESTS, e_max, "EXTREMUM OVER LINE LP COIN", PERF_LP_COIN, 2);
-    test_findExtremumOverLine(solver_DLP_coin, solver_LP_coin, a0, N_TESTS, e_max, "EXTREMUM OVER LINE DLP COIN", PERF_LP_COIN, 2);
-#endif
+    const int N_TESTS_EXTREMUM = 100;
+    Vector3 a0 = Vector3::Zero();
+    a0.head<2>() = 0.5*(com_LB+com_UB);
+    double e_max;
+    LP_status status = solvers[0]->computeEquilibriumRobustness(a0, e_max);
+    if(status!=LP_STATUS_OPTIMAL)
+      SEND_ERROR_MSG(solvers[0]->getName()+" failed to compute robustness of com position "+toString(a0.transpose())+", error code: "+toString(status));
+    else
+    {
+      test_name = "EXTREMUM OVER LINE ";
+      string test_name2 = "Compute equilibrium robustness ";
+      for(int s=1; s<N_SOLVERS; s++)
+      {
+        if(solvers[s]->getAlgorithm()!=STATIC_EQUILIBRIUM_ALGORITHM_LP2)
+          test_findExtremumOverLine(solvers[s], solvers[0], a0, N_TESTS_EXTREMUM, e_max, test_name+solvers[s]->getName(),
+              test_name2+solvers[0]->getName(), 1);
+      }
+    }
   }
 
   getProfiler().report_all();

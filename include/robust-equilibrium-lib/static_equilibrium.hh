@@ -101,6 +101,8 @@ public:
    */
   std::string getName(){ return m_name; }
 
+  StaticEquilibriumAlgorithm getAlgorithm(){ return m_algorithm; }
+
   /**
    * @brief Specify a new set of contacts.
    * All 3d vectors are expressed in a reference frame having the z axis aligned with gravity.
@@ -131,6 +133,9 @@ public:
    * @param com The 3d center of mass position to test.
    * @param robustness The computed measure of robustness.
    * @return The status of the LP solver.
+   * @note If the system is in force closure the status will be LP_STATUS_UNBOUNDED, meaning that the
+   * system can reach infinite robustness. This is due to the fact that we are not considering
+   * any upper limit for the friction cones.
    */
   LP_status computeEquilibriumRobustness(Cref_vector3 com, double &robustness);
 
@@ -173,6 +178,9 @@ public:
    * @param a0 2d vector representing an arbitrary point over the line
    * @param e_max Desired robustness in terms of the maximum force error tolerated by the system
    * @return The status of the LP solver.
+   * @note If the system is in force closure the status will be LP_STATUS_UNBOUNDED, meaning that the
+   * system can reach infinite robustness. This is due to the fact that we are not considering
+   * any upper limit for the friction cones.
   */
   LP_status findExtremumOverLine(Cref_vector3 a, Cref_vector3 a0, double e_max, Ref_vector3 com);
 
@@ -195,6 +203,9 @@ public:
    * @param com Output 3d com position.
    * @param e_max Desired robustness level.
    * @return The status of the LP solver.
+   * @note If the system is in force closure the status will be LP_STATUS_UNBOUNDED, meaning that the
+   * system can reach infinite robustness. This is due to the fact that we are not considering
+   * any upper limit for the friction cones.
    */
   LP_status findExtremumInDirection(Cref_vector3 direction, Ref_vector3 com, double e_max=0.0);
 
