@@ -26,11 +26,30 @@ The test ```test_LP_solvers``` tries to solve some LP problems using qpOases and
 * [cdd lib](https://www.inf.ethz.ch/personal/fukudak/cdd_home/)
 * [qpOases (version >= 3.0beta)](https://projects.coin-or.org/qpOASES)
 
-You can install cdd lib under Ubuntu 12.04 with the following command:
+## Installation Steps for Ubuntu 12.04
+You can install cdd lib with the following command:
 ```
 sudo apt-get install libcdd-dev
 ```
-For Eigen and qpOases follow the instructions at the relative webpage (links in the list above).
+You can install Eigen3 with the following command:
+```
+ sudo apt-get install libeigen3-dev
+```
+Install qpOases from sources following the instructions on its [webpage](https://projects.coin-or.org/qpOASES).
+Note that you need to compile qpOases into a dynamic library (not a static one).
+
+Then you can build the library using CMake:
+```
+mkdir $ROBUST_EQUI_LIB_DIR/build
+cd $ROBUST_EQUI_LIB_DIR/build
+cmake -DCMAKE_INSTALL_PREFIX=${DEVEL_DIR}/install ..
+make install
+```
+Currently, CMake may have problems finding CDD and qpOases.
+If this is the case you can specify their paths manually, for instance:
+```
+cmake -DCDD_LIBRARY=/usr/lib/libcdd.so -DqpOASES_INCLUDEDIR=${QP_OASES_DIR}/include -DqpOASES_LIB=${QP_OASES_DIR}/bin/libqpOASES.so -DCMAKE_INSTALL_PREFIX=${DEVEL_DIR}/install ..
+```
 
 ### Optional
 As an alternative to qpOases you can use [CLP](https://projects.coin-or.org/Clp) to solve linear programs.
