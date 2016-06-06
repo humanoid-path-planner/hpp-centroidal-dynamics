@@ -43,9 +43,6 @@ cd qpoases/build
 cmake -DCMAKE_INSTALL_PREFIX=${DEVEL_DIR}/install ..
 make install
 ```
-#Alternatively, you can install qpOases from sources following the instructions on its [webpage](https://projects.coin-or.org/qpOASES).
-#Note that you need to compile qpOases into a dynamic library (not a static one).
-
 Then you can clone this repository using ssh:
 ```
 git clone --recursive git@github.com:andreadelprete/robust-equilibrium-lib.git $ROBUST_EQUI_LIB_DIR
