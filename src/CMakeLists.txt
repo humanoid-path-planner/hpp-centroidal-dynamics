@@ -4,7 +4,7 @@ include_directories("${SRC_DIR}")
 include_directories("${INCLUDE_DIR}")
 include_directories("${EIGEN3_INCLUDE_DIR}")
 include_directories("${CDD_INCLUDE_DIR}")
-include_directories("${qpOASES_INCLUDE_DIR}")
+# no need to include directories for qpOASES as it is automatically done through pkgconfig
 
 if(CLP_FOUND)
   include_directories("${CLP_INCLUDE_DIR}")
@@ -35,8 +35,9 @@ if ( MSVC )
 	SET(CMAKE_DEBUG_POSTFIX d)
 endif ( MSVC )
 
-TARGET_LINK_LIBRARIES(robust-equilibrium-lib ${CDD_LIBRARY}
-                                             ${qpOASES_LIBRARY})
+TARGET_LINK_LIBRARIES(robust-equilibrium-lib ${CDD_LIBRARY})
+PKG_CONFIG_USE_DEPENDENCY(robust-equilibrium-lib qpOASES)
+
 if(CLP_FOUND)
   TARGET_LINK_LIBRARIES(robust-equilibrium-lib ${CLP_LIBRARY}
                                                /usr/lib/libCoinUtils.so)

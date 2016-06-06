@@ -35,10 +35,18 @@ You can install Eigen3 with the following command:
 ```
  sudo apt-get install libeigen3-dev
 ```
-Install qpOases from sources following the instructions on its [webpage](https://projects.coin-or.org/qpOASES).
-Note that you need to compile qpOases into a dynamic library (not a static one).
+For qpOases you have to install the pkg-config version you can find here: https://github.com/humanoid-path-planner/qpoases
+```
+git clone --recursive https://github.com/humanoid-path-planner/qpoases
+mkdir qpoases/build
+cd qpoases/build
+cmake -DCMAKE_INSTALL_PREFIX=${DEVEL_DIR}/install ..
+make install
+```
+#Alternatively, you can install qpOases from sources following the instructions on its [webpage](https://projects.coin-or.org/qpOASES).
+#Note that you need to compile qpOases into a dynamic library (not a static one).
 
-Then you can clone the repository using ssh:
+Then you can clone this repository using ssh:
 ```
 git clone --recursive git@github.com:andreadelprete/robust-equilibrium-lib.git $ROBUST_EQUI_LIB_DIR
 ```
@@ -46,17 +54,17 @@ or using http:
 ```
 git clone --recursive https://github.com/andreadelprete/robust-equilibrium-lib.git $ROBUST_EQUI_LIB_DIR
 ```
-And you can build the library using CMake:
+And you can build this library using CMake:
 ```
 mkdir $ROBUST_EQUI_LIB_DIR/build
 cd $ROBUST_EQUI_LIB_DIR/build
 cmake -DCMAKE_INSTALL_PREFIX=${DEVEL_DIR}/install ..
 make install
 ```
-Currently, CMake may have problems finding CDD and qpOases.
-If this is the case you can specify their paths manually, for instance:
+Currently, CMake may have problems finding CDD.
+If this is the case you can specify its path manually, for instance:
 ```
-cmake -DCDD_LIBRARY=/usr/lib/libcdd.so -DqpOASES_INCLUDEDIR=${QP_OASES_DIR}/include -DqpOASES_LIB=${QP_OASES_DIR}/bin/libqpOASES.so -DCMAKE_INSTALL_PREFIX=${DEVEL_DIR}/install ..
+cmake -DCDD_LIBRARY=/usr/lib/libcdd.so -DCMAKE_INSTALL_PREFIX=${DEVEL_DIR}/install ..
 ```
 
 ### Optional

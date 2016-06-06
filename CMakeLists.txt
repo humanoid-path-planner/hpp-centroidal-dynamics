@@ -61,7 +61,8 @@ else()
   add_definitions(-DCLP_FOUND)
 endif()
 
-SEARCH_FOR_QPOASES()
+#SEARCH_FOR_QPOASES()
+ADD_REQUIRED_DEPENDENCY("qpOASES")
 
 add_subdirectory (src)
 add_subdirectory (test)
