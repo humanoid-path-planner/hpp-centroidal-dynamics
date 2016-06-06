@@ -38,7 +38,15 @@ You can install Eigen3 with the following command:
 Install qpOases from sources following the instructions on its [webpage](https://projects.coin-or.org/qpOASES).
 Note that you need to compile qpOases into a dynamic library (not a static one).
 
-Then you can build the library using CMake:
+Then you can clone the repository using ssh:
+```
+git clone --recursive git@github.com:andreadelprete/robust-equilibrium-lib.git $ROBUST_EQUI_LIB_DIR
+```
+or using http:
+```
+git clone --recursive https://github.com/andreadelprete/robust-equilibrium-lib.git $ROBUST_EQUI_LIB_DIR
+```
+And you can build the library using CMake:
 ```
 mkdir $ROBUST_EQUI_LIB_DIR/build
 cd $ROBUST_EQUI_LIB_DIR/build
