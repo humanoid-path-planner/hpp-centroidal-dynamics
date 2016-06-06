@@ -14,7 +14,6 @@
 #include <sstream>
 #include <Eigen/Dense>
 #include <map>
-#include <initializer_list>
 #include "boost/assign.hpp"
 
 namespace robust_equilibrium
