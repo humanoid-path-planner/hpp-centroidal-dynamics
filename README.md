@@ -58,11 +58,6 @@ cd $ROBUST_EQUI_LIB_DIR/build
 cmake -DCMAKE_INSTALL_PREFIX=${DEVEL_DIR}/install ..
 make install
 ```
-Currently, CMake may have problems finding CDD.
-If this is the case you can specify its path manually, for instance:
-```
-cmake -DCDD_LIBRARY=/usr/lib/libcdd.so -DCMAKE_INSTALL_PREFIX=${DEVEL_DIR}/install ..
-```
 
 ### Optional
 As an alternative to qpOases you can use [CLP](https://projects.coin-or.org/Clp) to solve linear programs.
