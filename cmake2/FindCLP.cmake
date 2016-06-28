@@ -11,7 +11,7 @@ find_path(CLP_INCLUDE_DIR coin/ClpSimplex.hpp
           HINTS ${CLP_INCLUDEDIR}
           PATH_SUFFIXES CLP )
 
-find_library(CLP_LIBRARY NAMES libclp
+find_library(CLP_LIBRARY NAMES libclp.so
              HINTS ${CLP_LIBDIR} ${CLP_LIBRARY_DIRS} )
 
 set(CLP_LIBRARIES ${CLP_LIBRARY} )
