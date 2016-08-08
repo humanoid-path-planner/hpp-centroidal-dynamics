@@ -44,6 +44,8 @@ private:
   /** Inequality matrix and vector defining the gravito-inertial wrench cone H w <= h */
   MatrixXX m_H;
   VectorX m_h;
+  /** False if a numerical instability appeared in the computation H and h*/
+  bool m_is_cdd_stable;
 
   /** Inequality matrix and vector defining the CoM support polygon HD com + Hd <= h */
   MatrixX3 m_HD;
@@ -209,6 +211,17 @@ public:
    */
   LP_status findExtremumInDirection(Cref_vector3 direction, Ref_vector3 com, double e_max=0.0);
 
+  /**
+   * @brief Retrieve the inequalities that define the admissible wrenchs
+   * for the current contact set.
+   * @param H reference to the H matrix to initialize
+   * @param h reference to the h vector to initialize
+   * @return The status of the inequalities. If the inequalities are not defined
+   * due to numerical instabilities, will send appropriate error message,
+   * and return LP_STATUS_ERROR. If they are not defined because no
+   * contact has been defined, will return LP_STATUS_INFEASIBLE
+   */
+  LP_status getPolytopeInequalities(MatrixXX& H, VectorX& h) const;
 };
 
 } // end namespace robust_equilibrium

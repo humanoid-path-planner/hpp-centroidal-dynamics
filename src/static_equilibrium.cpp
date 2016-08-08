@@ -19,6 +19,7 @@ bool StaticEquilibrium::m_is_cdd_initialized = false;
 
 StaticEquilibrium::StaticEquilibrium(string name, double mass, unsigned int generatorsPerContact,
                                      SolverLP solver_type, bool useWarmStart)
+    : m_is_cdd_stable(true)
 {
   if(!m_is_cdd_initialized)
   {
@@ -293,6 +294,28 @@ LP_status StaticEquilibrium::checkRobustEquilibrium(Cref_vector3 com, bool &equi
   return LP_STATUS_OPTIMAL;
 }
 
+
+LP_status StaticEquilibrium::getPolytopeInequalities(MatrixXX& H, VectorX& h) const
+{
+    if(m_algorithm!=STATIC_EQUILIBRIUM_ALGORITHM_PP)
+    {
+      SEND_ERROR_MSG("getPolytopeInequalities is only implemented for the PP algorithm");
+      return LP_STATUS_ERROR;
+    }
+    if(!m_is_cdd_stable)
+    {
+      SEND_ERROR_MSG("numerical instability in cddlib");
+      return LP_STATUS_ERROR;
+    }
+    if(m_G_centr.cols()==0)
+    {
+      return LP_STATUS_INFEASIBLE;
+    }
+    H = m_H;
+    h = m_h;
+    return LP_STATUS_OPTIMAL;
+}
+
 LP_status StaticEquilibrium::findExtremumOverLine(Cref_vector3 a, Cref_vector3 a0, double e_max, Ref_vector3 com)
 {
   const long m = m_G_centr.cols(); // number of gravito-inertial wrench generators
@@ -438,6 +461,7 @@ bool StaticEquilibrium::computePolytopeProjection(Cref_matrix6X v)
 //  getProfiler().stop("eigen_to_cdd");
 
   dd_ErrorType error = dd_NoError;
+  m_is_cdd_stable = true;
 
 //  getProfiler().start("dd_DDMatrix2Poly");
   dd_PolyhedraPtr H_= dd_DDMatrix2Poly(V, &error);
@@ -446,6 +470,7 @@ bool StaticEquilibrium::computePolytopeProjection(Cref_matrix6X v)
   if(error != dd_NoError)
   {
     SEND_ERROR_MSG("numerical instability in cddlib. ill formed polytope");
+    m_is_cdd_stable = false;
     return false;
   }
 
