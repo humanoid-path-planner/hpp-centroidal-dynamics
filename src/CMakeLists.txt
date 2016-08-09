@@ -15,6 +15,7 @@ SET(LIBRARY_NAME ${PROJECT_NAME})
 
 SET(${LIBRARY_NAME}_SOURCES
     ${INCLUDE_DIR}/robust-equilibrium-lib/config.hh
+    ${INCLUDE_DIR}/robust-equilibrium-lib/util.hh
     ${INCLUDE_DIR}/robust-equilibrium-lib/solver_LP_abstract.hh
     ${INCLUDE_DIR}/robust-equilibrium-lib/solver_LP_qpoases.hh
     ${INCLUDE_DIR}/robust-equilibrium-lib/solver_LP_clp.hh
