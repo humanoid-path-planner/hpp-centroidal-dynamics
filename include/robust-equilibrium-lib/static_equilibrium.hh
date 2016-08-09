@@ -50,6 +50,8 @@ private:
     * indicate the max number of attempts to compute the cone by introducing
     * a small pertubation of the system */
   const unsigned max_num_cdd_trials;
+  /** whether to remove redundant inequalities when computing double description matrices*/
+  const bool canonicalize_cdd_matrix;
 
   /** Inequality matrix and vector defining the CoM support polygon HD com + Hd <= h */
   MatrixX3 m_HD;
@@ -88,10 +90,12 @@ public:
    * @param solver_type Type of LP solver to use.
    * @param useWarmStart Whether the LP solver can warm start the resolution.
    * @param max_num_cdd_trials indicate the max number of attempts to compute the cone by introducing
+   * @param canonicalize_cdd_matrix whether to remove redundant inequalities when computing double description matrices
    * a small pertubation of the system
    */
   StaticEquilibrium(std::string name, double mass, unsigned int generatorsPerContact,
-                    SolverLP solver_type, bool useWarmStart=true, const unsigned int max_num_cdd_trials=0);
+                    SolverLP solver_type, bool useWarmStart=true, const unsigned int max_num_cdd_trials=0,
+                    const bool canonicalize_cdd_matrix=false);
 
   /**
    * @brief Returns the useWarmStart flag.

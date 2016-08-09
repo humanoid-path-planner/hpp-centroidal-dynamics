@@ -19,9 +19,10 @@ bool StaticEquilibrium::m_is_cdd_initialized = false;
 
 StaticEquilibrium::StaticEquilibrium(string name, double mass, unsigned int generatorsPerContact,
                                      SolverLP solver_type, bool useWarmStart,
-                                     const unsigned int max_num_cdd_trials)
+                                     const unsigned int max_num_cdd_trials, const bool canonicalize_cdd_matrix)
     : m_is_cdd_stable(true)
     , max_num_cdd_trials(max_num_cdd_trials)
+    , canonicalize_cdd_matrix(canonicalize_cdd_matrix)
 {
   if(!m_is_cdd_initialized)
   {
@@ -495,7 +496,7 @@ LP_status StaticEquilibrium::findExtremumInDirection(Cref_vector3 direction, Ref
 bool StaticEquilibrium::computePolytopeProjection(Cref_matrix6X v)
 {
 //  getProfiler().start("eigen_to_cdd");
-  dd_MatrixPtr V = cone_span_eigen_to_cdd(v.transpose());
+  dd_MatrixPtr V = cone_span_eigen_to_cdd(v.transpose(),canonicalize_cdd_matrix);
 //  getProfiler().stop("eigen_to_cdd");
 
   dd_ErrorType error = dd_NoError;
