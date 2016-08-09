@@ -46,6 +46,10 @@ private:
   VectorX m_h;
   /** False if a numerical instability appeared in the computation H and h*/
   bool m_is_cdd_stable;
+  /** STATIC_EQUILIBRIUM_ALGORITHM_PP: If double description fails,
+    * indicate the max number of attempts to compute the cone by introducing
+    * a small pertubation of the system */
+  const unsigned max_num_cdd_trials;
 
   /** Inequality matrix and vector defining the CoM support polygon HD com + Hd <= h */
   MatrixX3 m_HD;
@@ -59,6 +63,8 @@ private:
   double m_b0_to_emax_coefficient;
 
   bool computePolytopeProjection(Cref_matrix6X v);
+  bool computeGenerators(Cref_matrixX3 contactPoints, Cref_matrixX3 contactNormals,
+                         double frictionCoefficient, const bool perturbate = false);
 
   /**
    * @brief Given the smallest coefficient of the contact force generators it computes
@@ -81,9 +87,11 @@ public:
    * @param generatorsPerContact Number of generators used to approximate the friction cone per contact point.
    * @param solver_type Type of LP solver to use.
    * @param useWarmStart Whether the LP solver can warm start the resolution.
+   * @param max_num_cdd_trials indicate the max number of attempts to compute the cone by introducing
+   * a small pertubation of the system
    */
   StaticEquilibrium(std::string name, double mass, unsigned int generatorsPerContact,
-                    SolverLP solver_type, bool useWarmStart=true);
+                    SolverLP solver_type, bool useWarmStart=true, const unsigned int max_num_cdd_trials=0);
 
   /**
    * @brief Returns the useWarmStart flag.
