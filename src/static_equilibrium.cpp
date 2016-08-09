@@ -99,7 +99,7 @@ bool StaticEquilibrium::setNewContacts(Cref_matrixX3 contactPoints, Cref_matrixX
     A.bottomRows<3>() = crossMatrix(-1.0*contactPoints.row(i).transpose());
 
     // compute generators
-    theta = 0.0;
+    theta = acos(1/sqrt(2));
     for(int j=0; j<cg; j++)
     {
       G.col(j) = frictionCoefficient*sin(theta)*T1
