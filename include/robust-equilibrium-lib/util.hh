@@ -101,10 +101,11 @@ namespace robust_equilibrium
   /**
  * Convert the specified list of rays from Eigen to cdd format.
  * @param input The mXn input Eigen matrix contains m rays of dimension n.
+ * @param bool whether to remove redundant inequalities
  * @return The mX(n+1) output cdd matrix, which contains an additional column,
  * the first one, with all zeros.
  */
-  dd_MatrixPtr cone_span_eigen_to_cdd(Cref_matrixXX input);
+  dd_MatrixPtr cone_span_eigen_to_cdd(Cref_matrixXX input, const bool canonicalize=false);
 
   /**
  * Compute the cross-product skew-symmetric matrix associated to the specified vector.

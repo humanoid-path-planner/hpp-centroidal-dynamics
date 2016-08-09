@@ -12,7 +12,7 @@
 namespace robust_equilibrium
 {
 
-dd_MatrixPtr cone_span_eigen_to_cdd(Cref_matrixXX input)
+dd_MatrixPtr cone_span_eigen_to_cdd(Cref_matrixXX input, const bool canonicalize)
 {
   dd_debug = false;
   dd_MatrixPtr M=NULL;
@@ -40,6 +40,17 @@ dd_MatrixPtr cone_span_eigen_to_cdd(Cref_matrixXX input)
     }
   }
   dd_clear(value);
+  if(canonicalize)
+  {
+    dd_ErrorType error = dd_NoError;
+    dd_rowset redset,impl_linset;
+    dd_rowindex newpos;
+    dd_MatrixCanonicalize(&M, &impl_linset, &redset, &newpos, &error);
+    set_free(redset);
+    set_free(impl_linset);
+    free(newpos);
+  }
+
   return M;
 }
 
