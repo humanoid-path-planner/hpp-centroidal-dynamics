@@ -515,6 +515,16 @@ bool StaticEquilibrium::computePolytopeProjection(Cref_matrix6X v)
 
 //  getProfiler().start("cdd to eigen");
   dd_MatrixPtr b_A = dd_CopyInequalities(H_);
+  if(canonicalize_cdd_matrix)
+  {
+    dd_ErrorType error = dd_NoError;
+    dd_rowset redset,impl_linset;
+    dd_rowindex newpos;
+    dd_MatrixCanonicalize(&b_A, &impl_linset, &redset, &newpos, &error);
+    set_free(redset);
+    set_free(impl_linset);
+    free(newpos);
+  }
   // get equalities and add them as complementary inequality constraints
   std::vector<long> eq_rows;
   for(long elem=1;elem<=(long)(b_A->linset[0]);++elem)
