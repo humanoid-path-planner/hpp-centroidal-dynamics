@@ -562,4 +562,30 @@ double StaticEquilibrium::convert_emax_to_b0(double emax)
   return (emax/m_b0_to_emax_coefficient);
 }
 
+
+LP_status StaticEquilibrium::findMaximumAcceleration(Cref_matrixXX A, Cref_vector6 h, double& alpha0){
+  int m = (int)A.cols() -1 ; // 4* number of contacts
+  VectorX b_a0(m+1);
+  VectorX c = VectorX::Zero(m+1);
+  c(m) = -1.0;  // because we search max alpha0
+  VectorX lb = VectorX::Zero(m+1);
+  VectorX ub = VectorX::Ones(m+1)*1e10; // Inf
+  VectorX Alb = -h;
+  VectorX Aub = -h;
+
+
+  LP_status lpStatus = m_solver->solve(c, lb, ub, A, Alb, Aub, b_a0);
+  if(lpStatus==LP_STATUS_OPTIMAL)
+  {
+    alpha0 = -1.0 * m_solver->getObjectiveValue();
+    return lpStatus;
+  }
+  alpha0 = 0.0;
+  SEND_DEBUG_MSG("Primal LP problem could not be solved: "+toString(lpStatus));
+  return lpStatus;
+
+}
+
+
+
 } // end namespace robust_equilibrium

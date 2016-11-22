@@ -56,6 +56,7 @@ namespace robust_equilibrium
 
   typedef const Eigen::Ref<const Vector2>     & Cref_vector2;
   typedef const Eigen::Ref<const Vector3>     & Cref_vector3;
+  typedef const Eigen::Ref<const Vector6>     & Cref_vector6;
   typedef const Eigen::Ref<const VectorX>     & Cref_vectorX;
   typedef const Eigen::Ref<const Rotation>    & Cref_rotation;
   typedef const Eigen::Ref<const MatrixX3>    & Cref_matrixX3;

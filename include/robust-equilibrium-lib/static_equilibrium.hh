@@ -234,6 +234,27 @@ public:
    * contact has been defined, will return LP_STATUS_INFEASIBLE
    */
   LP_status getPolytopeInequalities(MatrixXX& H, VectorX& h) const;
+
+  /**
+   * @brief findMaximumAcceleration Find the maximal acceleration along a given direction
+          find          b, alpha0
+          minimize      -alpha0
+          subject to    -h <= [-G  (Hv)] [b a0]^T   <= -h
+                        0       <= [b a0]^T <= Inf
+
+
+          b         are the coefficient of the contact force generators (f = V b)
+          v         is the vector3 defining the direction of the motion
+          alpha0    is the maximal amplitude of the acceleration, for the given direction v
+          c         is the CoM position
+          G         is the matrix whose columns are the gravito-inertial wrench generators
+          A         is [-G  (Hv)]
+   * @param A
+   * @param h
+   * @param alpha0
+   * @return The status of the LP solver.
+   */
+  LP_status findMaximumAcceleration(Cref_matrixXX A, Cref_vector6 h, double& alpha0);
 };
 
 } // end namespace robust_equilibrium
