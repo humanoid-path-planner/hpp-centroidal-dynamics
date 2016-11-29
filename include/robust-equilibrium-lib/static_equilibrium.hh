@@ -238,7 +238,7 @@ public:
   /**
    * @brief findMaximumAcceleration Find the maximal acceleration along a given direction
           find          b, alpha0
-          minimize      -alpha0
+          maximize      alpha0
           subject to    -h <= [-G  (Hv)] [b a0]^T   <= -h
                         0       <= [b a0]^T <= Inf
 
@@ -255,6 +255,24 @@ public:
    * @return The status of the LP solver.
    */
   LP_status findMaximumAcceleration(Cref_matrixXX A, Cref_vector6 h, double& alpha0);
+
+  /**
+   * @brief checkAdmissibleAcceleration return true if the given acceleration is admissible for the given contacts
+          find          b
+          subject to    G b = Ha + h
+                        0       <= b <= Inf
+          b         are the coefficient of the contact force generators (f = V b)
+          a         is the vector3 defining the acceleration
+          G         is the matrix whose columns are the gravito-inertial wrench generators
+          h and H come from polytope inequalities
+   * @param G
+   * @param H
+   * @param h
+   * @param a
+   * @return true if the acceleration is admissible, false otherwise
+   */
+  bool checkAdmissibleAcceleration(Cref_matrixXX G, Cref_matrixXX H, Cref_vector6 h, Cref_vector3 a );
+
 };
 
 } // end namespace robust_equilibrium

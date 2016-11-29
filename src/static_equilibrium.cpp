@@ -586,6 +586,26 @@ LP_status StaticEquilibrium::findMaximumAcceleration(Cref_matrixXX A, Cref_vecto
 
 }
 
+bool StaticEquilibrium::checkAdmissibleAcceleration(Cref_matrixXX G, Cref_matrixXX H, Cref_vector6 h, Cref_vector3 a ){
+  int m = (int)G.cols(); // number of contact * 4
+  VectorX b(m);
+  VectorX c = VectorX::Zero(m);
+  VectorX lb = VectorX::Zero(m);
+  VectorX ub = VectorX::Ones(m)*1e10; // Inf
+  VectorX Alb = H*a + h;
+  VectorX Aub = H*a + h;
+
+
+  LP_status lpStatus = m_solver->solve(c, lb, ub, G, Alb, Aub, b);
+  if(lpStatus==LP_STATUS_OPTIMAL)
+  {
+    return true;
+  }
+  else{
+    SEND_DEBUG_MSG("Primal LP problem could not be solved: "+toString(lpStatus));
+    return false;
+  }
+}
 
 
 } // end namespace robust_equilibrium
