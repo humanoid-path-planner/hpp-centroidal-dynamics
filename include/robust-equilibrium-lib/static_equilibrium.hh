@@ -154,6 +154,30 @@ public:
   LP_status computeEquilibriumRobustness(Cref_vector3 com, double &robustness);
 
   /**
+   * @brief Compute a measure of the robustness of the equilibrium of the specified com position.
+   * This amounts to solving the following LP:
+   *       find          b, b0
+   *       maximize      b0
+   *       subject to    G b = D c + d
+   *                     b >= b0
+   *  where:
+   *     b         are the coefficient of the contact force generators (f = G b)
+   *     b0        is a parameter proportional to the robustness measure
+   *     c         is the specified CoM position
+   *     G         is the 6xm matrix whose columns are the gravito-inertial wrench generators
+   *     D         is the 6x3 matrix mapping the CoM position in gravito-inertial wrench
+   *     d         is the 6d vector containing the gravity part of the gravito-inertial wrench
+   * @param com The 3d center of mass position to test.
+   * @param acc The 3d acceleration of the CoM.
+   * @param robustness The computed measure of robustness.
+   * @return The status of the LP solver.
+   * @note If the system is in force closure the status will be LP_STATUS_UNBOUNDED, meaning that the
+   * system can reach infinite robustness. This is due to the fact that we are not considering
+   * any upper limit for the friction cones.
+   */
+  LP_status computeEquilibriumRobustness(Cref_vector3 com, Cref_vector3 acc, double &robustness);
+
+  /**
    * @brief Check whether the specified com position is in robust equilibrium.
    * This amounts to solving the following feasibility LP:
    *       find          b

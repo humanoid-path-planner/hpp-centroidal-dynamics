@@ -303,6 +303,27 @@ LP_status StaticEquilibrium::computeEquilibriumRobustness(Cref_vector3 com, doub
   return LP_STATUS_ERROR;
 }
 
+LP_status StaticEquilibrium::computeEquilibriumRobustness(Cref_vector3 com, Cref_vector3 acc, double &robustness){
+  // Take the acceleration in account in D and d :
+  Matrix63 old_D = m_D;
+  Vector6 old_d = m_d;
+  m_D.block<3,3>(3,0) = crossMatrix(-m_mass * (m_gravity - acc));
+  m_d.head<3>()= m_mass * (m_gravity - acc);
+  // compute equilibrium robustness with the new D and d
+  LP_status status = computeEquilibriumRobustness(com,robustness);
+  // Switch back to the original values of D and d
+  m_D = old_D;
+  m_d = old_d;
+  return status;
+}
+
+/**
+  m_d.setZero();
+  m_d.head<3>() = m_mass*m_gravity;
+  m_D.setZero();
+  m_D.block<3,3>(3,0) = crossMatrix(-m_mass*m_gravity);
+*/
+
 LP_status StaticEquilibrium::checkRobustEquilibrium(Cref_vector3 com, bool &equilibrium, double e_max)
 {
   if(m_G_centr.cols()==0)
