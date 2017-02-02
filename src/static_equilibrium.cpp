@@ -18,12 +18,17 @@ namespace robust_equilibrium
 bool StaticEquilibrium::m_is_cdd_initialized = false;
 
 StaticEquilibrium::StaticEquilibrium(string name, double mass, unsigned int generatorsPerContact,
-                                     SolverLP solver_type, bool useWarmStart)
+                                     SolverLP solver_type, bool useWarmStart,
+                                     const unsigned int max_num_cdd_trials, const bool canonicalize_cdd_matrix)
+    : m_is_cdd_stable(true)
+    , max_num_cdd_trials(max_num_cdd_trials)
+    , canonicalize_cdd_matrix(canonicalize_cdd_matrix)
 {
   if(!m_is_cdd_initialized)
   {
     init_cdd_library();
     m_is_cdd_initialized = true;
+    srand ( (unsigned int) (time(NULL)) );
   }
 
   if(generatorsPerContact<3)
@@ -48,6 +53,82 @@ StaticEquilibrium::StaticEquilibrium(string name, double mass, unsigned int gene
   m_D.block<3,3>(3,0) = crossMatrix(-m_mass*m_gravity);
 }
 
+bool StaticEquilibrium::computeGenerators(Cref_matrixX3 contactPoints, Cref_matrixX3 contactNormals,
+                                          double frictionCoefficient, const bool perturbate)
+{
+    long int c = contactPoints.rows();
+    unsigned int &cg = m_generatorsPerContact;
+    double theta, delta_theta=2*M_PI/cg;
+    const value_type pi_4 = value_type(M_PI_4);
+    // perturbation for libcdd
+    const value_type epsilon = 2*1e-3;
+    if(perturbate)
+        frictionCoefficient = frictionCoefficient +(rand()/ value_type(RAND_MAX))*epsilon;
+    // Tangent directions
+    Vector3 T1, T2, N;
+    // contact point
+    Vector3 P;
+    // Matrix mapping a 3d contact force to gravito-inertial wrench (6 X 3)
+    Matrix63 A;
+    A.topRows<3>() = -Matrix3::Identity();
+    Matrix3X G(3, cg);
+    for(long int i=0; i<c; i++)
+    {
+      // check that contact normals have norm 1
+      if(fabs(contactNormals.row(i).norm()-1.0)>1e-6)
+      {
+        SEND_ERROR_MSG("Contact normals should have norm 1, this has norm %f"+toString(contactNormals.row(i).norm()));
+        return false;
+      }
+      // compute tangent directions
+      N = contactNormals.row(i);
+      P = contactPoints.row(i);
+      if(perturbate)
+      {
+          for(int k =0; k<3; ++k)
+          {
+              N(k) +=(rand()/ value_type(RAND_MAX))*epsilon;
+              P(k) +=(rand()/ value_type(RAND_MAX))*epsilon;
+          }
+          N.normalize();
+      }
+      T1 = N.cross(Vector3::UnitY());
+      if(T1.norm()<1e-5)
+        T1 = N.cross(Vector3::UnitX());
+      T2 = N.transpose().cross(T1);
+      T1.normalize();
+      T2.normalize();
+
+      // compute matrix mapping contact forces to gravito-inertial wrench
+      A.bottomRows<3>() = crossMatrix(-1.0*P);
+
+      // compute generators
+      theta = pi_4;
+      for(int j=0; j<cg; j++)
+      {
+        G.col(j) = frictionCoefficient*sin(theta)*T1
+                  + frictionCoefficient*cos(theta)*T2
+                  + contactNormals.row(i).transpose();
+        G.col(j).normalize();
+  //      SEND_DEBUG_MSG("Contact "+toString(i)+" generator "+toString(j)+" = "+toString(G.col(j).transpose()));
+        theta += delta_theta;
+      }
+
+      // project generators in 6d centroidal space
+      m_G_centr.block(0,cg*i,6,cg) = A * G;
+    }
+    // Compute the coefficient to convert b0 to e_max
+    Vector3 f0 = Vector3::Zero();
+    for(int j=0; j<cg; j++)
+      f0 += G.col(j); // sum of the contact generators
+    // Compute the distance between the friction cone boundaries and
+    // the sum of the contact generators, which is e_max when b0=1.
+    // When b0!=1 we just multiply b0 times this value.
+    // This value depends only on the number of generators and the friction coefficient
+    m_b0_to_emax_coefficient = (f0.cross(G.col(0))).norm();
+    return true;
+}
+
 bool StaticEquilibrium::setNewContacts(Cref_matrixX3 contactPoints, Cref_matrixX3 contactNormals,
                                        double frictionCoefficient, StaticEquilibriumAlgorithm alg)
 {
@@ -66,67 +147,26 @@ bool StaticEquilibrium::setNewContacts(Cref_matrixX3 contactPoints, Cref_matrixX
 
   m_algorithm = alg;
 
-  long int c = contactPoints.rows();
-  unsigned int &cg = m_generatorsPerContact;
-  double theta, delta_theta=2*M_PI/cg;
-  // Tangent directions
-  Vector3 T1, T2;
-  // Matrix mapping a 3d contact force to gravito-inertial wrench (6 X 3)
-  Matrix63 A;
-  A.topRows<3>() = -Matrix3::Identity();
   // Lists of contact generators (3 X generatorsPerContact)
-  Matrix3X G(3, cg);
-  m_G_centr.resize(6,c*cg);
+  m_G_centr.resize(6,contactPoints.rows()*m_generatorsPerContact);
 
-  for(long int i=0; i<c; i++)
+  if (!computeGenerators(contactPoints,contactNormals,frictionCoefficient,false))
   {
-    // check that contact normals have norm 1
-    if(fabs(contactNormals.row(i).norm()-1.0)>1e-6)
-    {
-      SEND_ERROR_MSG("Contact normals should have norm 1, this has norm %f"+toString(contactNormals.row(i).norm()));
-      return false;
-    }
-    // compute tangent directions
-    T1 = contactNormals.row(i).cross(Vector3::UnitY());
-    if(T1.norm()<1e-5)
-      T1 = contactNormals.row(i).cross(Vector3::UnitX());
-    T2 = contactNormals.row(i).transpose().cross(T1);
-    T1.normalize();
-    T2.normalize();
-
-    // compute matrix mapping contact forces to gravito-inertial wrench
-    A.bottomRows<3>() = crossMatrix(-1.0*contactPoints.row(i).transpose());
-
-    // compute generators
-    theta = 0.0;
-    for(int j=0; j<cg; j++)
-    {
-      G.col(j) = frictionCoefficient*sin(theta)*T1
-                + frictionCoefficient*cos(theta)*T2
-                + contactNormals.row(i).transpose();
-      G.col(j).normalize();
-//      SEND_DEBUG_MSG("Contact "+toString(i)+" generator "+toString(j)+" = "+toString(G.col(j).transpose()));
-      theta += delta_theta;
-    }
-
-    // project generators in 6d centroidal space
-    m_G_centr.block(0,cg*i,6,cg) = A * G;
+    return false;
   }
-
-  // Compute the coefficient to convert b0 to e_max
-  Vector3 f0 = Vector3::Zero();
-  for(int j=0; j<cg; j++)
-    f0 += G.col(j); // sum of the contact generators
-  // Compute the distance between the friction cone boundaries and
-  // the sum of the contact generators, which is e_max when b0=1.
-  // When b0!=1 we just multiply b0 times this value.
-  // This value depends only on the number of generators and the friction coefficient
-  m_b0_to_emax_coefficient = (f0.cross(G.col(0))).norm();
 
   if(m_algorithm==STATIC_EQUILIBRIUM_ALGORITHM_PP)
   {
-    if(!computePolytopeProjection(m_G_centr))
+    unsigned int attempts = max_num_cdd_trials;
+    while(!computePolytopeProjection(m_G_centr) && attempts>0)
+    {
+      computeGenerators(contactPoints,contactNormals,frictionCoefficient,true);
+      attempts--;
+    }
+    if(!m_is_cdd_stable)
+    {
       return false;
+    }
     m_HD = m_H * m_D;
     m_Hd = m_H * m_d;
   }
@@ -293,6 +333,28 @@ LP_status StaticEquilibrium::checkRobustEquilibrium(Cref_vector3 com, bool &equi
   return LP_STATUS_OPTIMAL;
 }
 
+
+LP_status StaticEquilibrium::getPolytopeInequalities(MatrixXX& H, VectorX& h) const
+{
+    if(m_algorithm!=STATIC_EQUILIBRIUM_ALGORITHM_PP)
+    {
+      SEND_ERROR_MSG("getPolytopeInequalities is only implemented for the PP algorithm");
+      return LP_STATUS_ERROR;
+    }
+    if(!m_is_cdd_stable)
+    {
+      SEND_ERROR_MSG("numerical instability in cddlib");
+      return LP_STATUS_ERROR;
+    }
+    if(m_G_centr.cols()==0)
+    {
+      return LP_STATUS_INFEASIBLE;
+    }
+    H = m_H;
+    h = m_h;
+    return LP_STATUS_OPTIMAL;
+}
+
 LP_status StaticEquilibrium::findExtremumOverLine(Cref_vector3 a, Cref_vector3 a0, double e_max, Ref_vector3 com)
 {
   const long m = m_G_centr.cols(); // number of gravito-inertial wrench generators
@@ -434,10 +496,11 @@ LP_status StaticEquilibrium::findExtremumInDirection(Cref_vector3 direction, Ref
 bool StaticEquilibrium::computePolytopeProjection(Cref_matrix6X v)
 {
 //  getProfiler().start("eigen_to_cdd");
-  dd_MatrixPtr V = cone_span_eigen_to_cdd(v.transpose());
+  dd_MatrixPtr V = cone_span_eigen_to_cdd(v.transpose(),canonicalize_cdd_matrix);
 //  getProfiler().stop("eigen_to_cdd");
 
   dd_ErrorType error = dd_NoError;
+  m_is_cdd_stable = true;
 
 //  getProfiler().start("dd_DDMatrix2Poly");
   dd_PolyhedraPtr H_= dd_DDMatrix2Poly(V, &error);
@@ -446,11 +509,22 @@ bool StaticEquilibrium::computePolytopeProjection(Cref_matrix6X v)
   if(error != dd_NoError)
   {
     SEND_ERROR_MSG("numerical instability in cddlib. ill formed polytope");
+    m_is_cdd_stable = false;
     return false;
   }
 
 //  getProfiler().start("cdd to eigen");
   dd_MatrixPtr b_A = dd_CopyInequalities(H_);
+  if(canonicalize_cdd_matrix)
+  {
+    dd_ErrorType error = dd_NoError;
+    dd_rowset redset,impl_linset;
+    dd_rowindex newpos;
+    dd_MatrixCanonicalize(&b_A, &impl_linset, &redset, &newpos, &error);
+    set_free(redset);
+    set_free(impl_linset);
+    free(newpos);
+  }
   // get equalities and add them as complementary inequality constraints
   std::vector<long> eq_rows;
   for(long elem=1;elem<=(long)(b_A->linset[0]);++elem)

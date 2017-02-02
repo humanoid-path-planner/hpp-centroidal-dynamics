@@ -44,6 +44,14 @@ private:
   /** Inequality matrix and vector defining the gravito-inertial wrench cone H w <= h */
   MatrixXX m_H;
   VectorX m_h;
+  /** False if a numerical instability appeared in the computation H and h*/
+  bool m_is_cdd_stable;
+  /** STATIC_EQUILIBRIUM_ALGORITHM_PP: If double description fails,
+    * indicate the max number of attempts to compute the cone by introducing
+    * a small pertubation of the system */
+  const unsigned max_num_cdd_trials;
+  /** whether to remove redundant inequalities when computing double description matrices*/
+  const bool canonicalize_cdd_matrix;
 
   /** Inequality matrix and vector defining the CoM support polygon HD com + Hd <= h */
   MatrixX3 m_HD;
@@ -57,6 +65,8 @@ private:
   double m_b0_to_emax_coefficient;
 
   bool computePolytopeProjection(Cref_matrix6X v);
+  bool computeGenerators(Cref_matrixX3 contactPoints, Cref_matrixX3 contactNormals,
+                         double frictionCoefficient, const bool perturbate = false);
 
   /**
    * @brief Given the smallest coefficient of the contact force generators it computes
@@ -79,9 +89,13 @@ public:
    * @param generatorsPerContact Number of generators used to approximate the friction cone per contact point.
    * @param solver_type Type of LP solver to use.
    * @param useWarmStart Whether the LP solver can warm start the resolution.
+   * @param max_num_cdd_trials indicate the max number of attempts to compute the cone by introducing
+   * @param canonicalize_cdd_matrix whether to remove redundant inequalities when computing double description matrices
+   * a small pertubation of the system
    */
   StaticEquilibrium(std::string name, double mass, unsigned int generatorsPerContact,
-                    SolverLP solver_type, bool useWarmStart=true);
+                    SolverLP solver_type, bool useWarmStart=true, const unsigned int max_num_cdd_trials=0,
+                    const bool canonicalize_cdd_matrix=false);
 
   /**
    * @brief Returns the useWarmStart flag.
@@ -209,6 +223,17 @@ public:
    */
   LP_status findExtremumInDirection(Cref_vector3 direction, Ref_vector3 com, double e_max=0.0);
 
+  /**
+   * @brief Retrieve the inequalities that define the admissible wrenchs
+   * for the current contact set.
+   * @param H reference to the H matrix to initialize
+   * @param h reference to the h vector to initialize
+   * @return The status of the inequalities. If the inequalities are not defined
+   * due to numerical instabilities, will send appropriate error message,
+   * and return LP_STATUS_ERROR. If they are not defined because no
+   * contact has been defined, will return LP_STATUS_INFEASIBLE
+   */
+  LP_status getPolytopeInequalities(MatrixXX& H, VectorX& h) const;
 };
 
 } // end namespace robust_equilibrium
