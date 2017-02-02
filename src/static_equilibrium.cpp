@@ -28,7 +28,7 @@ StaticEquilibrium::StaticEquilibrium(string name, double mass, unsigned int gene
   {
     init_cdd_library();
     m_is_cdd_initialized = true;
-    srand ( (unsigned int) (time(NULL)) );
+    //srand ( (unsigned int) (time(NULL)) );
   }
 
   if(generatorsPerContact<3)
@@ -596,6 +596,11 @@ LP_status StaticEquilibrium::findMaximumAcceleration(Cref_matrixXX A, Cref_vecto
 
 
   LP_status lpStatus = m_solver->solve(c, lb, ub, A, Alb, Aub, b_a0);
+  if(lpStatus==LP_STATUS_UNBOUNDED){
+    SEND_DEBUG_MSG("Primal LP problem is unbounded : "+toString(lpStatus));
+    alpha0 = std::numeric_limits<double>::infinity();
+    return lpStatus;
+  }
   if(lpStatus==LP_STATUS_OPTIMAL)
   {
     alpha0 = -1.0 * m_solver->getObjectiveValue();
@@ -618,7 +623,7 @@ bool StaticEquilibrium::checkAdmissibleAcceleration(Cref_matrixXX G, Cref_matrix
 
 
   LP_status lpStatus = m_solver->solve(c, lb, ub, G, Alb, Aub, b);
-  if(lpStatus==LP_STATUS_OPTIMAL)
+  if(lpStatus==LP_STATUS_OPTIMAL || lpStatus==LP_STATUS_UNBOUNDED)
   {
     return true;
   }
