@@ -75,7 +75,7 @@ bool StaticEquilibrium::computeGenerators(Cref_matrixX3 contactPoints, Cref_matr
     for(long int i=0; i<c; i++)
     {
       // check that contact normals have norm 1
-      if(fabs(contactNormals.row(i).norm()-1.0)>1e-6)
+      if(fabs(contactNormals.row(i).norm()-1.0)>1e-4)
       {
         SEND_ERROR_MSG("Contact normals should have norm 1, this has norm %f"+toString(contactNormals.row(i).norm()));
         return false;
@@ -620,15 +620,19 @@ bool StaticEquilibrium::checkAdmissibleAcceleration(Cref_matrixXX G, Cref_matrix
   VectorX ub = VectorX::Ones(m)*1e10; // Inf
   VectorX Alb = H*a + h;
   VectorX Aub = H*a + h;
+  int iter = 0;
+  LP_status lpStatus;
+  do{
+    lpStatus = m_solver->solve(c, lb, ub, G, Alb, Aub, b);
+    iter ++;
+  }while(lpStatus == LP_STATUS_ERROR && iter < 5);
 
-
-  LP_status lpStatus = m_solver->solve(c, lb, ub, G, Alb, Aub, b);
   if(lpStatus==LP_STATUS_OPTIMAL || lpStatus==LP_STATUS_UNBOUNDED)
   {
     return true;
   }
   else{
-    SEND_DEBUG_MSG("Primal LP problem could not be solved: "+toString(lpStatus));
+    //SEND_DEBUG_MSG("Primal LP problem could not be solved: "+toString(lpStatus));
     return false;
   }
 }
