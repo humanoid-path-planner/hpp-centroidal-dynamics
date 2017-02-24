@@ -597,7 +597,7 @@ LP_status StaticEquilibrium::findMaximumAcceleration(Cref_matrixXX A, Cref_vecto
 
   LP_status lpStatus = m_solver->solve(c, lb, ub, A, Alb, Aub, b_a0);
   if(lpStatus==LP_STATUS_UNBOUNDED){
-    SEND_DEBUG_MSG("Primal LP problem is unbounded : "+toString(lpStatus));
+    //SEND_DEBUG_MSG("Primal LP problem is unbounded : "+toString(lpStatus));
     alpha0 = std::numeric_limits<double>::infinity();
     return lpStatus;
   }
@@ -607,7 +607,7 @@ LP_status StaticEquilibrium::findMaximumAcceleration(Cref_matrixXX A, Cref_vecto
     return lpStatus;
   }
   alpha0 = 0.0;
-  SEND_DEBUG_MSG("Primal LP problem could not be solved: "+toString(lpStatus));
+  //SEND_DEBUG_MSG("Primal LP problem could not be solved: "+toString(lpStatus));
   return lpStatus;
 
 }
