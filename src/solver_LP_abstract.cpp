@@ -15,7 +15,7 @@
 
 using namespace std;
 
-namespace robust_equilibrium
+namespace centroidal_dynamics
 {
 
 Solver_LP_abstract* Solver_LP_abstract::getNewSolver(SolverLP solverType)
@@ -108,4 +108,4 @@ bool Solver_LP_abstract::setMaximumTime(double seconds)
   return true;
 }
 
-} // end namespace robust_equilibrium
+} // end namespace centroidal_dynamics

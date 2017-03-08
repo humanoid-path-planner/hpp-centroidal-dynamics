@@ -12,7 +12,7 @@
 
 using namespace std;
 
-namespace robust_equilibrium
+namespace centroidal_dynamics
 {
 
 bool StaticEquilibrium::m_is_cdd_initialized = false;
@@ -638,4 +638,4 @@ bool StaticEquilibrium::checkAdmissibleAcceleration(Cref_matrixXX G, Cref_matrix
 }
 
 
-} // end namespace robust_equilibrium
+} // end namespace centroidal_dynamics

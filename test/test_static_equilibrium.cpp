@@ -9,7 +9,7 @@
 #include <centroidal-dynamics-lib/logger.hh>
 #include <centroidal-dynamics-lib/stop-watch.hh>
 
-using namespace robust_equilibrium;
+using namespace centroidal_dynamics;
 using namespace Eigen;
 using namespace std;
 

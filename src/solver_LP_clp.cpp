@@ -8,7 +8,7 @@
 #include <centroidal-dynamics-lib/solver_LP_clp.hh>
 #include "CoinBuild.hpp"
 
-namespace robust_equilibrium
+namespace centroidal_dynamics
 {
 
 Solver_LP_clp::Solver_LP_clp(): Solver_LP_abstract()
@@ -116,6 +116,6 @@ bool Solver_LP_clp::setMaximumTime(double seconds)
   return true;
 }
 
-} // end namespace robust_equilibrium
+} // end namespace centroidal_dynamics
 
 #endif //CLP_FOUND

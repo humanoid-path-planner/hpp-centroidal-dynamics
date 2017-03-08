@@ -3,8 +3,8 @@
  * Author: Andrea Del Prete
  */
 
-#ifndef __robust_equilibrium_lib_logger_H__
-#define __robust_equilibrium_lib_logger_H__
+#ifndef __centroidal_dynamics_lib_logger_H__
+#define __centroidal_dynamics_lib_logger_H__
 
 /* --------------------------------------------------------------------- */
 /* --- INCLUDE --------------------------------------------------------- */
@@ -16,7 +16,7 @@
 #include <map>
 #include "boost/assign.hpp"
 
-namespace robust_equilibrium
+namespace centroidal_dynamics
 {
 
 //#define LOGGER_VERBOSITY_ERROR
@@ -183,6 +183,6 @@ namespace robust_equilibrium
   /** Method to get the logger (singleton). */
   Logger& getLogger();
 
-} // namespace robust_equilibrium
+} // namespace centroidal_dynamics
 
 #endif // #ifndef __sot_torque_control_trajectory_generators_H__

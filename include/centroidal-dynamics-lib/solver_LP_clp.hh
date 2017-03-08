@@ -13,7 +13,7 @@
 #include <centroidal-dynamics-lib/solver_LP_abstract.hh>
 #include "ClpSimplex.hpp"
 
-namespace robust_equilibrium
+namespace centroidal_dynamics
 {
 
 class CENTROIDAL_DYNAMICS_DLLAPI Solver_LP_clp: public Solver_LP_abstract
@@ -50,7 +50,7 @@ public:
   virtual bool setMaximumTime(double seconds);
 };
 
-} // end namespace robust_equilibrium
+} // end namespace centroidal_dynamics
 
 #endif //CENTROIDAL_DYNAMICS_LIB_SOLVER_LP_CLP_HH
 

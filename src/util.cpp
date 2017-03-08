@@ -9,7 +9,7 @@
 #include <centroidal-dynamics-lib/util.hh>
 #include <ctime>
 
-namespace robust_equilibrium
+namespace centroidal_dynamics
 {
 
 dd_MatrixPtr cone_span_eigen_to_cdd(Cref_matrixXX input, const bool canonicalize)
@@ -166,6 +166,6 @@ std::string getDateAndTimeAsString()
   return std::string(buffer);
 }
 
-} //namespace robust_equilibrium
+} //namespace centroidal_dynamics
 
 #endif //_CENTROIDAL_DYNAMICS_LIB_CONFIG_HH

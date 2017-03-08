@@ -16,7 +16,7 @@
 #include "cdd/cddtypes.h"
 #include "cdd/cdd.h"
 
-namespace robust_equilibrium
+namespace centroidal_dynamics
 {
 
   //#define USE_FLOAT 1;
@@ -129,6 +129,6 @@ namespace robust_equilibrium
 
   std::string getDateAndTimeAsString();
 
-} //namespace robust_equilibrium
+} //namespace centroidal_dynamics
 
 #endif //_CENTROIDAL_DYNAMICS_LIB_UTIL_HH

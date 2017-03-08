@@ -10,7 +10,7 @@
 #include <centroidal-dynamics-lib/config.hh>
 #include <centroidal-dynamics-lib/util.hh>
 
-namespace robust_equilibrium
+namespace centroidal_dynamics
 {
 
 /**
@@ -147,6 +147,6 @@ public:
 
 };
 
-} // end namespace robust_equilibrium
+} // end namespace centroidal_dynamics
 
 #endif //CENTROIDAL_DYNAMICS_LIB_SOLVER_LP_ABSTRACT_HH

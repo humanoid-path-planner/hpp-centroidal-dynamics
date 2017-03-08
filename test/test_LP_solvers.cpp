@@ -19,7 +19,7 @@
 #include <iomanip>
 
 using namespace std;
-using namespace robust_equilibrium;
+using namespace centroidal_dynamics;
 USING_NAMESPACE_QPOASES
 
 #define EPS 1e-6

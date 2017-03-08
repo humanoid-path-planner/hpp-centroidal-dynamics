@@ -11,7 +11,7 @@
 #include <centroidal-dynamics-lib/util.hh>
 #include <centroidal-dynamics-lib/solver_LP_abstract.hh>
 
-namespace robust_equilibrium
+namespace centroidal_dynamics
 {
 
 enum CENTROIDAL_DYNAMICS_DLLAPI EquilibriumAlgorithm
@@ -299,6 +299,6 @@ public:
 
 };
 
-} // end namespace robust_equilibrium
+} // end namespace centroidal_dynamics
 
 #endif

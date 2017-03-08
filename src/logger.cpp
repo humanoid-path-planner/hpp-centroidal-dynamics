@@ -15,7 +15,7 @@
 #include <boost/algorithm/string.hpp>
 #include <centroidal-dynamics-lib/logger.hh>
 
-namespace robust_equilibrium
+namespace centroidal_dynamics
 {
   using namespace std;
 
@@ -114,5 +114,5 @@ namespace robust_equilibrium
     return true;
   }
 
-} // namespace robust_equilibrium
+} // namespace centroidal_dynamics
 

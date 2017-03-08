@@ -8,7 +8,7 @@
 
 USING_NAMESPACE_QPOASES
 
-namespace robust_equilibrium
+namespace centroidal_dynamics
 {
 
   Solver_LP_qpoases::Solver_LP_qpoases(): Solver_LP_abstract()
@@ -82,4 +82,4 @@ namespace robust_equilibrium
     return LP_STATUS_ERROR;
   }
 
-} // end namespace robust_equilibrium
+} // end namespace centroidal_dynamics
