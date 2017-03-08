@@ -24,7 +24,7 @@ enum CENTROIDAL_DYNAMICS_DLLAPI EquilibriumAlgorithm
   EQUILIBRIUM_ALGORITHM_DIP  /// incremental projection algorithm based on dual LP formulation
 };
 
-class CENTROIDAL_DYNAMICS_DLLAPI StaticEquilibrium
+class CENTROIDAL_DYNAMICS_DLLAPI Equilibrium
 {
 private:
   static bool m_is_cdd_initialized;   /// true if cdd lib has been initialized, false otherwise
@@ -83,7 +83,7 @@ private:
 public:
 
   /**
-   * @brief StaticEquilibrium constructor.
+   * @brief Equilibrium constructor.
    * @param name Name of the object.
    * @param mass Mass of the system for which to test equilibrium.
    * @param generatorsPerContact Number of generators used to approximate the friction cone per contact point.
@@ -93,8 +93,8 @@ public:
    * @param canonicalize_cdd_matrix whether to remove redundant inequalities when computing double description matrices
    * a small pertubation of the system
    */
-  StaticEquilibrium(std::string name, double mass, unsigned int generatorsPerContact,
-                    SolverLP solver_type, bool useWarmStart=true, const unsigned int max_num_cdd_trials=0,
+  Equilibrium(std::string name, double mass, unsigned int generatorsPerContact,
+                    SolverLP solver_type = SOLVER_LP_QPOASES, bool useWarmStart=true, const unsigned int max_num_cdd_trials=0,
                     const bool canonicalize_cdd_matrix=false);
 
   /**
@@ -107,7 +107,7 @@ public:
    * @brief Specifies whether the LP solver is allowed to use warm start.
    * @param uws True if the LP solver is allowed to use warm start, false otherwise.
    */
-  void useWarmStart(bool uws){ m_solver->setUseWarmStart(uws); }
+  void setUseWarmStart(bool uws){ m_solver->setUseWarmStart(uws); }
 
   /**
    * @brief Get the name of this object.

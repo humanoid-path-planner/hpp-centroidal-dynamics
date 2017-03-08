@@ -24,8 +24,8 @@ using namespace std;
 
 #define EPS 1e-3  // required precision
 
-/** Check the coherence between the method StaticEquilibrium::computeEquilibriumRobustness
- * and the method StaticEquilibrium::checkRobustEquilibrium.
+/** Check the coherence between the method Equilibrium::computeEquilibriumRobustness
+ * and the method Equilibrium::checkRobustEquilibrium.
  * @param solver_1 Solver used to test computeEquilibriumRobustness.
  * @param solver_2 Solver used to test checkRobustEquilibrium.
  * @param comPositions List of 2d com positions on which to perform the tests.
@@ -33,8 +33,8 @@ using namespace std;
  * @param PERF_STRING_2 String to use for logging the computation times of solver_2
  * @param verb Verbosity level, 0 print nothing, 1 print summary, 2 print everything
  */
-int test_computeEquilibriumRobustness_vs_checkEquilibrium(StaticEquilibrium *solver_1,
-                                                          StaticEquilibrium *solver_2,
+int test_computeEquilibriumRobustness_vs_checkEquilibrium(Equilibrium *solver_1,
+                                                          Equilibrium *solver_2,
                                                           Cref_matrixXX comPositions,
                                                           const string& PERF_STRING_1="",
                                                           const string& PERF_STRING_2="",
@@ -93,7 +93,7 @@ int test_computeEquilibriumRobustness_vs_checkEquilibrium(StaticEquilibrium *sol
   return error_counter;
 }
 
-/** Test two different solvers on the method StaticEquilibrium::computeEquilibriumRobustness.
+/** Test two different solvers on the method Equilibrium::computeEquilibriumRobustness.
  * @param solver_1 First solver to test.
  * @param solver_2 Second solver to test.
  * @param comPositions List of 2d com positions on which to perform the tests.
@@ -101,7 +101,7 @@ int test_computeEquilibriumRobustness_vs_checkEquilibrium(StaticEquilibrium *sol
  * @param PERF_STRING_2 String to use for logging the computation times of solver_2
  * @param verb Verbosity level, 0 print nothing, 1 print summary, 2 print everything
  */
-int test_computeEquilibriumRobustness(StaticEquilibrium *solver_1, StaticEquilibrium *solver_2, Cref_matrixXX comPositions,
+int test_computeEquilibriumRobustness(Equilibrium *solver_1, Equilibrium *solver_2, Cref_matrixXX comPositions,
                                       const string& PERF_STRING_1, const string& PERF_STRING_2, int verb=0)
 {
   int error_counter = 0;
@@ -146,7 +146,7 @@ int test_computeEquilibriumRobustness(StaticEquilibrium *solver_1, StaticEquilib
   return error_counter;
 }
 
-/** Test method StaticEquilibrium::findExtremumOverLine. The test works in this way: first it
+/** Test method Equilibrium::findExtremumOverLine. The test works in this way: first it
  * calls the method findExtremumOverLine of the solver to test to find the extremum over a random
  * line with a specified robustness. Then it checks that the point found really has the specified
  * robustness by using the ground-truth solver.
@@ -159,7 +159,7 @@ int test_computeEquilibriumRobustness(StaticEquilibrium *solver_1, StaticEquilib
  * @param PERF_STRING_GROUND_TRUTH String to use for logging the computation times of solver_ground_truth
  * @param verb Verbosity level, 0 print nothing, 1 print summary, 2 print everything
  */
-int test_findExtremumOverLine(StaticEquilibrium *solver_to_test, StaticEquilibrium *solver_ground_truth,
+int test_findExtremumOverLine(Equilibrium *solver_to_test, Equilibrium *solver_ground_truth,
                               Cref_vector3 a0, int N_TESTS, double e_max,
                               const string& PERF_STRING_TEST, const string& PERF_STRING_GROUND_TRUTH, int verb=0)
 {
@@ -226,11 +226,11 @@ int test_findExtremumOverLine(StaticEquilibrium *solver_to_test, StaticEquilibri
 }
 
 /** Draw a grid on the screen using the robustness computed with the method
- *  StaticEquilibrium::computeEquilibriumRobustness.
+ *  Equilibrium::computeEquilibriumRobustness.
  * @param solver The solver to use for computing the equilibrium robustness.
  * @param comPositions Grid of CoM positions in the form of an Nx2 matrix.
  */
-void drawRobustnessGrid(int N_CONTACTS, int GRID_SIZE, StaticEquilibrium *solver,
+void drawRobustnessGrid(int N_CONTACTS, int GRID_SIZE, Equilibrium *solver,
                         Cref_matrixXX comPositions, Cref_matrixXX p)
 {
   MatrixXi contactPointCoord(4*N_CONTACTS,2);
@@ -381,11 +381,11 @@ void testWithLoadedData()
     return;
   }
 
-  StaticEquilibrium* solvers[N_SOLVERS];
+  Equilibrium* solvers[N_SOLVERS];
   double robustness[N_SOLVERS];
   for(int s=0; s<N_SOLVERS; s++)
   {
-    solvers[s] = new StaticEquilibrium(solverNames[s], mass, generatorsPerContact, SOLVER_LP_QPOASES);
+    solvers[s] = new Equilibrium(solverNames[s], mass, generatorsPerContact, SOLVER_LP_QPOASES);
     if(!solvers[s]->setNewContacts(contactPoints, contactNormals, mu, algorithms[s]))
     {
       SEND_ERROR_MSG("Error while setting new contacts for solver "+solvers[s]->getName());
@@ -461,10 +461,10 @@ int main()
   cout<<"Number of generators per contact: "<<generatorsPerContact<<endl;
   cout<<"Gonna test equilibrium on a 2d grid of "<<GRID_SIZE<<"X"<<GRID_SIZE<<" points "<<endl;
 
-  StaticEquilibrium* solver_PP = new StaticEquilibrium("PP", mass, generatorsPerContact, SOLVER_LP_QPOASES);
-  StaticEquilibrium* solvers[N_SOLVERS];
+  Equilibrium* solver_PP = new Equilibrium("PP", mass, generatorsPerContact, SOLVER_LP_QPOASES);
+  Equilibrium* solvers[N_SOLVERS];
   for(int s=0; s<N_SOLVERS; s++)
-    solvers[s] = new StaticEquilibrium(solverNames[s], mass, generatorsPerContact, lp_solver_types[s]);
+    solvers[s] = new Equilibrium(solverNames[s], mass, generatorsPerContact, lp_solver_types[s]);
 
   MatrixXX p, N;
   RVector2 com_LB, com_UB;

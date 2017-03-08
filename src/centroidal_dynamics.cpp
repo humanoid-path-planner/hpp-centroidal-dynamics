@@ -15,9 +15,9 @@ using namespace std;
 namespace centroidal_dynamics
 {
 
-bool StaticEquilibrium::m_is_cdd_initialized = false;
+bool Equilibrium::m_is_cdd_initialized = false;
 
-StaticEquilibrium::StaticEquilibrium(string name, double mass, unsigned int generatorsPerContact,
+Equilibrium::Equilibrium(string name, double mass, unsigned int generatorsPerContact,
                                      SolverLP solver_type, bool useWarmStart,
                                      const unsigned int max_num_cdd_trials, const bool canonicalize_cdd_matrix)
     : m_is_cdd_stable(true)
@@ -53,7 +53,7 @@ StaticEquilibrium::StaticEquilibrium(string name, double mass, unsigned int gene
   m_D.block<3,3>(3,0) = crossMatrix(-m_mass*m_gravity);
 }
 
-bool StaticEquilibrium::computeGenerators(Cref_matrixX3 contactPoints, Cref_matrixX3 contactNormals,
+bool Equilibrium::computeGenerators(Cref_matrixX3 contactPoints, Cref_matrixX3 contactNormals,
                                           double frictionCoefficient, const bool perturbate)
 {
     long int c = contactPoints.rows();
@@ -129,7 +129,7 @@ bool StaticEquilibrium::computeGenerators(Cref_matrixX3 contactPoints, Cref_matr
     return true;
 }
 
-bool StaticEquilibrium::setNewContacts(Cref_matrixX3 contactPoints, Cref_matrixX3 contactNormals,
+bool Equilibrium::setNewContacts(Cref_matrixX3 contactPoints, Cref_matrixX3 contactNormals,
                                        double frictionCoefficient, EquilibriumAlgorithm alg)
 {
   assert(contactPoints.rows()==contactNormals.rows());
@@ -175,7 +175,7 @@ bool StaticEquilibrium::setNewContacts(Cref_matrixX3 contactPoints, Cref_matrixX
 }
 
 
-LP_status StaticEquilibrium::computeEquilibriumRobustness(Cref_vector3 com, double &robustness)
+LP_status Equilibrium::computeEquilibriumRobustness(Cref_vector3 com, double &robustness)
 {
   const long m = m_G_centr.cols(); // number of gravito-inertial wrench generators
   if(m==0)
@@ -303,7 +303,7 @@ LP_status StaticEquilibrium::computeEquilibriumRobustness(Cref_vector3 com, doub
   return LP_STATUS_ERROR;
 }
 
-LP_status StaticEquilibrium::computeEquilibriumRobustness(Cref_vector3 com, Cref_vector3 acc, double &robustness){
+LP_status Equilibrium::computeEquilibriumRobustness(Cref_vector3 com, Cref_vector3 acc, double &robustness){
   // Take the acceleration in account in D and d :
   Matrix63 old_D = m_D;
   Vector6 old_d = m_d;
@@ -324,7 +324,7 @@ LP_status StaticEquilibrium::computeEquilibriumRobustness(Cref_vector3 com, Cref
   m_D.block<3,3>(3,0) = crossMatrix(-m_mass*m_gravity);
 */
 
-LP_status StaticEquilibrium::checkRobustEquilibrium(Cref_vector3 com, bool &equilibrium, double e_max)
+LP_status Equilibrium::checkRobustEquilibrium(Cref_vector3 com, bool &equilibrium, double e_max)
 {
   if(m_G_centr.cols()==0)
   {
@@ -355,7 +355,7 @@ LP_status StaticEquilibrium::checkRobustEquilibrium(Cref_vector3 com, bool &equi
 }
 
 
-LP_status StaticEquilibrium::getPolytopeInequalities(MatrixXX& H, VectorX& h) const
+LP_status Equilibrium::getPolytopeInequalities(MatrixXX& H, VectorX& h) const
 {
     if(m_algorithm!=EQUILIBRIUM_ALGORITHM_PP)
     {
@@ -376,7 +376,7 @@ LP_status StaticEquilibrium::getPolytopeInequalities(MatrixXX& H, VectorX& h) co
     return LP_STATUS_OPTIMAL;
 }
 
-LP_status StaticEquilibrium::findExtremumOverLine(Cref_vector3 a, Cref_vector3 a0, double e_max, Ref_vector3 com)
+LP_status Equilibrium::findExtremumOverLine(Cref_vector3 a, Cref_vector3 a0, double e_max, Ref_vector3 com)
 {
   const long m = m_G_centr.cols(); // number of gravito-inertial wrench generators
   if(m_G_centr.cols()==0)
@@ -506,7 +506,7 @@ LP_status StaticEquilibrium::findExtremumOverLine(Cref_vector3 a, Cref_vector3 a
   return LP_STATUS_ERROR;
 }
 
-LP_status StaticEquilibrium::findExtremumInDirection(Cref_vector3 direction, Ref_vector3 com, double e_max)
+LP_status Equilibrium::findExtremumInDirection(Cref_vector3 direction, Ref_vector3 com, double e_max)
 {
   if(m_G_centr.cols()==0)
     return LP_STATUS_INFEASIBLE;
@@ -514,7 +514,7 @@ LP_status StaticEquilibrium::findExtremumInDirection(Cref_vector3 direction, Ref
   return LP_STATUS_ERROR;
 }
 
-bool StaticEquilibrium::computePolytopeProjection(Cref_matrix6X v)
+bool Equilibrium::computePolytopeProjection(Cref_matrix6X v)
 {
 //  getProfiler().start("eigen_to_cdd");
   dd_MatrixPtr V = cone_span_eigen_to_cdd(v.transpose(),canonicalize_cdd_matrix);
@@ -573,18 +573,18 @@ bool StaticEquilibrium::computePolytopeProjection(Cref_matrix6X v)
   return true;
 }
 
-double StaticEquilibrium::convert_b0_to_emax(double b0)
+double Equilibrium::convert_b0_to_emax(double b0)
 {
   return (b0*m_b0_to_emax_coefficient);
 }
 
-double StaticEquilibrium::convert_emax_to_b0(double emax)
+double Equilibrium::convert_emax_to_b0(double emax)
 {
   return (emax/m_b0_to_emax_coefficient);
 }
 
 
-LP_status StaticEquilibrium::findMaximumAcceleration(Cref_matrixXX A, Cref_vector6 h, double& alpha0){
+LP_status Equilibrium::findMaximumAcceleration(Cref_matrixXX A, Cref_vector6 h, double& alpha0){
   int m = (int)A.cols() -1 ; // 4* number of contacts
   VectorX b_a0(m+1);
   VectorX c = VectorX::Zero(m+1);
@@ -612,7 +612,7 @@ LP_status StaticEquilibrium::findMaximumAcceleration(Cref_matrixXX A, Cref_vecto
 
 }
 
-bool StaticEquilibrium::checkAdmissibleAcceleration(Cref_matrixXX G, Cref_matrixXX H, Cref_vector6 h, Cref_vector3 a ){
+bool Equilibrium::checkAdmissibleAcceleration(Cref_matrixXX G, Cref_matrixXX H, Cref_vector6 h, Cref_vector3 a ){
   int m = (int)G.cols(); // number of contact * 4
   VectorX b(m);
   VectorX c = VectorX::Zero(m);

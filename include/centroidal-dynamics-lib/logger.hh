@@ -10,7 +10,7 @@
 /* --- INCLUDE --------------------------------------------------------- */
 /* --------------------------------------------------------------------- */
 
-#include <robust-equilibrium-lib/config.hh>
+#include <centroidal-dynamics-lib/config.hh>
 #include <sstream>
 #include <Eigen/Dense>
 #include <map>
