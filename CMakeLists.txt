@@ -31,6 +31,16 @@ SETUP_PROJECT()
 string (REPLACE "-Werror" "" CMAKE_CXX_FLAGS ${CMAKE_CXX_FLAGS})
 MESSAGE( STATUS "CMAKE_CXX_FLAGS: " ${CMAKE_CXX_FLAGS} )
 
+IF(BUILD_PYTHON_INTERFACE)
+	OPTION (BUILD_PYTHON_INTERFACE "Build the python binding" OFF)
+ENDIF(BUILD_PYTHON_INTERFACE)
+
+find_package( PythonLibs 2.7 REQUIRED )
+include_directories( ${PYTHON_INCLUDE_DIRS} )
+
+find_package( Boost COMPONENTS python REQUIRED )
+include_directories( ${Boost_INCLUDE_DIR} )
+
 # Declare Headers
 SET(${PROJECT_NAME}_HEADERS
 		include/centroidal-dynamics-lib/config.hh
