@@ -39,7 +39,6 @@ IF(BUILD_PYTHON_INTERFACE)
 	find_package( Boost COMPONENTS python REQUIRED )
 	include_directories( ${Boost_INCLUDE_DIR} )
 
-	SET(PKG_CONFIG_PYWRAP_REQUIRES "eigenpy >= 1.3.1")
 ENDIF(BUILD_PYTHON_INTERFACE)
 
 

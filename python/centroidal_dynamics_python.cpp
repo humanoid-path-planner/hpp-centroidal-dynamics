@@ -3,6 +3,7 @@
 
 #include <eigenpy/memory.hpp>
 #include <eigenpy/eigenpy.hpp>
+#include <eigenpy/geometry.hpp>
 
 #include <boost/python.hpp>
 
@@ -12,10 +13,10 @@ namespace centroidal_dynamics
 {
 using namespace boost::python;
 
-bool wrapSetNewContacts(Equilibrium& self, MatrixX3 contactPoints, MatrixX3 contactNormals,
-                    double frictionCoefficient, EquilibriumAlgorithm alg)
+bool wrapSetNewContacts(Equilibrium& self, const MatrixXX& contactPoints, const MatrixXX& contactNormals) //,
+                    //double frictionCoefficient, EquilibriumAlgorithm alg)
 {
-    return self.setNewContacts(contactPoints, contactNormals, frictionCoefficient, alg);
+    return self.setNewContacts(contactPoints, contactNormals, 0.3, EQUILIBRIUM_ALGORITHM_LP);
 }
 
 
@@ -25,8 +26,9 @@ BOOST_PYTHON_MODULE(centroidal_dynamics)
     eigenpy::enableEigenPy();
 
     eigenpy::enableEigenPySpecific<MatrixX3,MatrixX3>();
-    /*eigenpy::exposeAngleAxis();
-    eigenpy::exposeQuaternion();*/
+    eigenpy::enableEigenPySpecific<MatrixXX,MatrixXX>();
+    eigenpy::exposeAngleAxis();
+    eigenpy::exposeQuaternion();
 
     /** END eigenpy init**/
 
