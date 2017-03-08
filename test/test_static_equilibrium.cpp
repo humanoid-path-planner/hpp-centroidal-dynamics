@@ -5,7 +5,7 @@
 
 #include <vector>
 #include <iostream>
-#include <centroidal-dynamics-lib/static_equilibrium.hh>
+#include <centroidal-dynamics-lib/centroidal_dynamics.hh>
 #include <centroidal-dynamics-lib/logger.hh>
 #include <centroidal-dynamics-lib/stop-watch.hh>
 
@@ -359,9 +359,9 @@ void testWithLoadedData()
 
   const int N_SOLVERS = 3;
   string solverNames[] = {"LP oases", "LP2 oases", "DLP oases"};
-  StaticEquilibriumAlgorithm algorithms[] = {STATIC_EQUILIBRIUM_ALGORITHM_LP,
-                                             STATIC_EQUILIBRIUM_ALGORITHM_LP2,
-                                             STATIC_EQUILIBRIUM_ALGORITHM_DLP};
+  EquilibriumAlgorithm algorithms[] = {EQUILIBRIUM_ALGORITHM_LP,
+                                             EQUILIBRIUM_ALGORITHM_LP2,
+                                             EQUILIBRIUM_ALGORITHM_DLP};
 
   MatrixXX contactPoints, contactNormals;
   Vector3 com;
@@ -440,20 +440,20 @@ int main()
   const int N_SOLVERS = 6;
   string solverNames[] = {"LP oases", "LP2 oases", "DLP oases",
                           "LP coin", "LP2 coin", "DLP coin"};
-  StaticEquilibriumAlgorithm algorithms[] = {STATIC_EQUILIBRIUM_ALGORITHM_LP,
-                                             STATIC_EQUILIBRIUM_ALGORITHM_LP2,
-                                             STATIC_EQUILIBRIUM_ALGORITHM_DLP,
-                                             STATIC_EQUILIBRIUM_ALGORITHM_LP,
-                                             STATIC_EQUILIBRIUM_ALGORITHM_LP2,
-                                             STATIC_EQUILIBRIUM_ALGORITHM_DLP};
+  EquilibriumAlgorithm algorithms[] = {EQUILIBRIUM_ALGORITHM_LP,
+                                             EQUILIBRIUM_ALGORITHM_LP2,
+                                             EQUILIBRIUM_ALGORITHM_DLP,
+                                             EQUILIBRIUM_ALGORITHM_LP,
+                                             EQUILIBRIUM_ALGORITHM_LP2,
+                                             EQUILIBRIUM_ALGORITHM_DLP};
   SolverLP lp_solver_types[] = {SOLVER_LP_QPOASES, SOLVER_LP_QPOASES, SOLVER_LP_QPOASES,
                         SOLVER_LP_CLP, SOLVER_LP_CLP, SOLVER_LP_CLP};
 #else
   const int N_SOLVERS = 3;
   string solverNames[] = {"LP oases", "LP2 oases", "DLP oases"};
-  StaticEquilibriumAlgorithm algorithms[] = {STATIC_EQUILIBRIUM_ALGORITHM_LP,
-                                             STATIC_EQUILIBRIUM_ALGORITHM_LP2,
-                                             STATIC_EQUILIBRIUM_ALGORITHM_DLP};
+  EquilibriumAlgorithm algorithms[] = {EQUILIBRIUM_ALGORITHM_LP,
+                                             EQUILIBRIUM_ALGORITHM_LP2,
+                                             EQUILIBRIUM_ALGORITHM_DLP};
   SolverLP lp_solver_types[] = {SOLVER_LP_QPOASES, SOLVER_LP_QPOASES, SOLVER_LP_QPOASES};
 #endif
 
@@ -487,7 +487,7 @@ int main()
       getProfiler().stop(PERF_LP_PREPARATION);
     }
     getProfiler().start(PERF_PP);
-    if(!solver_PP->setNewContacts(p, N, mu, STATIC_EQUILIBRIUM_ALGORITHM_PP))
+    if(!solver_PP->setNewContacts(p, N, mu, EQUILIBRIUM_ALGORITHM_PP))
     {
       SEND_ERROR_MSG("Error while setting new contacts for solver "+solver_PP->getName());
       return -1;
@@ -544,7 +544,7 @@ int main()
       string test_name2 = "Compute equilibrium robustness ";
       for(int s=1; s<N_SOLVERS; s++)
       {
-        if(solvers[s]->getAlgorithm()!=STATIC_EQUILIBRIUM_ALGORITHM_LP2)
+        if(solvers[s]->getAlgorithm()!=EQUILIBRIUM_ALGORITHM_LP2)
           test_findExtremumOverLine(solvers[s], solvers[0], a0, N_TESTS_EXTREMUM, e_max, test_name+solvers[s]->getName(),
               test_name2+solvers[0]->getName(), 1);
       }

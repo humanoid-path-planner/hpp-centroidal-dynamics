@@ -39,7 +39,7 @@ SET(${PROJECT_NAME}_HEADERS
 		include/centroidal-dynamics-lib/solver_LP_abstract.hh
 		include/centroidal-dynamics-lib/solver_LP_qpoases.hh
 		include/centroidal-dynamics-lib/solver_LP_clp.hh
-		include/centroidal-dynamics-lib/static_equilibrium.hh
+		include/centroidal-dynamics-lib/centroidal_dynamics.hh
 		include/centroidal-dynamics-lib/stop-watch.hh
   )
 

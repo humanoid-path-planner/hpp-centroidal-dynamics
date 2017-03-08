@@ -73,7 +73,7 @@ namespace robust_equilibrium
 
   /** Enum representing the different kind of messages.
        */
-  enum ROBUST_EQUILIBRIUM_DLLAPI MsgType
+  enum CENTROIDAL_DYNAMICS_DLLAPI MsgType
   {
     MSG_TYPE_DEBUG          =0,
     MSG_TYPE_INFO           =1,
@@ -113,7 +113,7 @@ namespace robust_equilibrium
     return ss.str();
   }
 
-  enum ROBUST_EQUILIBRIUM_DLLAPI LoggerVerbosity
+  enum CENTROIDAL_DYNAMICS_DLLAPI LoggerVerbosity
   {
     VERBOSITY_ALL,
     VERBOSITY_INFO_WARNING_ERROR,
@@ -124,7 +124,7 @@ namespace robust_equilibrium
 
   /** A simple class for logging messages
       */
-  class ROBUST_EQUILIBRIUM_DLLAPI Logger
+  class CENTROIDAL_DYNAMICS_DLLAPI Logger
   {
   public:
 

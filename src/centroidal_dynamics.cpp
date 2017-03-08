@@ -3,7 +3,7 @@
  * Author: Andrea Del Prete
  */
 
-#include <centroidal-dynamics-lib/static_equilibrium.hh>
+#include <centroidal-dynamics-lib/centroidal_dynamics.hh>
 #include <centroidal-dynamics-lib/logger.hh>
 #include <centroidal-dynamics-lib/stop-watch.hh>
 #include <iostream>
@@ -130,16 +130,16 @@ bool StaticEquilibrium::computeGenerators(Cref_matrixX3 contactPoints, Cref_matr
 }
 
 bool StaticEquilibrium::setNewContacts(Cref_matrixX3 contactPoints, Cref_matrixX3 contactNormals,
-                                       double frictionCoefficient, StaticEquilibriumAlgorithm alg)
+                                       double frictionCoefficient, EquilibriumAlgorithm alg)
 {
   assert(contactPoints.rows()==contactNormals.rows());
 
-  if(alg==STATIC_EQUILIBRIUM_ALGORITHM_IP)
+  if(alg==EQUILIBRIUM_ALGORITHM_IP)
   {
     SEND_ERROR_MSG("Algorithm IP not implemented yet");
     return false;
   }
-  if(alg==STATIC_EQUILIBRIUM_ALGORITHM_DIP)
+  if(alg==EQUILIBRIUM_ALGORITHM_DIP)
   {
     SEND_ERROR_MSG("Algorithm DIP not implemented yet");
     return false;
@@ -155,7 +155,7 @@ bool StaticEquilibrium::setNewContacts(Cref_matrixX3 contactPoints, Cref_matrixX
     return false;
   }
 
-  if(m_algorithm==STATIC_EQUILIBRIUM_ALGORITHM_PP)
+  if(m_algorithm==EQUILIBRIUM_ALGORITHM_PP)
   {
     unsigned int attempts = max_num_cdd_trials;
     while(!computePolytopeProjection(m_G_centr) && attempts>0)
@@ -181,7 +181,7 @@ LP_status StaticEquilibrium::computeEquilibriumRobustness(Cref_vector3 com, doub
   if(m==0)
     return LP_STATUS_INFEASIBLE;
 
-  if(m_algorithm==STATIC_EQUILIBRIUM_ALGORITHM_LP)
+  if(m_algorithm==EQUILIBRIUM_ALGORITHM_LP)
   {
     /* Compute the robustness measure of the equilibrium of a specified CoM position
      * by solving the following LP:
@@ -220,7 +220,7 @@ LP_status StaticEquilibrium::computeEquilibriumRobustness(Cref_vector3 com, doub
     return lpStatus;
   }
 
-  if(m_algorithm==STATIC_EQUILIBRIUM_ALGORITHM_LP2)
+  if(m_algorithm==EQUILIBRIUM_ALGORITHM_LP2)
   {
     /* Compute the robustness measure of the equilibrium of a specified CoM position
      * by solving the following LP:
@@ -257,7 +257,7 @@ LP_status StaticEquilibrium::computeEquilibriumRobustness(Cref_vector3 com, doub
     return lpStatus_primal;
   }
 
-  if(m_algorithm==STATIC_EQUILIBRIUM_ALGORITHM_DLP)
+  if(m_algorithm==EQUILIBRIUM_ALGORITHM_DLP)
   {
     /*Compute the robustness measure of the equilibrium of a specified CoM position
       by solving the following dual LP:
@@ -336,7 +336,7 @@ LP_status StaticEquilibrium::checkRobustEquilibrium(Cref_vector3 com, bool &equi
     SEND_ERROR_MSG("checkRobustEquilibrium with e_max!=0 not implemented yet");
     return LP_STATUS_ERROR;
   }
-  if(m_algorithm!=STATIC_EQUILIBRIUM_ALGORITHM_PP)
+  if(m_algorithm!=EQUILIBRIUM_ALGORITHM_PP)
   {
     SEND_ERROR_MSG("checkRobustEquilibrium is only implemented for the PP algorithm");
     return LP_STATUS_ERROR;
@@ -357,7 +357,7 @@ LP_status StaticEquilibrium::checkRobustEquilibrium(Cref_vector3 com, bool &equi
 
 LP_status StaticEquilibrium::getPolytopeInequalities(MatrixXX& H, VectorX& h) const
 {
-    if(m_algorithm!=STATIC_EQUILIBRIUM_ALGORITHM_PP)
+    if(m_algorithm!=EQUILIBRIUM_ALGORITHM_PP)
     {
       SEND_ERROR_MSG("getPolytopeInequalities is only implemented for the PP algorithm");
       return LP_STATUS_ERROR;
@@ -384,7 +384,7 @@ LP_status StaticEquilibrium::findExtremumOverLine(Cref_vector3 a, Cref_vector3 a
 
   double b0 = convert_emax_to_b0(e_max);
 
-  if(m_algorithm==STATIC_EQUILIBRIUM_ALGORITHM_LP)
+  if(m_algorithm==EQUILIBRIUM_ALGORITHM_LP)
   {
     /* Compute the extremum CoM position over the line a*p + a0 that is in robust equilibrium
      * by solving the following LP:
@@ -436,7 +436,7 @@ LP_status StaticEquilibrium::findExtremumOverLine(Cref_vector3 a, Cref_vector3 a
     return lpStatus_primal;
   }
 
-  if(m_algorithm==STATIC_EQUILIBRIUM_ALGORITHM_DLP)
+  if(m_algorithm==EQUILIBRIUM_ALGORITHM_DLP)
   {
     /* Compute the extremum CoM position over the line a*x + a0 that is in robust equilibrium
      * by solving the following dual LP:

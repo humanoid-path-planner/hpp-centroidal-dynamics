@@ -3,8 +3,8 @@
  * Author: Andrea Del Prete
  */
 
-#ifndef ROBUST_EQUILIBRIUM_LIB_SOLVER_LP_ABSTRACT_HH
-#define ROBUST_EQUILIBRIUM_LIB_SOLVER_LP_ABSTRACT_HH
+#ifndef CENTROIDAL_DYNAMICS_LIB_SOLVER_LP_ABSTRACT_HH
+#define CENTROIDAL_DYNAMICS_LIB_SOLVER_LP_ABSTRACT_HH
 
 #include <Eigen/Dense>
 #include <centroidal-dynamics-lib/config.hh>
@@ -16,7 +16,7 @@ namespace robust_equilibrium
 /**
   * Available LP solvers.
   */
-enum ROBUST_EQUILIBRIUM_DLLAPI SolverLP
+enum CENTROIDAL_DYNAMICS_DLLAPI SolverLP
 {
   SOLVER_LP_QPOASES = 0
 #ifdef CLP_FOUND
@@ -28,7 +28,7 @@ enum ROBUST_EQUILIBRIUM_DLLAPI SolverLP
 /**
   * Possible states of an LP solver.
   */
-enum ROBUST_EQUILIBRIUM_DLLAPI LP_status
+enum CENTROIDAL_DYNAMICS_DLLAPI LP_status
 {
   LP_STATUS_UNKNOWN=-1,
   LP_STATUS_OPTIMAL=0,
@@ -42,7 +42,7 @@ enum ROBUST_EQUILIBRIUM_DLLAPI LP_status
 /**
  * @brief Abstract interface for a Linear Program (LP) solver.
  */
-class ROBUST_EQUILIBRIUM_DLLAPI Solver_LP_abstract
+class CENTROIDAL_DYNAMICS_DLLAPI Solver_LP_abstract
 {
 protected:
   bool                  m_useWarmStart;   // true if the solver is allowed to warm start
@@ -149,4 +149,4 @@ public:
 
 } // end namespace robust_equilibrium
 
-#endif //ROBUST_EQUILIBRIUM_LIB_SOLVER_LP_ABSTRACT_HH
+#endif //CENTROIDAL_DYNAMICS_LIB_SOLVER_LP_ABSTRACT_HH

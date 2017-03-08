@@ -3,8 +3,8 @@
  * Author: Andrea Del Prete
  */
 
-#ifndef ROBUST_EQUILIBRIUM_LIB_STATIC_EQUILIBRIUM_H
-#define ROBUST_EQUILIBRIUM_LIB_STATIC_EQUILIBRIUM_H
+#ifndef CENTROIDAL_DYNAMICS_LIB_STATIC_EQUILIBRIUM_H
+#define CENTROIDAL_DYNAMICS_LIB_STATIC_EQUILIBRIUM_H
 
 #include <Eigen/Dense>
 #include <centroidal-dynamics-lib/config.hh>
@@ -14,23 +14,23 @@
 namespace robust_equilibrium
 {
 
-enum ROBUST_EQUILIBRIUM_DLLAPI StaticEquilibriumAlgorithm
+enum CENTROIDAL_DYNAMICS_DLLAPI EquilibriumAlgorithm
 {
-  STATIC_EQUILIBRIUM_ALGORITHM_LP,  /// primal LP formulation
-  STATIC_EQUILIBRIUM_ALGORITHM_LP2, /// another primal LP formulation
-  STATIC_EQUILIBRIUM_ALGORITHM_DLP, /// dual LP formulation
-  STATIC_EQUILIBRIUM_ALGORITHM_PP,  /// polytope projection algorithm
-  STATIC_EQUILIBRIUM_ALGORITHM_IP,  /// incremental projection algorithm based on primal LP formulation
-  STATIC_EQUILIBRIUM_ALGORITHM_DIP  /// incremental projection algorithm based on dual LP formulation
+  EQUILIBRIUM_ALGORITHM_LP,  /// primal LP formulation
+  EQUILIBRIUM_ALGORITHM_LP2, /// another primal LP formulation
+  EQUILIBRIUM_ALGORITHM_DLP, /// dual LP formulation
+  EQUILIBRIUM_ALGORITHM_PP,  /// polytope projection algorithm
+  EQUILIBRIUM_ALGORITHM_IP,  /// incremental projection algorithm based on primal LP formulation
+  EQUILIBRIUM_ALGORITHM_DIP  /// incremental projection algorithm based on dual LP formulation
 };
 
-class ROBUST_EQUILIBRIUM_DLLAPI StaticEquilibrium
+class CENTROIDAL_DYNAMICS_DLLAPI StaticEquilibrium
 {
 private:
   static bool m_is_cdd_initialized;   /// true if cdd lib has been initialized, false otherwise
 
   std::string                 m_name;         /// name of this object
-  StaticEquilibriumAlgorithm  m_algorithm;    /// current algorithm used
+  EquilibriumAlgorithm  m_algorithm;    /// current algorithm used
   Solver_LP_abstract*         m_solver;       /// LP solver
   SolverLP                    m_solver_type;  /// type of LP solver
 
@@ -46,7 +46,7 @@ private:
   VectorX m_h;
   /** False if a numerical instability appeared in the computation H and h*/
   bool m_is_cdd_stable;
-  /** STATIC_EQUILIBRIUM_ALGORITHM_PP: If double description fails,
+  /** EQUILIBRIUM_ALGORITHM_PP: If double description fails,
     * indicate the max number of attempts to compute the cone by introducing
     * a small pertubation of the system */
   const unsigned max_num_cdd_trials;
@@ -115,7 +115,7 @@ public:
    */
   std::string getName(){ return m_name; }
 
-  StaticEquilibriumAlgorithm getAlgorithm(){ return m_algorithm; }
+  EquilibriumAlgorithm getAlgorithm(){ return m_algorithm; }
 
   /**
    * @brief Specify a new set of contacts.
@@ -128,7 +128,7 @@ public:
    * @return True if the operation succeeded, false otherwise.
    */
   bool setNewContacts(Cref_matrixX3 contactPoints, Cref_matrixX3 contactNormals,
-                      double frictionCoefficient, StaticEquilibriumAlgorithm alg);
+                      double frictionCoefficient, EquilibriumAlgorithm alg);
 
   /**
    * @brief Compute a measure of the robustness of the equilibrium of the specified com position.

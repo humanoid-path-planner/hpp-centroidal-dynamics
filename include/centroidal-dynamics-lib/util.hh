@@ -2,8 +2,8 @@
  * Copyright 2015, LAAS-CNRS
  * Author: Andrea Del Prete
  */
-#ifndef _ROBUST_EQUILIBRIUM_LIB_UTIL_HH
-#define _ROBUST_EQUILIBRIUM_LIB_UTIL_HH
+#ifndef _CENTROIDAL_DYNAMICS_LIB_UTIL_HH
+#define _CENTROIDAL_DYNAMICS_LIB_UTIL_HH
 
 #include <iostream>
 #include <fstream>
@@ -131,4 +131,4 @@ namespace robust_equilibrium
 
 } //namespace robust_equilibrium
 
-#endif //_ROBUST_EQUILIBRIUM_LIB_UTIL_HH
+#endif //_CENTROIDAL_DYNAMICS_LIB_UTIL_HH

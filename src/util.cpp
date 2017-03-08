@@ -3,8 +3,8 @@
  * Author: Andrea Del Prete
  */
 
-#ifndef _ROBUST_EQUILIBRIUM_LIB_CONFIG_HH
-#define _ROBUST_EQUILIBRIUM_LIB_CONFIG_HH
+#ifndef _CENTROIDAL_DYNAMICS_LIB_CONFIG_HH
+#define _CENTROIDAL_DYNAMICS_LIB_CONFIG_HH
 
 #include <centroidal-dynamics-lib/util.hh>
 #include <ctime>
@@ -168,4 +168,4 @@ std::string getDateAndTimeAsString()
 
 } //namespace robust_equilibrium
 
-#endif //_ROBUST_EQUILIBRIUM_LIB_CONFIG_HH
+#endif //_CENTROIDAL_DYNAMICS_LIB_CONFIG_HH

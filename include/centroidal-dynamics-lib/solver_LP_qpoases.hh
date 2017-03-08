@@ -3,8 +3,8 @@
  * Author: Andrea Del Prete
  */
 
-#ifndef ROBUST_EQUILIBRIUM_LIB_SOLVER_QPOASES_HH
-#define ROBUST_EQUILIBRIUM_LIB_SOLVER_QPOASES_HH
+#ifndef CENTROIDAL_DYNAMICS_LIB_SOLVER_QPOASES_HH
+#define CENTROIDAL_DYNAMICS_LIB_SOLVER_QPOASES_HH
 
 #include <centroidal-dynamics-lib/config.hh>
 #include <centroidal-dynamics-lib/util.hh>
@@ -14,7 +14,7 @@
 namespace robust_equilibrium
 {
 
-class ROBUST_EQUILIBRIUM_DLLAPI Solver_LP_qpoases: public Solver_LP_abstract
+class CENTROIDAL_DYNAMICS_DLLAPI Solver_LP_qpoases: public Solver_LP_abstract
 {
 private:
   qpOASES::Options    m_options;  // solver options
@@ -49,4 +49,4 @@ public:
 
 } // end namespace robust_equilibrium
 
-#endif //ROBUST_EQUILIBRIUM_LIB_SOLVER_QPOASES_HH
+#endif //CENTROIDAL_DYNAMICS_LIB_SOLVER_QPOASES_HH
