@@ -41,7 +41,7 @@ PKG_CONFIG_USE_DEPENDENCY(${LIBRARY_NAME} qpOASES)
 
 if(CLP_FOUND)
   TARGET_LINK_LIBRARIES(${LIBRARY_NAME} ${CLP_LIBRARIES}
-                                               /usr/lib/libCoinUtils.so)
+																							 /usr/lib/libCoinUtils.so)
 endif()
 
 SET_TARGET_PROPERTIES(${LIBRARY_NAME} PROPERTIES LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}")

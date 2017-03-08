@@ -17,8 +17,8 @@ namespace centroidal_dynamics
 
 bool Equilibrium::m_is_cdd_initialized = false;
 
-Equilibrium::Equilibrium(string name, double mass, unsigned int generatorsPerContact,
-                                     SolverLP solver_type, bool useWarmStart,
+Equilibrium::Equilibrium(const string& name, const double mass, const unsigned int generatorsPerContact,
+                                     const SolverLP solver_type, const bool useWarmStart,
                                      const unsigned int max_num_cdd_trials, const bool canonicalize_cdd_matrix)
     : m_is_cdd_stable(true)
     , max_num_cdd_trials(max_num_cdd_trials)
@@ -31,18 +31,18 @@ Equilibrium::Equilibrium(string name, double mass, unsigned int generatorsPerCon
     //srand ( (unsigned int) (time(NULL)) );
   }
 
-  if(generatorsPerContact<3)
-  {
-    SEND_WARNING_MSG("Algorithm cannot work with less than 3 generators per contact!");
-    generatorsPerContact = 3;
-  }
-
   m_name = name;
   m_solver_type = solver_type;
   m_solver = Solver_LP_abstract::getNewSolver(solver_type);
   m_solver->setUseWarmStart(useWarmStart);
 
   m_generatorsPerContact = generatorsPerContact;
+  if(generatorsPerContact<3)
+  {
+    SEND_WARNING_MSG("Algorithm cannot work with less than 3 generators per contact!");
+    m_generatorsPerContact = 3;
+  }
+
   m_mass = mass;
   m_gravity.setZero();
   m_gravity(2) = -9.81;

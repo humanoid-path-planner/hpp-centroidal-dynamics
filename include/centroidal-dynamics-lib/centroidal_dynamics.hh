@@ -81,7 +81,7 @@ private:
   double convert_emax_to_b0(double emax);
 
 public:
-
+    EIGEN_MAKE_ALIGNED_OPERATOR_NEW
   /**
    * @brief Equilibrium constructor.
    * @param name Name of the object.
@@ -93,8 +93,8 @@ public:
    * @param canonicalize_cdd_matrix whether to remove redundant inequalities when computing double description matrices
    * a small pertubation of the system
    */
-  Equilibrium(std::string name, double mass, unsigned int generatorsPerContact,
-                    SolverLP solver_type = SOLVER_LP_QPOASES, bool useWarmStart=true, const unsigned int max_num_cdd_trials=0,
+  Equilibrium(const std::string& name, const double mass, const unsigned int generatorsPerContact,
+                    const SolverLP solver_type = SOLVER_LP_QPOASES, bool useWarmStart=true, const unsigned int max_num_cdd_trials=0,
                     const bool canonicalize_cdd_matrix=false);
 
   /**

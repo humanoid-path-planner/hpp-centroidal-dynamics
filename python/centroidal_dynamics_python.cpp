@@ -1,13 +1,35 @@
 #include "centroidal-dynamics-lib/centroidal_dynamics.hh"
+#include "centroidal-dynamics-lib/util.hh"
+
+#include <eigenpy/memory.hpp>
+#include <eigenpy/eigenpy.hpp>
 
 #include <boost/python.hpp>
+
+EIGENPY_DEFINE_STRUCT_ALLOCATOR_SPECIALIZATION(centroidal_dynamics::Equilibrium)
 
 namespace centroidal_dynamics
 {
 using namespace boost::python;
 
+bool wrapSetNewContacts(Equilibrium& self, MatrixX3 contactPoints, MatrixX3 contactNormals,
+                    double frictionCoefficient, EquilibriumAlgorithm alg)
+{
+    return self.setNewContacts(contactPoints, contactNormals, frictionCoefficient, alg);
+}
+
+
 BOOST_PYTHON_MODULE(centroidal_dynamics)
 {
+    /** BEGIN eigenpy init**/
+    eigenpy::enableEigenPy();
+
+    eigenpy::enableEigenPySpecific<MatrixX3,MatrixX3>();
+    /*eigenpy::exposeAngleAxis();
+    eigenpy::exposeQuaternion();*/
+
+    /** END eigenpy init**/
+
     /** BEGIN enum types **/
   #ifdef CLP_FOUND
     enum_<SolverLP>("SolverLP")
@@ -36,6 +58,7 @@ BOOST_PYTHON_MODULE(centroidal_dynamics)
             .def("setUseWarmStart", &Equilibrium::setUseWarmStart)
             .def("getName", &Equilibrium::getName)
             .def("getAlgorithm", &Equilibrium::getAlgorithm)
+            .def("setNewContacts", &wrapSetNewContacts)
     ;
 }
 
