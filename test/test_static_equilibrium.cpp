@@ -5,9 +5,9 @@
 
 #include <vector>
 #include <iostream>
-#include <robust-equilibrium-lib/static_equilibrium.hh>
-#include <robust-equilibrium-lib/logger.hh>
-#include <robust-equilibrium-lib/stop-watch.hh>
+#include <centroidal-dynamics-lib/static_equilibrium.hh>
+#include <centroidal-dynamics-lib/logger.hh>
+#include <centroidal-dynamics-lib/stop-watch.hh>
 
 using namespace robust_equilibrium;
 using namespace Eigen;
@@ -169,7 +169,7 @@ int test_findExtremumOverLine(StaticEquilibrium *solver_to_test, StaticEquilibri
   double desired_robustness, robustness;
   for(unsigned int i=0; i<N_TESTS; i++)
   {
-    uniform(-1.0*Vector3::Ones(), Vector3::Ones(), a);
+    uniform3(-1.0*Vector3::Ones(), Vector3::Ones(), a);
     if(e_max>=0.0)
       desired_robustness = (rand()/ value_type(RAND_MAX))*e_max;
     else

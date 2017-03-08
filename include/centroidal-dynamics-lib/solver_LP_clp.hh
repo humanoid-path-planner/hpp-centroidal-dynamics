@@ -8,9 +8,9 @@
 #ifndef ROBUST_EQUILIBRIUM_LIB_SOLVER_LP_CLP_HH
 #define ROBUST_EQUILIBRIUM_LIB_SOLVER_LP_CLP_HH
 
-#include <robust-equilibrium-lib/config.hh>
-#include <robust-equilibrium-lib/util.hh>
-#include <robust-equilibrium-lib/solver_LP_abstract.hh>
+#include <centroidal-dynamics-lib/config.hh>
+#include <centroidal-dynamics-lib/util.hh>
+#include <centroidal-dynamics-lib/solver_LP_abstract.hh>
 #include "ClpSimplex.hpp"
 
 namespace robust_equilibrium

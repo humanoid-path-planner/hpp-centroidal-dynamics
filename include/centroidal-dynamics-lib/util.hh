@@ -118,6 +118,8 @@ namespace robust_equilibrium
 
   void release_cdd_library();
 
+  // in some distribution the conversion Ref_matrixXX to Ref_vector3 does not compile
+  void uniform3(Cref_vector3 lower_bounds, Cref_vector3 upper_bounds, Ref_vector3 out);
   void uniform(Cref_matrixXX lower_bounds, Cref_matrixXX upper_bounds, Ref_matrixXX out);
 
   void euler_matrix(double roll, double pitch, double yaw, Ref_rotation R);

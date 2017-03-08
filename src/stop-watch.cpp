@@ -24,7 +24,7 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 */
 
-#include "robust-equilibrium-lib/Stdafx.hh"
+#include "centroidal-dynamics-lib/Stdafx.hh"
 
 #ifndef WIN32
 	#include <sys/time.h>
@@ -34,7 +34,7 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 #endif
 
 #include <iomanip>      // std::setprecision
-#include "robust-equilibrium-lib/stop-watch.hh"
+#include "centroidal-dynamics-lib/stop-watch.hh"
 
 using std::map;
 using std::string;

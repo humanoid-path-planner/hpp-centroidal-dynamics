@@ -13,7 +13,7 @@
 #include <iostream>
 #include <iomanip>      // std::setprecision
 #include <boost/algorithm/string.hpp>
-#include <robust-equilibrium-lib/logger.hh>
+#include <centroidal-dynamics-lib/logger.hh>
 
 namespace robust_equilibrium
 {

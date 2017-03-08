@@ -6,7 +6,7 @@
 #ifndef _ROBUST_EQUILIBRIUM_LIB_CONFIG_HH
 #define _ROBUST_EQUILIBRIUM_LIB_CONFIG_HH
 
-#include <robust-equilibrium-lib/util.hh>
+#include <centroidal-dynamics-lib/util.hh>
 #include <ctime>
 
 namespace robust_equilibrium
@@ -66,6 +66,18 @@ void release_cdd_library()
   //dd_free_global_constants();
 }
 
+void uniform3(Cref_vector3 lower_bounds, Cref_vector3 upper_bounds, Ref_vector3 out)
+{
+
+  assert(lower_bounds.rows()==out.rows());
+  assert(upper_bounds.rows()==out.rows());
+  assert(lower_bounds.cols()==out.cols());
+  assert(upper_bounds.cols()==out.cols());
+  for(int i=0; i<out.rows(); i++)
+    for(int j=0; j<out.cols(); j++)
+      out(i,j) = (rand()/ value_type(RAND_MAX))*(upper_bounds(i,j)-lower_bounds(i,j)) + lower_bounds(i,j);
+}
+
 void uniform(Cref_matrixXX lower_bounds, Cref_matrixXX upper_bounds, Ref_matrixXX out)
 {
 
@@ -77,6 +89,7 @@ void uniform(Cref_matrixXX lower_bounds, Cref_matrixXX upper_bounds, Ref_matrixX
     for(int j=0; j<out.cols(); j++)
       out(i,j) = (rand()/ value_type(RAND_MAX))*(upper_bounds(i,j)-lower_bounds(i,j)) + lower_bounds(i,j);
 }
+
 
 void euler_matrix(double roll, double pitch, double yaw, Ref_rotation R)
 {

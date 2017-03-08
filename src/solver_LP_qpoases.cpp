@@ -3,8 +3,8 @@
  * Author: Andrea Del Prete
  */
 
-#include <robust-equilibrium-lib/solver_LP_qpoases.hh>
-#include <robust-equilibrium-lib/logger.hh>
+#include <centroidal-dynamics-lib/solver_LP_qpoases.hh>
+#include <centroidal-dynamics-lib/logger.hh>
 
 USING_NAMESPACE_QPOASES
 

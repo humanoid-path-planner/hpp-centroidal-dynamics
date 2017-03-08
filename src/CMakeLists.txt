@@ -14,12 +14,12 @@ endif()
 SET(LIBRARY_NAME ${PROJECT_NAME})
 
 SET(${LIBRARY_NAME}_SOURCES
-    ${INCLUDE_DIR}/robust-equilibrium-lib/config.hh
-    ${INCLUDE_DIR}/robust-equilibrium-lib/util.hh
-    ${INCLUDE_DIR}/robust-equilibrium-lib/solver_LP_abstract.hh
-    ${INCLUDE_DIR}/robust-equilibrium-lib/solver_LP_qpoases.hh
-    ${INCLUDE_DIR}/robust-equilibrium-lib/solver_LP_clp.hh
-    ${INCLUDE_DIR}/robust-equilibrium-lib/static_equilibrium.hh
+		${INCLUDE_DIR}/centroidal-dynamics-lib/config.hh
+		${INCLUDE_DIR}/centroidal-dynamics-lib/util.hh
+		${INCLUDE_DIR}/centroidal-dynamics-lib/solver_LP_abstract.hh
+		${INCLUDE_DIR}/centroidal-dynamics-lib/solver_LP_qpoases.hh
+		${INCLUDE_DIR}/centroidal-dynamics-lib/solver_LP_clp.hh
+		${INCLUDE_DIR}/centroidal-dynamics-lib/static_equilibrium.hh
     static_equilibrium.cpp
     solver_LP_abstract.cpp
     solver_LP_qpoases.cpp

@@ -5,7 +5,7 @@
 
 #ifdef CLP_FOUND
 
-#include <robust-equilibrium-lib/solver_LP_clp.hh>
+#include <centroidal-dynamics-lib/solver_LP_clp.hh>
 #include "CoinBuild.hpp"
 
 namespace robust_equilibrium

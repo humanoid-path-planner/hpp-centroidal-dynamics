@@ -28,7 +28,7 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 #ifndef WBR_STOPWATCH_H
 #define WBR_STOPWATCH_H
 
-#include "robust-equilibrium-lib/Stdafx.hh"
+#include "centroidal-dynamics-lib/Stdafx.hh"
 
 #ifndef WIN32
 	/* The classes below are exported */

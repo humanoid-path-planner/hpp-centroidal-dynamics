@@ -3,9 +3,9 @@
  * Author: Andrea Del Prete
  */
 
-#include <robust-equilibrium-lib/static_equilibrium.hh>
-#include <robust-equilibrium-lib/logger.hh>
-#include <robust-equilibrium-lib/stop-watch.hh>
+#include <centroidal-dynamics-lib/static_equilibrium.hh>
+#include <centroidal-dynamics-lib/logger.hh>
+#include <centroidal-dynamics-lib/stop-watch.hh>
 #include <iostream>
 #include <vector>
 #include <ctime>

@@ -7,8 +7,8 @@
 #define ROBUST_EQUILIBRIUM_LIB_SOLVER_LP_ABSTRACT_HH
 
 #include <Eigen/Dense>
-#include <robust-equilibrium-lib/config.hh>
-#include <robust-equilibrium-lib/util.hh>
+#include <centroidal-dynamics-lib/config.hh>
+#include <centroidal-dynamics-lib/util.hh>
 
 namespace robust_equilibrium
 {

@@ -3,9 +3,9 @@ INCLUDE(cmake/base.cmake)
 INCLUDE(cmake/cpack.cmake)
 INCLUDE(cmake2/FindqpOASES.cmake)
 
-SET(PROJECT_NAME robust-equilibrium-lib)
+SET(PROJECT_NAME centroidal-dynamics-lib)
 SET(PROJECT_DESCRIPTION
-   "Utility classes for testing (robust) static equilibrium of a system in contact with the environment"
+	 "Utility classes for testing (robust) equilibrium of a system in contact with the environment, and other centroidal dynamics methods."
  )
 SET(PROJECT_URL "")
 
@@ -33,14 +33,14 @@ MESSAGE( STATUS "CMAKE_CXX_FLAGS: " ${CMAKE_CXX_FLAGS} )
 
 # Declare Headers
 SET(${PROJECT_NAME}_HEADERS
-    include/robust-equilibrium-lib/config.hh
-    include/robust-equilibrium-lib/util.hh
-    include/robust-equilibrium-lib/logger.hh
-    include/robust-equilibrium-lib/solver_LP_abstract.hh
-    include/robust-equilibrium-lib/solver_LP_qpoases.hh
-    include/robust-equilibrium-lib/solver_LP_clp.hh
-    include/robust-equilibrium-lib/static_equilibrium.hh
-    include/robust-equilibrium-lib/stop-watch.hh
+		include/centroidal-dynamics-lib/config.hh
+		include/centroidal-dynamics-lib/util.hh
+		include/centroidal-dynamics-lib/logger.hh
+		include/centroidal-dynamics-lib/solver_LP_abstract.hh
+		include/centroidal-dynamics-lib/solver_LP_qpoases.hh
+		include/centroidal-dynamics-lib/solver_LP_clp.hh
+		include/centroidal-dynamics-lib/static_equilibrium.hh
+		include/centroidal-dynamics-lib/stop-watch.hh
   )
 
 find_package(Eigen3)
