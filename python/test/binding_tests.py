@@ -40,3 +40,8 @@ ddc= asmatrix(array([1000.,0.,0.]))
 status, robustness = eq.computeEquilibriumRobustness(c,ddc)
 assert (status == LP_STATUS_OPTIMAL), "LP should not fail"
 assert (robustness < 0), "first test should NOT be in equilibrirum"
+
+#now, use polytope projection algorithm
+eq.setNewContacts(asmatrix(P),asmatrix(N),0.3,EquilibriumAlgorithm.EQUILIBRIUM_ALGORITHM_PP)
+H,h = eq.getPolytopeInequalities()
+

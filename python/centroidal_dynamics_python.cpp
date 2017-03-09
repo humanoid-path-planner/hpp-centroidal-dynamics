@@ -26,6 +26,16 @@ boost::python::tuple wrapComputeEquilibriumRobustness(Equilibrium& self, const V
     return boost::python::make_tuple(status, robustness);
 }
 
+boost::python::tuple wrapGetPolytopeInequalities(Equilibrium& self)
+{
+    MatrixXX H;
+    VectorX h;
+    self.getPolytopeInequalities(H,h);
+    MatrixXXColMajor _H = H;
+    return boost::python::make_tuple(_H, h);
+}
+
+
 
 BOOST_PYTHON_MODULE(centroidal_dynamics)
 {
@@ -33,7 +43,9 @@ BOOST_PYTHON_MODULE(centroidal_dynamics)
     eigenpy::enableEigenPy();
 
     eigenpy::enableEigenPySpecific<MatrixX3ColMajor,MatrixX3ColMajor>();
+    eigenpy::enableEigenPySpecific<MatrixXXColMajor,MatrixXXColMajor>();
     eigenpy::enableEigenPySpecific<Vector3,Vector3>();
+    eigenpy::enableEigenPySpecific<VectorX,VectorX>();
     /*eigenpy::exposeAngleAxis();
     eigenpy::exposeQuaternion();*/
 
@@ -83,6 +95,7 @@ BOOST_PYTHON_MODULE(centroidal_dynamics)
             .def("setNewContacts", setNewContacts)
             .def("computeEquilibriumRobustness", wrapComputeQuasiEquilibriumRobustness)
             .def("computeEquilibriumRobustness", wrapComputeEquilibriumRobustness)
+            .def("getPolytopeInequalities", wrapGetPolytopeInequalities)
     ;
 }
 
