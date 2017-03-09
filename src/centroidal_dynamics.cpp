@@ -182,9 +182,19 @@ bool Equilibrium::setNewContacts(const MatrixX3& contactPoints, const MatrixX3& 
   return true;
 }
 
+static const Vector3 zero_acc = Vector3::Zero();
 
 LP_status Equilibrium::computeEquilibriumRobustness(Cref_vector3 com, double &robustness)
 {
+    return computeEquilibriumRobustness(com, zero_acc, robustness);
+}
+
+LP_status Equilibrium::computeEquilibriumRobustness(Cref_vector3 com, Cref_vector3 acc, double &robustness)
+{
+  // Take the acceleration in account in D and d :
+  m_D.block<3,3>(3,0) = crossMatrix(-m_mass * (m_gravity - acc));
+  m_d.head<3>()= m_mass * (m_gravity - acc);
+
   const long m = m_G_centr.cols(); // number of gravito-inertial wrench generators
   if(m==0)
     return LP_STATUS_INFEASIBLE;
@@ -309,20 +319,6 @@ LP_status Equilibrium::computeEquilibriumRobustness(Cref_vector3 com, double &ro
 
   SEND_ERROR_MSG("checkRobustEquilibrium is not implemented for the specified algorithm");
   return LP_STATUS_ERROR;
-}
-
-LP_status Equilibrium::computeEquilibriumRobustness(Cref_vector3 com, Cref_vector3 acc, double &robustness){
-  // Take the acceleration in account in D and d :
-  Matrix63 old_D = m_D;
-  Vector6 old_d = m_d;
-  m_D.block<3,3>(3,0) = crossMatrix(-m_mass * (m_gravity - acc));
-  m_d.head<3>()= m_mass * (m_gravity - acc);
-  // compute equilibrium robustness with the new D and d
-  LP_status status = computeEquilibriumRobustness(com,robustness);
-  // Switch back to the original values of D and d
-  m_D = old_D;
-  m_d = old_d;
-  return status;
 }
 
 /**
