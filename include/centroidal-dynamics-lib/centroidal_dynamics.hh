@@ -120,15 +120,30 @@ public:
   /**
    * @brief Specify a new set of contacts.
    * All 3d vectors are expressed in a reference frame having the z axis aligned with gravity.
-   * In other words the gravity vecotr is (0, 0, -9.81).
+   * In other words the gravity vecotr is (0, 0, -9.81). This method considers row-major
+   * matrices as input.
    * @param contactPoints List of N 3d contact points as an Nx3 matrix.
    * @param contactNormals List of N 3d contact normal directions as an Nx3 matrix.
    * @param frictionCoefficient The contact friction coefficient.
    * @param alg Algorithm to use for testing equilibrium.
    * @return True if the operation succeeded, false otherwise.
    */
-  bool setNewContacts(Cref_matrixX3 contactPoints, Cref_matrixX3 contactNormals,
-                      double frictionCoefficient, EquilibriumAlgorithm alg);
+  bool setNewContacts(const MatrixX3& contactPoints, const MatrixX3& contactNormals,
+                      const double frictionCoefficient, const EquilibriumAlgorithm alg);
+
+  /**
+   * @brief Specify a new set of contacts.
+   * All 3d vectors are expressed in a reference frame having the z axis aligned with gravity.
+   * In other words the gravity vecotr is (0, 0, -9.81). This method considers column major
+   * matrices as input, and converts them into rowmajor matrices for internal use with the solvers.
+   * @param contactPoints List of N 3d contact points as an Nx3 matrix.
+   * @param contactNormals List of N 3d contact normal directions as an Nx3 matrix.
+   * @param frictionCoefficient The contact friction coefficient.
+   * @param alg Algorithm to use for testing equilibrium.
+   * @return True if the operation succeeded, false otherwise.
+   */
+  bool setNewContacts(const MatrixX3ColMajor& contactPoints, const MatrixX3ColMajor&  contactNormals,
+                      const double frictionCoefficient, const EquilibriumAlgorithm alg);
 
   /**
    * @brief Compute a measure of the robustness of the equilibrium of the specified com position.

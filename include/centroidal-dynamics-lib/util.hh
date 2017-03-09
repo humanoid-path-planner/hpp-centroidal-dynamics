@@ -64,6 +64,12 @@ namespace centroidal_dynamics
   typedef const Eigen::Ref<const Matrix6X>    & Cref_matrix6X;
   typedef const Eigen::Ref<const MatrixXX>    & Cref_matrixXX;
 
+  /**Column major definitions for compatibility with classical eigen use**/
+  typedef Eigen::Matrix <value_type, Eigen::Dynamic, 3, Eigen::ColMajor>              MatrixX3ColMajor;
+  typedef Eigen::Matrix <value_type, Eigen::Dynamic, Eigen::Dynamic, Eigen::ColMajor> MatrixXXColMajor;
+  typedef const Eigen::Ref<const MatrixX3ColMajor>  & Cref_matrixX3ColMajor;
+  typedef Eigen::Ref<MatrixXXColMajor>              &  ref_matrixXXColMajor;
+
   /**
    * Write the specified matrix to a binary file with the specified name.
    */

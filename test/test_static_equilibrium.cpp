@@ -308,7 +308,7 @@ void generateContacts(unsigned int N_CONTACTS, double MIN_CONTACT_DISTANCE, doub
                       RVector3 &CONTACT_POINT_UPPER_BOUNDS,
                       RVector3 &RPY_LOWER_BOUNDS,
                       RVector3 &RPY_UPPER_BOUNDS,
-                      MatrixXX& p, MatrixXX& N)
+                      MatrixX3& p, MatrixX3& N)
 {
   MatrixXX contact_pos = MatrixXX::Zero(N_CONTACTS, 3);
   MatrixXX contact_rpy = MatrixXX::Zero(N_CONTACTS, 3);
@@ -381,12 +381,16 @@ void testWithLoadedData()
     return;
   }
 
+  // this is a test to ensure that a matrixXX can be cast into a MatrixX3
+  const MatrixX3& cp = contactPoints;
+  const MatrixX3& cn = contactNormals;
   Equilibrium* solvers[N_SOLVERS];
   double robustness[N_SOLVERS];
   for(int s=0; s<N_SOLVERS; s++)
   {
     solvers[s] = new Equilibrium(solverNames[s], mass, generatorsPerContact, SOLVER_LP_QPOASES);
-    if(!solvers[s]->setNewContacts(contactPoints, contactNormals, mu, algorithms[s]))
+
+    if(!solvers[s]->setNewContacts(cp, cn, mu, algorithms[s]))
     {
       SEND_ERROR_MSG("Error while setting new contacts for solver "+solvers[s]->getName());
       continue;
@@ -466,7 +470,7 @@ int main()
   for(int s=0; s<N_SOLVERS; s++)
     solvers[s] = new Equilibrium(solverNames[s], mass, generatorsPerContact, lp_solver_types[s]);
 
-  MatrixXX p, N;
+  MatrixX3 p, N;
   RVector2 com_LB, com_UB;
   VectorX x_range(GRID_SIZE), y_range(GRID_SIZE);
   MatrixXX comPositions(GRID_SIZE*GRID_SIZE, 3);

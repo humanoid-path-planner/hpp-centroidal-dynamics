@@ -129,8 +129,16 @@ bool Equilibrium::computeGenerators(Cref_matrixX3 contactPoints, Cref_matrixX3 c
     return true;
 }
 
-bool Equilibrium::setNewContacts(Cref_matrixX3 contactPoints, Cref_matrixX3 contactNormals,
-                                       double frictionCoefficient, EquilibriumAlgorithm alg)
+bool Equilibrium::setNewContacts(const MatrixX3ColMajor& contactPoints, const MatrixX3ColMajor& contactNormals,
+                                       const double frictionCoefficient, const EquilibriumAlgorithm alg)
+{
+    MatrixX3 _contactPoints  = contactPoints;
+    MatrixX3 _contactNormals = contactNormals;
+    return setNewContacts(_contactPoints,_contactNormals, frictionCoefficient, alg);
+}
+
+bool Equilibrium::setNewContacts(const MatrixX3& contactPoints, const MatrixX3& contactNormals,
+                                 const double frictionCoefficient, const EquilibriumAlgorithm alg)
 {
   assert(contactPoints.rows()==contactNormals.rows());
 
