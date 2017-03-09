@@ -18,4 +18,6 @@ IF(APPLE)
 ENDIF(APPLE)
 PKG_CONFIG_USE_DEPENDENCY(centroidal_dynamics eigenpy)
 
-#INSTALL(TARGETS centroidal_dynamics DESTINATION lib)
+INSTALL(
+	FILES ${LIBRARY_OUTPUT_PATH}/centroidal_dynamics.so	DESTINATION ${PYTHON_SITELIB}
+)

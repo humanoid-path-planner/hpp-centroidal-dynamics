@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 2.6)
 INCLUDE(cmake/base.cmake)
-INCLUDE(cmake/cpack.cmake)
+INCLUDE(cmake/python.cmake)
 INCLUDE(cmake2/FindqpOASES.cmake)
 
 SET(PROJECT_NAME centroidal-dynamics-lib)
@@ -31,8 +31,10 @@ SETUP_PROJECT()
 string (REPLACE "-Werror" "" CMAKE_CXX_FLAGS ${CMAKE_CXX_FLAGS})
 MESSAGE( STATUS "CMAKE_CXX_FLAGS: " ${CMAKE_CXX_FLAGS} )
 
-OPTION (BUILD_PYTHON_INTERFACE "Build the python binding" ON)
+OPTION (BUILD_PYTHON_INTERFACE "Build the python binding" OFF)
 IF(BUILD_PYTHON_INTERFACE)
+# search for python
+	FINDPYTHON(2.7 EXACT REQUIRED)
 	find_package( PythonLibs 2.7 REQUIRED )
 	include_directories( ${PYTHON_INCLUDE_DIRS} )
 
@@ -82,5 +84,4 @@ IF(BUILD_PYTHON_INTERFACE)
 ENDIF(BUILD_PYTHON_INTERFACE)
 
 SETUP_PROJECT_FINALIZE()
-SETUP_PROJECT_CPACK()
 
