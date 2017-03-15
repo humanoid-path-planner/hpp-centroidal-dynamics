@@ -325,21 +325,6 @@ LP_status Equilibrium::computeEquilibriumRobustness(Cref_vector3 com, Cref_vecto
 }
 
 
-LP_status StaticEquilibrium::computeEquilibriumRobustness(Cref_vector3 com, Cref_vector3 acc, double &robustness){
-  // Take the acceleration in account in D and d :
-  Matrix63 old_D = m_D;
-  Vector6 old_d = m_d;
-  m_D.block<3,3>(3,0) = crossMatrix(-m_mass * (m_gravity - acc));
-  m_d.head<3>()= m_mass * (m_gravity - acc);
-  // compute equilibrium robustness with the new D and d
-  LP_status status = computeEquilibriumRobustness(com,robustness);
-  // Switch back to the original values of D and d
-  m_D = old_D;
-  m_d = old_d;
-  return status;
-}
-
-
 LP_status Equilibrium::checkRobustEquilibrium(Cref_vector3 com, bool &equilibrium, double e_max)
 {
   if(m_G_centr.cols()==0)
@@ -601,7 +586,7 @@ double Equilibrium::convert_emax_to_b0(double emax)
 
 
 
-LP_status StaticEquilibrium::findMaximumAcceleration(Cref_matrix63 H, Cref_vector6 h,Cref_vector3 v, double& alpha0){
+LP_status Equilibrium::findMaximumAcceleration(Cref_matrix63 H, Cref_vector6 h,Cref_vector3 v, double& alpha0){
   int m = (int)m_G_centr.cols() -1 ; // 4* number of contacts
   VectorX b_a0(m+1);
   VectorX c = VectorX::Zero(m+1);
@@ -633,7 +618,7 @@ LP_status StaticEquilibrium::findMaximumAcceleration(Cref_matrix63 H, Cref_vecto
 }
 
 
-bool StaticEquilibrium::checkAdmissibleAcceleration(Cref_matrix63 H, Cref_vector6 h, Cref_vector3 a ){
+bool Equilibrium::checkAdmissibleAcceleration(Cref_matrix63 H, Cref_vector6 h, Cref_vector3 a ){
   int m = (int)m_G_centr.cols(); // number of contact * generator per contacts
   VectorX b(m);
   VectorX c = VectorX::Zero(m);
