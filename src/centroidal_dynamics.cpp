@@ -592,15 +592,11 @@ bool Equilibrium::computePolytopeProjection(Cref_matrix6X v)
     {
         const Eigen::Ref<VectorX>& chosen_comb = I.row(i);
         for(int j = 0; j < chosen_comb.size(); ++j)
-        {
-            std::cout << "block " << n << " " << 1 << " " << j << " " << 0 << std::endl;
-            std::cout << "col " << v.col((int)(chosen_comb[j])).rows() << std::endl;
-            std::cout << "col " << v.col((int)(chosen_comb[j])) << std::endl;
-            std::cout << " V " << V.rows()<< " " << V.cols() << std::endl;
-            V.block(j,0,n,1) = v.col((int)(chosen_comb[j]));
-        }
+            V.col(j) = v.col((int)(chosen_comb[j]));
         Eigen::FullPivLU<MatrixXX> lu(V);
         MatrixXX c = lu.kernel();
+        std::cout << "c " << c.cols() << std::endl;
+        std::cout << "V " << V.cols() << std::endl;
         if(c.cols()==1) // The n-1 lines of V are lineraly independent
         {
             c.normalize();
@@ -610,7 +606,7 @@ bool Equilibrium::computePolytopeProjection(Cref_matrix6X v)
             std::set<int>::const_iterator setit = J.begin();
             MatrixXX VV = MatrixXX::Zero(n,J.size());
             for(int j = 0; j < chosen_comb.size(); ++j, ++setit)
-                VV.block(1,m,j,0) = v.col(*setit);
+                VV.col(j) = v.col(*setit);
             MatrixXX scalar=VV*c(0,0);
             std::cout << "scalar " << scalar << std::endl;
         }
