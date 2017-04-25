@@ -541,6 +541,34 @@ int choosenk(const int n, const int k)
     return fact(n) / (fact(k) * fact(n - k));
 }
 
+VectorX computeCombVector(const int order)
+{
+    VectorX res = VectorX::Zero(order);
+    for (int i = 0; i< order; ++i)
+        res[i] = i;
+    return res;
+}
+#include <algorithm>
+#include <set>
+#include <iterator>
+
+std::set<int> vec_to_set(Cref_vectorX A)
+{
+    std::set<int> res;
+    for(int i = 0; i < A.size(); ++i)
+        res.insert(A[i]);
+    return res;
+}
+
+//elements of A not in B
+std::set<int> setDiff(Cref_vectorX A, Cref_vectorX B)
+{
+    std::set<int> s1 = vec_to_set(A), s2 = vec_to_set(B);
+    // Fill in s1 and s2 with values
+    std::set<int> result;
+    std::set_difference(s1.begin(), s1.end(), s2.begin(), s2.end(),
+        std::inserter(result, result.end()));
+}
 bool Equilibrium::computePolytopeProjection(Cref_matrix6X v)
 {
 
@@ -552,12 +580,45 @@ bool Equilibrium::computePolytopeProjection(Cref_matrix6X v)
         SEND_ERROR_MSG("V has more lines that columns, this case is not handled!");
         return false;
     }
-    MatrixXX test = v;
-    VectorX vec;
-    nchoosek(vec,6,test);
+    MatrixXX I;
+    VectorX comb = computeCombVector(m);
+    nchoosek(comb,n-1,I);
+    int nbcomb = I.rows();
+    int sizemat = (int)(2*nchoosek(m,n-1));
+    MatrixXX C = MatrixXX::Zero(sizemat,n);
+    VectorX d = VectorX::Zero(sizemat);
+    MatrixXX V = MatrixXX::Zero(n,m);
+    for(int i = 0; i< nbcomb; ++i)
+    {
+        const Eigen::Ref<VectorX>& chosen_comb = I.row(i);
+        for(int j = 0; j < chosen_comb.size(); ++j)
+        {
+            std::cout << "block " << n << " " << 1 << " " << j << " " << 0 << std::endl;
+            std::cout << "col " << v.col((int)(chosen_comb[j])).rows() << std::endl;
+            std::cout << "col " << v.col((int)(chosen_comb[j])) << std::endl;
+            std::cout << " V " << V.rows()<< " " << V.cols() << std::endl;
+            V.block(j,0,n,1) = v.col((int)(chosen_comb[j]));
+        }
+        Eigen::FullPivLU<MatrixXX> lu(V);
+        MatrixXX c = lu.kernel();
+        if(c.cols()==1) // The n-1 lines of V are lineraly independent
+        {
+            c.normalize();
+            C.row(2*i-1) = c;
+            C.row(2*i) = c;
+            std::set<int> J = setDiff(comb,chosen_comb);
+            std::set<int>::const_iterator setit = J.begin();
+            MatrixXX VV = MatrixXX::Zero(n,J.size());
+            for(int j = 0; j < chosen_comb.size(); ++j, ++setit)
+                VV.block(1,m,j,0) = v.col(*setit);
+            MatrixXX scalar=VV*c(0,0);
+            std::cout << "scalar " << scalar << std::endl;
+        }
+    }
+
     //int I = I=nchoosek(1:m,n-1);*/
 //  getProfiler().start("eigen_to_cdd");
-  dd_MatrixPtr V = cone_span_eigen_to_cdd(v.transpose(),canonicalize_cdd_matrix);
+ /* dd_MatrixPtr V = cone_span_eigen_to_cdd(v.transpose(),canonicalize_cdd_matrix);
 //  getProfiler().stop("eigen_to_cdd");
 
   dd_ErrorType error = dd_NoError;
@@ -608,6 +669,7 @@ bool Equilibrium::computePolytopeProjection(Cref_matrix6X v)
     m_h(rowsize + i) = -m_h((int)(*cit));
     m_H(rowsize + i) = -m_H((int)(*cit));
   }
+<<<<<<< HEAD
 //  getProfiler().stop("cdd to eigen");
   if(m_h.rows() < n )
     {
@@ -616,6 +678,9 @@ bool Equilibrium::computePolytopeProjection(Cref_matrix6X v)
         return false;
     }
 
+=======
+//  getProfiler().stop("cdd to eigen");*/
+>>>>>>> ongoing
 
   return true;
 }
