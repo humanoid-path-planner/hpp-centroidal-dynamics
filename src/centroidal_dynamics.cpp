@@ -521,12 +521,41 @@ LP_status Equilibrium::findExtremumInDirection(Cref_vector3 direction, Ref_vecto
   SEND_ERROR_MSG("findExtremumInDirection not implemented yet");
   return LP_STATUS_ERROR;
 }
+///
+/// \brief Computes factorial of a number
+///
+int fact(const int n)
+{
+    assert(n>=0);
+    int res = 1;
+    for (int i=2 ; i <= n ; ++i)
+       res *= i;
+    return res;
+}
+
+///
+/// \brief Computes a binomal coefficient
+///
+int choosenk(const int n, const int k)
+{
+    return fact(n) / (fact(k) * fact(n - k));
+}
 
 bool Equilibrium::computePolytopeProjection(Cref_matrix6X v)
 {
-    int n = (int)(v.rows());
-    int m = (int)(v.cols());
 
+    // todo: for the moment using ad hoc upper bound = 500 N
+    int n = (int)v.rows();
+    int m = (int)v.cols();
+    if (n>m)
+    {
+        SEND_ERROR_MSG("V has more lines that columns, this case is not handled!");
+        return false;
+    }
+    MatrixXX test = v;
+    VectorX vec;
+    nchoosek(vec,6,test);
+    //int I = I=nchoosek(1:m,n-1);*/
 //  getProfiler().start("eigen_to_cdd");
   dd_MatrixPtr V = cone_span_eigen_to_cdd(v.transpose(),canonicalize_cdd_matrix);
 //  getProfiler().stop("eigen_to_cdd");
