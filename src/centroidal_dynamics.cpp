@@ -362,7 +362,7 @@ LP_status Equilibrium::computeEquilibriumRobustness(Cref_vector3 com, Cref_vecto
     return lpStatus_dual;
   }
 
-  SEND_ERROR_MSG("checkRobustEquilibrium is not implemented for the specified algorithm");
+  SEND_ERROR_MSG("computeEquilibriumRobustness is not implemented for the specified algorithm");
   return LP_STATUS_ERROR;
 }
 
@@ -568,7 +568,7 @@ bool Equilibrium::computePolytopeProjection(Cref_matrix6X v, const int graspInde
         return false;
     }
 //  getProfiler().start("eigen_to_cdd");
-    dd_MatrixPtr V = cone_span_eigen_to_cdd(v.transpose(),canonicalize_cdd_matrix,graspIndex);
+    dd_MatrixPtr V = cone_span_eigen_to_cdd(v.transpose(),canonicalize_cdd_matrix,graspIndex*6);
 //  getProfiler().stop("eigen_to_cdd");
 
   dd_ErrorType error = dd_NoError;

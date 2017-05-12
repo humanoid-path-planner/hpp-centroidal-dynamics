@@ -153,7 +153,7 @@ public:
    * @return True if the operation succeeded, false otherwise.
    */
   bool setNewContacts(const MatrixX3ColMajor& contactPoints, const MatrixX3ColMajor&  contactNormals,
-                      const double frictionCoefficient, const EquilibriumAlgorithm alg, const int graspIndex = -1, const double maxGraspForce = 50.);
+                      const double frictionCoefficient, const EquilibriumAlgorithm alg, const int graspIndex = -1, const double maxGraspForce = 500.);
 
   void setG(Cref_matrix6X G){m_G_centr = G;}
 
