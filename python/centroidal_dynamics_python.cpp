@@ -26,6 +26,25 @@ boost::python::tuple wrapComputeEquilibriumRobustness(Equilibrium& self, const V
     return boost::python::make_tuple(status, robustness);
 }
 
+boost::python::tuple wrapCheckRobustEquilibrium(Equilibrium& self, const Vector3& com)
+{
+    bool robustness;
+    LP_status status = self.checkRobustEquilibrium(com, robustness);
+    return boost::python::make_tuple(status, robustness);
+}
+
+bool wrapSetNewContacts(Equilibrium& self, const MatrixX3ColMajor& contactPoints, const MatrixX3ColMajor&  contactNormals,
+                        const double frictionCoefficient, const EquilibriumAlgorithm alg)
+{
+    return self.setNewContacts(contactPoints, contactNormals, frictionCoefficient, alg);
+}
+
+bool wrapSetNewContactsFull(Equilibrium& self, const MatrixX3ColMajor& contactPoints, const MatrixX3ColMajor&  contactNormals,
+                      const double frictionCoefficient, const EquilibriumAlgorithm alg, const int graspIndex, const double maxGraspForce)
+{
+    return self.setNewContacts(contactPoints, contactNormals, frictionCoefficient, alg, graspIndex, maxGraspForce);
+}
+
 boost::python::tuple wrapGetPolytopeInequalities(Equilibrium& self)
 {
     MatrixXX H;
@@ -86,17 +105,19 @@ BOOST_PYTHON_MODULE(centroidal_dynamics)
 
     /** END enum types **/
 
-    bool (Equilibrium::*setNewContacts)
-            (const MatrixX3ColMajor&, const MatrixX3ColMajor&, const double, const EquilibriumAlgorithm) = &Equilibrium::setNewContacts;
+    //bool (Equilibrium::*setNewContacts)
+    //        (const MatrixX3ColMajor&, const MatrixX3ColMajor&, const double, const EquilibriumAlgorithm, const int graspIndex, const double maxGraspForce) = &Equilibrium::setNewContacts;
 
     class_<Equilibrium>("Equilibrium", init<std::string, double, unsigned int, optional <SolverLP, bool, const unsigned int, const bool> >())
             .def("useWarmStart", &Equilibrium::useWarmStart)
             .def("setUseWarmStart", &Equilibrium::setUseWarmStart)
             .def("getName", &Equilibrium::getName)
             .def("getAlgorithm", &Equilibrium::getAlgorithm)
-            .def("setNewContacts", setNewContacts)
+            .def("setNewContacts", wrapSetNewContacts)
+            .def("setNewContacts", wrapSetNewContactsFull)
             .def("computeEquilibriumRobustness", wrapComputeQuasiEquilibriumRobustness)
             .def("computeEquilibriumRobustness", wrapComputeEquilibriumRobustness)
+            .def("checkRobustEquilibrium", wrapCheckRobustEquilibrium)
             .def("getPolytopeInequalities", wrapGetPolytopeInequalities)
     ;
 }

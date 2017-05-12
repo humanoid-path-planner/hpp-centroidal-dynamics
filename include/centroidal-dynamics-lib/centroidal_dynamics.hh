@@ -66,9 +66,9 @@ private:
   /** Coefficient used for converting the robustness measure in Newtons */
   double m_b0_to_emax_coefficient;
 
-  bool computePolytopeProjection(Cref_matrix6X v);
+  bool computePolytopeProjection(Cref_matrix6X v, const int graspIndex = -1);
   bool computeGenerators(Cref_matrixX3 contactPoints, Cref_matrixX3 contactNormals,
-                         double frictionCoefficient, const bool perturbate = false);
+                         double frictionCoefficient,  const int graspIndex, const double maxGraspForce, const bool perturbate = false);
 
   /**
    * @brief Given the smallest coefficient of the contact force generators it computes
@@ -130,10 +130,13 @@ public:
    * @param contactNormals List of N 3d contact normal directions as an Nx3 matrix.
    * @param frictionCoefficient The contact friction coefficient.
    * @param alg Algorithm to use for testing equilibrium.
+   * @param graspIndex if different than -1, specify starting where the contact points are grasping points
+   * WARNING graspIndexOnly works for PP algorithm
+   * @param maxGraspForce maximum grasping force applicable at each contact point
    * @return True if the operation succeeded, false otherwise.
    */
   bool setNewContacts(const MatrixX3& contactPoints, const MatrixX3& contactNormals,
-                      const double frictionCoefficient, const EquilibriumAlgorithm alg);
+                      const double frictionCoefficient, const EquilibriumAlgorithm alg, const int graspIndex = -1, const double maxGraspForce = 50.);
 
   /**
    * @brief Specify a new set of contacts.
@@ -144,10 +147,13 @@ public:
    * @param contactNormals List of N 3d contact normal directions as an Nx3 matrix.
    * @param frictionCoefficient The contact friction coefficient.
    * @param alg Algorithm to use for testing equilibrium.
+   * @param graspIndex if different than -1, specify starting where the contact points are grasping points
+   * WARNING graspIndexOnly works for PP algorithm
+   * @param maxGraspForce maximum grasping force applicable at each contact point
    * @return True if the operation succeeded, false otherwise.
    */
   bool setNewContacts(const MatrixX3ColMajor& contactPoints, const MatrixX3ColMajor&  contactNormals,
-                      const double frictionCoefficient, const EquilibriumAlgorithm alg);
+                      const double frictionCoefficient, const EquilibriumAlgorithm alg, const int graspIndex = -1, const double maxGraspForce = 50.);
 
   void setG(Cref_matrix6X G){m_G_centr = G;}
 

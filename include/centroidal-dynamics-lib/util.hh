@@ -115,7 +115,7 @@ namespace centroidal_dynamics
  * @return The mX(n+1) output cdd matrix, which contains an additional column,
  * the first one, with all zeros.
  */
-  dd_MatrixPtr cone_span_eigen_to_cdd(Cref_matrixXX input, const bool canonicalize=false);
+  dd_MatrixPtr cone_span_eigen_to_cdd(Cref_matrixXX input, const bool canonicalize=false, const int graspIndex = -1);
 
   /**
  * Compute the cross-product skew-symmetric matrix associated to the specified vector.
@@ -191,8 +191,6 @@ namespace centroidal_dynamics
         int running_i  = 0;
         int running_j = 0;
         Matrix<typename DerivedU::Scalar,1,Dynamic> running(1,k);
-       /* const std::function<void(int,int)> doCombs =
-        [&running,&N,&doCombs,&running_i,&running_j,&U,&V](int offset, int k)*/;
         doCombs(running, running_i, running_j, U, V,0,k);
     }
 } //namespace centroidal_dynamics

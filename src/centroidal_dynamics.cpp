@@ -55,9 +55,13 @@ Equilibrium::Equilibrium(const string& name, const double mass, const unsigned i
 }
 
 bool Equilibrium::computeGenerators(Cref_matrixX3 contactPoints, Cref_matrixX3 contactNormals,
-                                          double frictionCoefficient, const bool perturbate)
+                                          double frictionCoefficient, const int graspIndex, const double maxGraspForce, const bool perturbate)
 {
-    long int c = contactPoints.rows();
+    if(graspIndex != -1)
+    {
+      assert(graspIndex < contactPoints.rows());
+    }
+    long int c = graspIndex > -1 ? graspIndex : contactPoints.rows();
     unsigned int &cg = m_generatorsPerContact;
     double theta, delta_theta=2*M_PI/cg;
     const value_type pi_4 = value_type(M_PI_4);
@@ -118,6 +122,30 @@ bool Equilibrium::computeGenerators(Cref_matrixX3 contactPoints, Cref_matrixX3 c
       // project generators in 6d centroidal space
       m_G_centr.block(0,cg*i,6,cg) = A * G;
     }
+    if(graspIndex > -1)
+    {
+        Matrix3X cube(3, 8);
+        cube.col(0)= Vector3(-maxGraspForce,-maxGraspForce,-maxGraspForce);
+        cube.col(1)= Vector3( maxGraspForce,-maxGraspForce,-maxGraspForce);
+        cube.col(2)= Vector3( maxGraspForce, maxGraspForce,-maxGraspForce);
+        cube.col(3)= Vector3(-maxGraspForce, maxGraspForce,-maxGraspForce);
+        cube.col(4)= Vector3(-maxGraspForce,-maxGraspForce, maxGraspForce);
+        cube.col(5)= Vector3( maxGraspForce,-maxGraspForce, maxGraspForce);
+        cube.col(6)= Vector3( maxGraspForce, maxGraspForce, maxGraspForce);
+        cube.col(7)= Vector3(-maxGraspForce, maxGraspForce, maxGraspForce);
+        //first compute the cube constraining the grasping force.
+        for(long int i=graspIndex; i<contactPoints.rows(); i++)
+        {
+          // compute tangent directions
+          //N = contactNormals.row(i);
+          P = contactPoints.row(i);
+          // compute matrix mapping contact forces to gravito-inertial wrench
+          A.bottomRows<3>() = crossMatrix(-1.0*P);
+          // project generators in 6d centroidal space
+          m_G_centr.block(0,graspIndex*cg + 8*(i-graspIndex),6,8) = A * cube;
+        }
+    }
+
     // Compute the coefficient to convert b0 to e_max
     Vector3 f0 = Vector3::Zero();
     for(int j=0; j<cg; j++)
@@ -138,18 +166,22 @@ void Equilibrium::setAlgorithm(EquilibriumAlgorithm algorithm){
 }
 
 bool Equilibrium::setNewContacts(const MatrixX3ColMajor& contactPoints, const MatrixX3ColMajor& contactNormals,
-                                       const double frictionCoefficient, const EquilibriumAlgorithm alg)
+                                       const double frictionCoefficient, const EquilibriumAlgorithm alg, const int graspIndex, const double maxGraspForce)
 {
     MatrixX3 _contactPoints  = contactPoints;
     MatrixX3 _contactNormals = contactNormals;
-    return setNewContacts(_contactPoints,_contactNormals, frictionCoefficient, alg);
+    return setNewContacts(_contactPoints,_contactNormals, frictionCoefficient, alg, graspIndex, maxGraspForce);
 }
 
 bool Equilibrium::setNewContacts(const MatrixX3& contactPoints, const MatrixX3& contactNormals,
-                                 const double frictionCoefficient, const EquilibriumAlgorithm alg)
+                                 const double frictionCoefficient, const EquilibriumAlgorithm alg, const int graspIndex, const double maxGraspForce)
 {
   assert(contactPoints.rows()==contactNormals.rows());
-
+  if(alg!=EQUILIBRIUM_ALGORITHM_PP && graspIndex != -1)
+  {
+    SEND_ERROR_MSG("GRASPING not implemented yet expect for EQUILIBRIUM_ALGORITHM_PP");
+    return false;
+  }
   if(alg==EQUILIBRIUM_ALGORITHM_IP)
   {
     SEND_ERROR_MSG("Algorithm IP not implemented yet");
@@ -164,9 +196,12 @@ bool Equilibrium::setNewContacts(const MatrixX3& contactPoints, const MatrixX3& 
   m_algorithm = alg;
 
   // Lists of contact generators (3 X generatorsPerContact)
-  m_G_centr.resize(6,contactPoints.rows()*m_generatorsPerContact);
+  if(graspIndex == -1)
+    m_G_centr.resize(6,contactPoints.rows()*m_generatorsPerContact);
+  else
+    m_G_centr.resize(6,graspIndex*m_generatorsPerContact+(contactPoints.rows()-graspIndex)*8);
 
-  if (!computeGenerators(contactPoints,contactNormals,frictionCoefficient,false))
+  if (!computeGenerators(contactPoints,contactNormals,frictionCoefficient, graspIndex, maxGraspForce,false))
   {
     return false;
   }
@@ -174,9 +209,9 @@ bool Equilibrium::setNewContacts(const MatrixX3& contactPoints, const MatrixX3& 
   if(m_algorithm==EQUILIBRIUM_ALGORITHM_PP)
   {
     unsigned int attempts = max_num_cdd_trials;
-    while(!computePolytopeProjection(m_G_centr) && attempts>0)
+    while(!computePolytopeProjection(m_G_centr, graspIndex) && attempts>0)
     {
-      computeGenerators(contactPoints,contactNormals,frictionCoefficient,true);
+      computeGenerators(contactPoints,contactNormals,frictionCoefficient, graspIndex, maxGraspForce,true);
       attempts--;
     }
     // resetting random because obviously libcdd always resets to 0
@@ -521,55 +556,7 @@ LP_status Equilibrium::findExtremumInDirection(Cref_vector3 direction, Ref_vecto
   SEND_ERROR_MSG("findExtremumInDirection not implemented yet");
   return LP_STATUS_ERROR;
 }
-///
-/// \brief Computes factorial of a number
-///
-int fact(const int n)
-{
-    assert(n>=0);
-    int res = 1;
-    for (int i=2 ; i <= n ; ++i)
-       res *= i;
-    return res;
-}
-
-///
-/// \brief Computes a binomal coefficient
-///
-int choosenk(const int n, const int k)
-{
-    return fact(n) / (fact(k) * fact(n - k));
-}
-
-VectorX computeCombVector(const int order)
-{
-    VectorX res = VectorX::Zero(order);
-    for (int i = 0; i< order; ++i)
-        res[i] = i;
-    return res;
-}
-#include <algorithm>
-#include <set>
-#include <iterator>
-
-std::set<int> vec_to_set(Cref_vectorX A)
-{
-    std::set<int> res;
-    for(int i = 0; i < A.size(); ++i)
-        res.insert(A[i]);
-    return res;
-}
-
-//elements of A not in B
-std::set<int> setDiff(Cref_vectorX A, Cref_vectorX B)
-{
-    std::set<int> s1 = vec_to_set(A), s2 = vec_to_set(B);
-    // Fill in s1 and s2 with values
-    std::set<int> result;
-    std::set_difference(s1.begin(), s1.end(), s2.begin(), s2.end(),
-        std::inserter(result, result.end()));
-}
-bool Equilibrium::computePolytopeProjection(Cref_matrix6X v)
+bool Equilibrium::computePolytopeProjection(Cref_matrix6X v, const int graspIndex)
 {
 
     // todo: for the moment using ad hoc upper bound = 500 N
@@ -580,41 +567,8 @@ bool Equilibrium::computePolytopeProjection(Cref_matrix6X v)
         SEND_ERROR_MSG("V has more lines that columns, this case is not handled!");
         return false;
     }
-    MatrixXX I;
-    VectorX comb = computeCombVector(m);
-    nchoosek(comb,n-1,I);
-    int nbcomb = I.rows();
-    int sizemat = (int)(2*nchoosek(m,n-1));
-    MatrixXX C = MatrixXX::Zero(sizemat,n);
-    VectorX d = VectorX::Zero(sizemat);
-    MatrixXX V = MatrixXX::Zero(n,m);
-    for(int i = 0; i< nbcomb; ++i)
-    {
-        const Eigen::Ref<VectorX>& chosen_comb = I.row(i);
-        for(int j = 0; j < chosen_comb.size(); ++j)
-            V.col(j) = v.col((int)(chosen_comb[j]));
-        Eigen::FullPivLU<MatrixXX> lu(V);
-        MatrixXX c = lu.kernel();
-        std::cout << "c " << c.cols() << std::endl;
-        std::cout << "V " << V.cols() << std::endl;
-        if(c.cols()==1) // The n-1 lines of V are lineraly independent
-        {
-            c.normalize();
-            C.row(2*i-1) = c;
-            C.row(2*i) = c;
-            std::set<int> J = setDiff(comb,chosen_comb);
-            std::set<int>::const_iterator setit = J.begin();
-            MatrixXX VV = MatrixXX::Zero(n,J.size());
-            for(int j = 0; j < chosen_comb.size(); ++j, ++setit)
-                VV.col(j) = v.col(*setit);
-            MatrixXX scalar=VV*c(0,0);
-            std::cout << "scalar " << scalar << std::endl;
-        }
-    }
-
-    //int I = I=nchoosek(1:m,n-1);*/
 //  getProfiler().start("eigen_to_cdd");
- /* dd_MatrixPtr V = cone_span_eigen_to_cdd(v.transpose(),canonicalize_cdd_matrix);
+    dd_MatrixPtr V = cone_span_eigen_to_cdd(v.transpose(),canonicalize_cdd_matrix,graspIndex);
 //  getProfiler().stop("eigen_to_cdd");
 
   dd_ErrorType error = dd_NoError;
@@ -665,7 +619,6 @@ bool Equilibrium::computePolytopeProjection(Cref_matrix6X v)
     m_h(rowsize + i) = -m_h((int)(*cit));
     m_H(rowsize + i) = -m_H((int)(*cit));
   }
-<<<<<<< HEAD
 //  getProfiler().stop("cdd to eigen");
   if(m_h.rows() < n )
     {
@@ -673,10 +626,6 @@ bool Equilibrium::computePolytopeProjection(Cref_matrix6X v)
         m_is_cdd_stable = false;
         return false;
     }
-
-=======
-//  getProfiler().stop("cdd to eigen");*/
->>>>>>> ongoing
 
   return true;
 }
