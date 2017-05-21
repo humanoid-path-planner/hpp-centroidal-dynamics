@@ -30,6 +30,8 @@ boost::python::tuple wrapGetPolytopeInequalities(Equilibrium& self)
 {
     MatrixXX H;
     VectorX h;
+    H = MatrixXX::Zero(6,6);
+    h = VectorX::Zero(6,1);
     self.getPolytopeInequalities(H,h);
     MatrixXXColMajor _H = H;
     return boost::python::make_tuple(_H, h);
