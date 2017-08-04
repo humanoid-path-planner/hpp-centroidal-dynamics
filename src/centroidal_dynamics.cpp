@@ -599,8 +599,14 @@ LP_status Equilibrium::findMaximumAcceleration(Cref_matrix63 H, Cref_vector6 h,C
   VectorX Alb = -h;
   VectorX Aub = -h;
 
+  int iter = 0;
+  LP_status lpStatus;
+  do{
+    lpStatus = m_solver->solve(c, lb, ub, A, Alb, Aub, b_a0);
+    iter ++;
+  }while(lpStatus == LP_STATUS_ERROR && iter < 3);
 
-  LP_status lpStatus = m_solver->solve(c, lb, ub, A, Alb, Aub, b_a0);
+
   if(lpStatus==LP_STATUS_UNBOUNDED){
     //SEND_DEBUG_MSG("Primal LP problem is unbounded : "+toString(lpStatus));
     alpha0 = std::numeric_limits<double>::infinity();
