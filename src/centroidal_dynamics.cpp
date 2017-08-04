@@ -587,15 +587,15 @@ double Equilibrium::convert_emax_to_b0(double emax)
 
 
 LP_status Equilibrium::findMaximumAcceleration(Cref_matrix63 H, Cref_vector6 h,Cref_vector3 v, double& alpha0){
-  int m = (int)m_G_centr.cols() -1 ; // 4* number of contacts
-  VectorX b_a0(m+1);
-  VectorX c = VectorX::Zero(m+1);
-  MatrixXX A = MatrixXX::Zero(6, m+1);
+  int m = (int)m_G_centr.cols(); // 4* number of contacts
+  VectorX b_a0(m);
+  VectorX c = VectorX::Zero(m);
+  MatrixXX A = MatrixXX::Zero(6, m);
   A.topLeftCorner(6,m) = - m_G_centr;
   A.topRightCorner(6,1) = H * v;
-  c(m) = -1.0;  // because we search max alpha0
-  VectorX lb = VectorX::Zero(m+1);
-  VectorX ub = VectorX::Ones(m+1)*1e10; // Inf
+  c(m-1) = -1.0;  // because we search max alpha0, and c = [ B alpha ]^t
+  VectorX lb = VectorX::Zero(m);
+  VectorX ub = VectorX::Ones(m)*1e10; // Inf
   VectorX Alb = -h;
   VectorX Aub = -h;
 
