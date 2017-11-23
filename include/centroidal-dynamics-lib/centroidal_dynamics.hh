@@ -26,6 +26,10 @@ enum CENTROIDAL_DYNAMICS_DLLAPI EquilibriumAlgorithm
 
 class CENTROIDAL_DYNAMICS_DLLAPI Equilibrium
 {
+public:
+  const double m_mass; /// mass of the system
+  const Vector3 m_gravity; ///  gravity vector
+
 private:
   static bool m_is_cdd_initialized;   /// true if cdd lib has been initialized, false otherwise
 
@@ -35,8 +39,6 @@ private:
   SolverLP                    m_solver_type;  /// type of LP solver
 
   unsigned int  m_generatorsPerContact; /// number of generators to approximate the friction cone per contact point
-  double        m_mass;                 /// mass of the system
-  Vector3       m_gravity;              /// gravity vector
 
   /** Gravito-inertial wrench generators (6 X numberOfContacts*generatorsPerContact) */
   Matrix6X m_G_centr;

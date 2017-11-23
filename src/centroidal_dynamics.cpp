@@ -20,7 +20,9 @@ bool Equilibrium::m_is_cdd_initialized = false;
 Equilibrium::Equilibrium(const string& name, const double mass, const unsigned int generatorsPerContact,
                                      const SolverLP solver_type, const bool useWarmStart,
                                      const unsigned int max_num_cdd_trials, const bool canonicalize_cdd_matrix)
-    : m_is_cdd_stable(true)
+    : m_mass(mass)
+    , m_gravity(0.,0.,-9.81)
+    , m_is_cdd_stable(true)
     , max_num_cdd_trials(max_num_cdd_trials)
     , canonicalize_cdd_matrix(canonicalize_cdd_matrix)
 {
@@ -43,9 +45,8 @@ Equilibrium::Equilibrium(const string& name, const double mass, const unsigned i
     m_generatorsPerContact = 3;
   }
 
-  m_mass = mass;
-  m_gravity.setZero();
-  m_gravity(2) = -9.81;
+  /*m_gravity.setZero();
+  m_gravity(2) = -9.81;*/
 
   m_d.setZero();
   m_d.head<3>() = m_mass*m_gravity;
