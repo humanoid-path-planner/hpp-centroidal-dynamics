@@ -172,6 +172,8 @@ bool Equilibrium::setNewContacts(const MatrixX3& contactPoints, const MatrixX3& 
       computeGenerators(contactPoints,contactNormals,frictionCoefficient,true);
       attempts--;
     }
+    // resetting random because obviously libcdd always resets to 0
+    srand(time(NULL));
     if(!m_is_cdd_stable)
     {
       return false;
