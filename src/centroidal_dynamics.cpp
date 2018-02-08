@@ -517,6 +517,9 @@ LP_status Equilibrium::findExtremumInDirection(Cref_vector3 direction, Ref_vecto
 
 bool Equilibrium::computePolytopeProjection(Cref_matrix6X v)
 {
+    int n = (int)(v.rows());
+    int m = (int)(v.cols());
+
 //  getProfiler().start("eigen_to_cdd");
   dd_MatrixPtr V = cone_span_eigen_to_cdd(v.transpose(),canonicalize_cdd_matrix);
 //  getProfiler().stop("eigen_to_cdd");
@@ -570,6 +573,15 @@ bool Equilibrium::computePolytopeProjection(Cref_matrix6X v)
     m_H(rowsize + i) = -m_H((int)(*cit));
   }
 //  getProfiler().stop("cdd to eigen");
+
+  std::cout<<" inequalities : m = "<<m<<std::endl;
+  if(m_h.rows() < n )
+    {
+        SEND_ERROR_MSG("numerical instability in cddlib. ill formed polytope");
+        m_is_cdd_stable = false;
+        return false;
+    }
+
 
   return true;
 }
