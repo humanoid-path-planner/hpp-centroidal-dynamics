@@ -130,6 +130,13 @@ bool Equilibrium::computeGenerators(Cref_matrixX3 contactPoints, Cref_matrixX3 c
     return true;
 }
 
+void Equilibrium::setAlgorithm(EquilibriumAlgorithm algorithm){
+    if(algorithm == EQUILIBRIUM_ALGORITHM_PP && m_G_centr.rows() > 0)
+      SEND_DEBUG_MSG("Cannot set algorithm to PP after setting contacts, you should call again setNewContact with PP algorithm");
+    else
+      m_algorithm = algorithm;
+}
+
 bool Equilibrium::setNewContacts(const MatrixX3ColMajor& contactPoints, const MatrixX3ColMajor& contactNormals,
                                        const double frictionCoefficient, const EquilibriumAlgorithm alg)
 {
@@ -324,12 +331,6 @@ LP_status Equilibrium::computeEquilibriumRobustness(Cref_vector3 com, Cref_vecto
   return LP_STATUS_ERROR;
 }
 
-/**
-  m_d.setZero();
-  m_d.head<3>() = m_mass*m_gravity;
-  m_D.setZero();
-  m_D.block<3,3>(3,0) = crossMatrix(-m_mass*m_gravity);
-*/
 
 LP_status Equilibrium::checkRobustEquilibrium(Cref_vector3 com, bool &equilibrium, double e_max)
 {
@@ -523,6 +524,9 @@ LP_status Equilibrium::findExtremumInDirection(Cref_vector3 direction, Ref_vecto
 
 bool Equilibrium::computePolytopeProjection(Cref_matrix6X v)
 {
+    int n = (int)(v.rows());
+    int m = (int)(v.cols());
+
 //  getProfiler().start("eigen_to_cdd");
   dd_MatrixPtr V = cone_span_eigen_to_cdd(v.transpose(),canonicalize_cdd_matrix);
 //  getProfiler().stop("eigen_to_cdd");
@@ -577,6 +581,15 @@ bool Equilibrium::computePolytopeProjection(Cref_matrix6X v)
   }
 //  getProfiler().stop("cdd to eigen");
 
+  std::cout<<" inequalities : m = "<<m<<std::endl;
+  if(m_h.rows() < n )
+    {
+        SEND_ERROR_MSG("numerical instability in cddlib. ill formed polytope");
+        m_is_cdd_stable = false;
+        return false;
+    }
+
+
   return true;
 }
 
@@ -591,18 +604,28 @@ double Equilibrium::convert_emax_to_b0(double emax)
 }
 
 
-LP_status Equilibrium::findMaximumAcceleration(Cref_matrixXX A, Cref_vector6 h, double& alpha0){
-  int m = (int)A.cols() -1 ; // 4* number of contacts
-  VectorX b_a0(m+1);
-  VectorX c = VectorX::Zero(m+1);
-  c(m) = -1.0;  // because we search max alpha0
-  VectorX lb = VectorX::Zero(m+1);
-  VectorX ub = VectorX::Ones(m+1)*1e10; // Inf
+
+LP_status Equilibrium::findMaximumAcceleration(Cref_matrix63 H, Cref_vector6 h,Cref_vector3 v, double& alpha0){
+  int m = (int)m_G_centr.cols(); // 4* number of contacts
+  VectorX b_a0(m);
+  VectorX c = VectorX::Zero(m);
+  MatrixXX A = MatrixXX::Zero(6, m);
+  A.topLeftCorner(6,m) = - m_G_centr;
+  A.topRightCorner(6,1) = H * v;
+  c(m-1) = -1.0;  // because we search max alpha0, and c = [ B alpha ]^t
+  VectorX lb = VectorX::Zero(m);
+  VectorX ub = VectorX::Ones(m)*1e10; // Inf
   VectorX Alb = -h;
   VectorX Aub = -h;
 
+  int iter = 0;
+  LP_status lpStatus;
+  do{
+    lpStatus = m_solver->solve(c, lb, ub, A, Alb, Aub, b_a0);
+    iter ++;
+  }while(lpStatus == LP_STATUS_ERROR && iter < 3);
 
-  LP_status lpStatus = m_solver->solve(c, lb, ub, A, Alb, Aub, b_a0);
+
   if(lpStatus==LP_STATUS_UNBOUNDED){
     //SEND_DEBUG_MSG("Primal LP problem is unbounded : "+toString(lpStatus));
     alpha0 = std::numeric_limits<double>::infinity();
@@ -619,8 +642,9 @@ LP_status Equilibrium::findMaximumAcceleration(Cref_matrixXX A, Cref_vector6 h, 
 
 }
 
-bool Equilibrium::checkAdmissibleAcceleration(Cref_matrixXX G, Cref_matrixXX H, Cref_vector6 h, Cref_vector3 a ){
-  int m = (int)G.cols(); // number of contact * 4
+
+bool Equilibrium::checkAdmissibleAcceleration(Cref_matrix63 H, Cref_vector6 h, Cref_vector3 a ){
+  int m = (int)m_G_centr.cols(); // number of contact * generator per contacts
   VectorX b(m);
   VectorX c = VectorX::Zero(m);
   VectorX lb = VectorX::Zero(m);
@@ -630,9 +654,9 @@ bool Equilibrium::checkAdmissibleAcceleration(Cref_matrixXX G, Cref_matrixXX H, 
   int iter = 0;
   LP_status lpStatus;
   do{
-    lpStatus = m_solver->solve(c, lb, ub, G, Alb, Aub, b);
+    lpStatus = m_solver->solve(c, lb, ub, m_G_centr, Alb, Aub, b);
     iter ++;
-  }while(lpStatus == LP_STATUS_ERROR && iter < 5);
+  }while(lpStatus == LP_STATUS_ERROR && iter < 3);
 
   if(lpStatus==LP_STATUS_OPTIMAL || lpStatus==LP_STATUS_UNBOUNDED)
   {

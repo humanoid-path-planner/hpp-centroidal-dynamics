@@ -62,6 +62,7 @@ namespace centroidal_dynamics
   typedef const Eigen::Ref<const MatrixX3>    & Cref_matrixX3;
   typedef const Eigen::Ref<const Matrix43>    & Cref_matrix43;
   typedef const Eigen::Ref<const Matrix6X>    & Cref_matrix6X;
+  typedef const Eigen::Ref<const Matrix63>    & Cref_matrix63;
   typedef const Eigen::Ref<const MatrixXX>    & Cref_matrixXX;
 
   /**Column major definitions for compatibility with classical eigen use**/

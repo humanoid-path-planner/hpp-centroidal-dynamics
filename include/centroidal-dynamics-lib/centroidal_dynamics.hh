@@ -119,6 +119,8 @@ public:
 
   EquilibriumAlgorithm getAlgorithm(){ return m_algorithm; }
 
+  void setAlgorithm(EquilibriumAlgorithm algorithm);
+
   /**
    * @brief Specify a new set of contacts.
    * All 3d vectors are expressed in a reference frame having the z axis aligned with gravity.
@@ -146,6 +148,8 @@ public:
    */
   bool setNewContacts(const MatrixX3ColMajor& contactPoints, const MatrixX3ColMajor&  contactNormals,
                       const double frictionCoefficient, const EquilibriumAlgorithm alg);
+
+  void setG(Cref_matrix6X G){m_G_centr = G;}
 
   /**
    * @brief Compute a measure of the robustness of the equilibrium of the specified com position.
@@ -280,7 +284,7 @@ public:
    * @brief findMaximumAcceleration Find the maximal acceleration along a given direction
           find          b, alpha0
           maximize      alpha0
-          subject to    -h <= [-G  (Hv)] [b a0]^T   <= -h
+          subject to    [-G  (Hv)] [b a0]^T  = -h
                         0       <= [b a0]^T <= Inf
 
 
@@ -289,13 +293,15 @@ public:
           alpha0    is the maximal amplitude of the acceleration, for the given direction v
           c         is the CoM position
           G         is the matrix whose columns are the gravito-inertial wrench generators
-          A         is [-G  (Hv)]
-   * @param A
-   * @param h
-   * @param alpha0
+          H         is m*[I3 ĉ]^T
+          h         is m*[-g  (c x -g)]^T
+   * @param H input
+   * @param h input
+   * @param v input
+   * @param alpha0 output
    * @return The status of the LP solver.
    */
-  LP_status findMaximumAcceleration(Cref_matrixXX A, Cref_vector6 h, double& alpha0);
+  LP_status findMaximumAcceleration(Cref_matrix63 H, Cref_vector6 h, Cref_vector3 v, double& alpha0);
 
   /**
    * @brief checkAdmissibleAcceleration return true if the given acceleration is admissible for the given contacts
@@ -305,14 +311,12 @@ public:
           b         are the coefficient of the contact force generators (f = V b)
           a         is the vector3 defining the acceleration
           G         is the matrix whose columns are the gravito-inertial wrench generators
-          h and H come from polytope inequalities
-   * @param G
-   * @param H
-   * @param h
-   * @param a
+          H         is m*[I3 ĉ]^T
+          h         is m*[-g  (c x -g)]^T
+   * @param a the acceleration
    * @return true if the acceleration is admissible, false otherwise
    */
-  bool checkAdmissibleAcceleration(Cref_matrixXX G, Cref_matrixXX H, Cref_vector6 h, Cref_vector3 a );
+  bool checkAdmissibleAcceleration(Cref_matrix63 H, Cref_vector6 h, Cref_vector3 a );
 
 };
 
