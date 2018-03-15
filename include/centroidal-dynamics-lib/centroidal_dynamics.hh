@@ -119,6 +119,8 @@ public:
 
   EquilibriumAlgorithm getAlgorithm(){ return m_algorithm; }
 
+  void setAlgorithm(EquilibriumAlgorithm algorithm);
+
   /**
    * @brief Specify a new set of contacts.
    * All 3d vectors are expressed in a reference frame having the z axis aligned with gravity.

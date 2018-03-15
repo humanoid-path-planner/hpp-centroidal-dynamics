@@ -130,6 +130,13 @@ bool Equilibrium::computeGenerators(Cref_matrixX3 contactPoints, Cref_matrixX3 c
     return true;
 }
 
+void Equilibrium::setAlgorithm(EquilibriumAlgorithm algorithm){
+    if(algorithm == EQUILIBRIUM_ALGORITHM_PP && m_G_centr.rows() > 0)
+      SEND_DEBUG_MSG("Cannot set algorithm to PP after setting contacts, you should call again setNewContact with PP algorithm");
+    else
+      m_algorithm = algorithm;
+}
+
 bool Equilibrium::setNewContacts(const MatrixX3ColMajor& contactPoints, const MatrixX3ColMajor& contactNormals,
                                        const double frictionCoefficient, const EquilibriumAlgorithm alg)
 {
