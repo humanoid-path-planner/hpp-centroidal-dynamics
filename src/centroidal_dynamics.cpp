@@ -580,8 +580,6 @@ bool Equilibrium::computePolytopeProjection(Cref_matrix6X v)
     m_H(rowsize + i) = -m_H((int)(*cit));
   }
 //  getProfiler().stop("cdd to eigen");
-
-  std::cout<<" inequalities : m = "<<m<<std::endl;
   if(m_h.rows() < n )
     {
         SEND_ERROR_MSG("numerical instability in cddlib. ill formed polytope");
