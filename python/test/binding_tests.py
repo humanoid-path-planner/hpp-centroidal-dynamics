@@ -28,7 +28,7 @@ N = asmatrix(array([z for _ in range(4)]))
 #setting contact positions and normals, as well as friction coefficients 
 eq.setNewContacts(asmatrix(P),asmatrix(N),0.3,EquilibriumAlgorithm.EQUILIBRIUM_ALGORITHM_LP)
 
-c= asmatrix(array([0.,0.,1.]))
+c= asmatrix(array([0.,0.,1.])).T
 
 #computing robustness of a given configuration, first with no argument (0 acceleration, static equilibrium)
 status, robustness = eq.computeEquilibriumRobustness(c)
@@ -36,7 +36,7 @@ assert (status == LP_STATUS_OPTIMAL), "LP should not fail"
 assert (robustness > 0), "first test should be in equilibrirum"
 	
 #computing robustness of a given configuration with non zero acceleration
-ddc= asmatrix(array([1000.,0.,0.]))
+ddc= asmatrix(array([1000.,0.,0.])).T
 status, robustness = eq.computeEquilibriumRobustness(c,ddc)
 assert (status == LP_STATUS_OPTIMAL), "LP should not fail"
 assert (robustness < 0), "first test should NOT be in equilibrirum"
