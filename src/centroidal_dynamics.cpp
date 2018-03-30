@@ -17,6 +17,30 @@ namespace centroidal_dynamics
 
 bool Equilibrium::m_is_cdd_initialized = false;
 
+
+Equilibrium::Equilibrium(const Equilibrium& other)
+   : m_mass(other.m_mass)
+   , m_gravity(other.m_gravity)
+   , m_name (other.m_name)
+   , m_algorithm(other.m_algorithm)
+   , m_solver_type (other.m_solver_type)
+   , m_solver (Solver_LP_abstract::getNewSolver(other.m_solver_type))
+   , m_generatorsPerContact(other.m_generatorsPerContact)
+   , m_G_centr(other.m_G_centr)
+   , m_H(other.m_H)
+   , m_h(other.m_h)
+   , m_is_cdd_stable(other.m_is_cdd_stable)
+   , max_num_cdd_trials(other.max_num_cdd_trials)
+   , canonicalize_cdd_matrix(other.canonicalize_cdd_matrix)
+   , m_HD(other.m_HD)
+   , m_Hd(other.m_Hd)
+   , m_D(other.m_D)
+   , m_d(other.m_d)
+   , m_b0_to_emax_coefficient(other.m_b0_to_emax_coefficient)
+{
+    m_solver->setUseWarmStart(other.m_solver->getUseWarmStart());
+}
+
 Equilibrium::Equilibrium(const string& name, const double mass, const unsigned int generatorsPerContact,
                                      const SolverLP solver_type, const bool useWarmStart,
                                      const unsigned int max_num_cdd_trials, const bool canonicalize_cdd_matrix)

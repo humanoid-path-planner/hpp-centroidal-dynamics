@@ -35,8 +35,8 @@ private:
 
   std::string                 m_name;         /// name of this object
   EquilibriumAlgorithm  m_algorithm;    /// current algorithm used
-  Solver_LP_abstract*         m_solver;       /// LP solver
   SolverLP                    m_solver_type;  /// type of LP solver
+  Solver_LP_abstract*         m_solver;       /// LP solver
 
   unsigned int  m_generatorsPerContact; /// number of generators to approximate the friction cone per contact point
 
@@ -98,6 +98,9 @@ public:
   Equilibrium(const std::string& name, const double mass, const unsigned int generatorsPerContact,
                     const SolverLP solver_type = SOLVER_LP_QPOASES, bool useWarmStart=true, const unsigned int max_num_cdd_trials=0,
                     const bool canonicalize_cdd_matrix=false);
+
+
+  Equilibrium(const Equilibrium& other);
 
   /**
    * @brief Returns the useWarmStart flag.
