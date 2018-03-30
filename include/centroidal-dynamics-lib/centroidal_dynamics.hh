@@ -225,6 +225,30 @@ public:
    */
   LP_status checkRobustEquilibrium(Cref_vector3 com, bool &equilibrium, double e_max=0.0);
 
+
+  /**
+   * @brief Check whether the specified com position is in robust equilibrium.
+   * This amounts to solving the following feasibility LP:
+   *       find          b
+   *       minimize      1
+   *       subject to    G b = D c + d
+   *                     b >= b0
+   *  where:
+   *     b         are the coefficient of the contact force generators (f = G b)
+   *     b0        is a parameter proportional to the specified robustness measure
+   *     c         is the specified CoM position
+   *     G         is the 6xm matrix whose columns are the gravito-inertial wrench generators
+   *     D         is the 6x3 matrix mapping the CoM position in gravito-inertial wrench
+   *     d         is the 6d vector containing the gravity part of the gravito-inertial wrench
+   * @param com The 3d center of mass position to test.
+   * @param acc The 3d acceleration of the CoM.
+   * @param equilibrium True if com is in robust equilibrium, false otherwise.
+   * @param e_max Desired robustness level.
+   * @return The status of the LP solver.
+   */
+  LP_status checkRobustEquilibrium(Cref_vector3 com, Cref_vector3 acc, bool &equilibrium, double e_max=0.0);
+
+
   /**
    * @brief Compute the extremum CoM position over the line a*x + a0 that is in robust equilibrium.
    * This amounts to solving the following LP:

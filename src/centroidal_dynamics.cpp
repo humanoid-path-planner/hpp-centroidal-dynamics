@@ -366,9 +366,18 @@ LP_status Equilibrium::computeEquilibriumRobustness(Cref_vector3 com, Cref_vecto
   return LP_STATUS_ERROR;
 }
 
+LP_status Equilibrium::checkRobustEquilibrium(Cref_vector3 com, bool &equilibrium, double e_max){
+    checkRobustEquilibrium(com,zero_acc,equilibrium,e_max);
+}
 
-LP_status Equilibrium::checkRobustEquilibrium(Cref_vector3 com, bool &equilibrium, double e_max)
+LP_status Equilibrium::checkRobustEquilibrium(Cref_vector3 com, Cref_vector3 acc, bool &equilibrium, double e_max)
 {
+    // Take the acceleration in account in D and d :
+    m_D.block<3,3>(3,0) = crossMatrix(-m_mass * (m_gravity - acc));
+    m_d.head<3>()= m_mass * (m_gravity - acc);
+    m_HD = m_H * m_D;
+    m_Hd = m_H * m_d;
+
   if(m_G_centr.cols()==0)
   {
     equilibrium=false;
