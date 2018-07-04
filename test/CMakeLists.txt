@@ -42,4 +42,5 @@ endif ( MSVC )
 
 ADD_TESTCASE(test_static_equilibrium FALSE)
 ADD_TESTCASE(test_LP_solvers FALSE)
+PKG_CONFIG_USE_DEPENDENCY(test_LP_solvers qpOASES)
 
