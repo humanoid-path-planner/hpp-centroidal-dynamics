@@ -1,6 +1,6 @@
 # Declare Headers
 SET(${PROJECT_NAME}_HEADERS
-  config.hh
+  local_config.hh
   util.hh
   logger.hh
   solver_LP_abstract.hh

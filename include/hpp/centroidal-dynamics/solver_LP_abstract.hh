@@ -7,7 +7,7 @@
 #define CENTROIDAL_DYNAMICS_LIB_SOLVER_LP_ABSTRACT_HH
 
 #include <Eigen/Dense>
-#include <hpp/centroidal-dynamics/config.hh>
+#include <hpp/centroidal-dynamics/local_config.hh>
 #include <hpp/centroidal-dynamics/util.hh>
 
 namespace centroidal_dynamics

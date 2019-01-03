@@ -7,7 +7,7 @@
 #define CENTROIDAL_DYNAMICS_LIB_STATIC_EQUILIBRIUM_H
 
 #include <Eigen/Dense>
-#include <hpp/centroidal-dynamics/config.hh>
+#include <hpp/centroidal-dynamics/local_config.hh>
 #include <hpp/centroidal-dynamics/util.hh>
 #include <hpp/centroidal-dynamics/solver_LP_abstract.hh>
 
