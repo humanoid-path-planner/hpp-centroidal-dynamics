@@ -17,3 +17,5 @@ PKG_CONFIG_USE_DEPENDENCY(centroidal_dynamics eigenpy)
 INSTALL(
   TARGETS centroidal_dynamics	DESTINATION ${PYTHON_SITELIB}
 )
+
+ADD_PYTHON_UNIT_TEST("python-centroidal-dynamics" "python/test/binding_tests.py" "python")
