@@ -8,12 +8,12 @@
 #include "CoinTime.hpp"
 #include "CoinBuild.hpp"
 #include "CoinModel.hpp"
-#include <centroidal-dynamics-lib/solver_LP_clp.hh>
+#include <hpp/centroidal-dynamics/solver_LP_clp.hh>
 #endif
 
 #include <qpOASES.hpp>
-#include <centroidal-dynamics-lib/solver_LP_qpoases.hh>
-#include <centroidal-dynamics-lib/logger.hh>
+#include <hpp/centroidal-dynamics/solver_LP_qpoases.hh>
+#include <hpp/centroidal-dynamics/logger.hh>
 
 #include <iostream>
 #include <iomanip>

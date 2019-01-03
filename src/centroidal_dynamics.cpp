@@ -3,9 +3,9 @@
  * Author: Andrea Del Prete
  */
 
-#include <centroidal-dynamics-lib/centroidal_dynamics.hh>
-#include <centroidal-dynamics-lib/logger.hh>
-#include <centroidal-dynamics-lib/stop-watch.hh>
+#include <hpp/centroidal-dynamics/centroidal_dynamics.hh>
+#include <hpp/centroidal-dynamics/logger.hh>
+#include <hpp/centroidal-dynamics/stop-watch.hh>
 #include <iostream>
 #include <vector>
 #include <ctime>

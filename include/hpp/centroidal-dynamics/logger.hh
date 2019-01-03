@@ -10,7 +10,7 @@
 /* --- INCLUDE --------------------------------------------------------- */
 /* --------------------------------------------------------------------- */
 
-#include <centroidal-dynamics-lib/config.hh>
+#include <hpp/centroidal-dynamics/config.hh>
 #include <sstream>
 #include <Eigen/Dense>
 #include <map>

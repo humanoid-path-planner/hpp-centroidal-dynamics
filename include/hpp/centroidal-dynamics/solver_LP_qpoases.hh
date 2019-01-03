@@ -6,9 +6,9 @@
 #ifndef CENTROIDAL_DYNAMICS_LIB_SOLVER_QPOASES_HH
 #define CENTROIDAL_DYNAMICS_LIB_SOLVER_QPOASES_HH
 
-#include <centroidal-dynamics-lib/config.hh>
-#include <centroidal-dynamics-lib/util.hh>
-#include <centroidal-dynamics-lib/solver_LP_abstract.hh>
+#include <hpp/centroidal-dynamics/config.hh>
+#include <hpp/centroidal-dynamics/util.hh>
+#include <hpp/centroidal-dynamics/solver_LP_abstract.hh>
 #include <qpOASES.hpp>
 
 namespace centroidal_dynamics

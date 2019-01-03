@@ -1,5 +1,5 @@
-#include "centroidal-dynamics-lib/centroidal_dynamics.hh"
-#include "centroidal-dynamics-lib/util.hh"
+#include "hpp/centroidal-dynamics/centroidal_dynamics.hh"
+#include "hpp/centroidal-dynamics/util.hh"
 
 #include <eigenpy/memory.hpp>
 #include <eigenpy/eigenpy.hpp>

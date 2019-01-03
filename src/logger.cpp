@@ -13,7 +13,7 @@
 #include <iostream>
 #include <iomanip>      // std::setprecision
 #include <boost/algorithm/string.hpp>
-#include <centroidal-dynamics-lib/logger.hh>
+#include <hpp/centroidal-dynamics/logger.hh>
 
 namespace centroidal_dynamics
 {
@@ -115,4 +115,3 @@ namespace centroidal_dynamics
   }
 
 } // namespace centroidal_dynamics
-

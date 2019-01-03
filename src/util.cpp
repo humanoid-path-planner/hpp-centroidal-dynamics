@@ -6,7 +6,7 @@
 #ifndef _CENTROIDAL_DYNAMICS_LIB_CONFIG_HH
 #define _CENTROIDAL_DYNAMICS_LIB_CONFIG_HH
 
-#include <centroidal-dynamics-lib/util.hh>
+#include <hpp/centroidal-dynamics/util.hh>
 #include <ctime>
 
 namespace centroidal_dynamics

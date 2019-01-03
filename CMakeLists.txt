@@ -12,6 +12,8 @@ SET(PROJECT_DESCRIPTION
  )
 SET(PROJECT_URL "https://github.com/${PROJECT_ORG}/${PROJECT_NAME}")
 
+SET(CUSTOM_HEADER_DIR "hpp/centroidal-dynamics")
+
 set(CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/cmake/;${PROJECT_SOURCE_DIR}/cmake2/")
 
 SETUP_PROJECT()
@@ -35,19 +37,6 @@ IF(BUILD_PYTHON_INTERFACE)
 
 ENDIF(BUILD_PYTHON_INTERFACE)
 
-
-# Declare Headers
-SET(${PROJECT_NAME}_HEADERS
-		include/centroidal-dynamics-lib/config.hh
-		include/centroidal-dynamics-lib/util.hh
-		include/centroidal-dynamics-lib/logger.hh
-		include/centroidal-dynamics-lib/solver_LP_abstract.hh
-		include/centroidal-dynamics-lib/solver_LP_qpoases.hh
-		include/centroidal-dynamics-lib/solver_LP_clp.hh
-		include/centroidal-dynamics-lib/centroidal_dynamics.hh
-		include/centroidal-dynamics-lib/stop-watch.hh
-  )
-
 ADD_REQUIRED_DEPENDENCY("eigen3")
 INCLUDE_DIRECTORIES(${EIGEN3_INCLUDE_DIR})
 
@@ -64,6 +53,7 @@ endif()
 #SEARCH_FOR_QPOASES()
 ADD_REQUIRED_DEPENDENCY("qpOASES")
 
+ADD_SUBDIRECTORY (include/${CUSTOM_HEADER_DIR})
 add_subdirectory (src)
 add_subdirectory (test)
 IF(BUILD_PYTHON_INTERFACE)

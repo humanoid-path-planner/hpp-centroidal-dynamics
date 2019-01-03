@@ -5,7 +5,7 @@
 
 #ifdef CLP_FOUND
 
-#include <centroidal-dynamics-lib/solver_LP_clp.hh>
+#include <hpp/centroidal-dynamics/solver_LP_clp.hh>
 #include "CoinBuild.hpp"
 
 namespace centroidal_dynamics
