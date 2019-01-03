@@ -469,7 +469,7 @@ int main()
       if(!readMatrixFromFile(file_path+solution_filename+".dat", realSol))
       {
         SEND_ERROR_MSG("Error while reading LP solution from file "+solution_filename);
-        return -1;
+        //return -1;
       }
       sol.resize(c.size());
       solverOases->solve(c, lb, ub, A, Alb, Aub, sol);
