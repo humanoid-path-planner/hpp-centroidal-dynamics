@@ -58,7 +58,7 @@ boost::python::tuple wrapGetPolytopeInequalities(Equilibrium& self)
 
 
 
-BOOST_PYTHON_MODULE(centroidal_dynamics)
+BOOST_PYTHON_MODULE(hpp_centroidal_dynamics)
 {
     /** BEGIN eigenpy init**/
     eigenpy::enableEigenPy();
