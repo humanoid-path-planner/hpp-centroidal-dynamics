@@ -3,7 +3,6 @@ cmake_minimum_required(VERSION 2.6)
 INCLUDE(cmake/base.cmake)
 INCLUDE(cmake/test.cmake)
 INCLUDE(cmake/python.cmake)
-INCLUDE(cmake2/FindqpOASES.cmake)
 
 SET(PROJECT_ORG stonneau)
 SET(PROJECT_NAME hpp-centroidal-dynamics)
@@ -51,7 +50,12 @@ else()
 endif()
 
 #SEARCH_FOR_QPOASES()
-ADD_REQUIRED_DEPENDENCY("qpOASES")
+#ADD_REQUIRED_DEPENDENCY("qpOASES")
+SET(QPOASES_PREFIX ${CMAKE_PREFIX_PATH} CACHE PATH "Set the prefix where qpOASES is installed")
+FIND_LIBRARY(QPOASES_LIBRARY "qpOASES" PATHS ${QPOASES_PREFIX} PATH_SUFFIXES lib)
+FIND_PATH(QPOASES_INCLUDE_DIRS NAMES "qpOASES.hpp" PATHS ${QPOASES_PREFIX} PATH_SUFFIXES include)
+INCLUDE_DIRECTORIES(${QPOASES_INCLUDE_DIRS})
+
 
 ADD_SUBDIRECTORY (include/${CUSTOM_HEADER_DIR})
 add_subdirectory (src)
