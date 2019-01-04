@@ -45,15 +45,10 @@ assert (robustness < 0), "first test should NOT be in equilibrirum"
 eq.setNewContacts(asmatrix(P),asmatrix(N),0.3,EquilibriumAlgorithm.EQUILIBRIUM_ALGORITHM_PP)
 H,h = eq.getPolytopeInequalities()
 
-
-#now, use polytope projection algorithm with grasping
-eq.setNewContacts(asmatrix(P),asmatrix(N),0.3,EquilibriumAlgorithm.EQUILIBRIUM_ALGORITHM_PP,4,50.)
-H,h = eq.getPolytopeInequalities()
-print P
-c= asmatrix(array([0.,0.,1.]))
+#~ c= asmatrix(array([0.,0.,1.])).T
 status, stable = eq.checkRobustEquilibrium(c)
-#~ assert (status == LP_STATUS_OPTIMAL), "checkRobustEquilibrium should not fail"
-#~ assert (stable), "lat test should be in equilibrirum"
+assert (status == LP_STATUS_OPTIMAL), "checkRobustEquilibrium should not fail"
+assert (stable), "lat test should be in equilibrirum"
 
 
 from numpy import array, vstack, zeros, sqrt, cross, matrix, asmatrix

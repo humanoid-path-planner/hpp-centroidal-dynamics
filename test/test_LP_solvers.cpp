@@ -343,7 +343,7 @@ void test_small_LP()
   model.addRow(3, row2Index, row2Value,
                1.0, 1.0);
 
-  int n = model.getNumCols();
+  int n = model.getdimVarXs();
   int m = model.getNumRows();
   cout<<"Problem has "<<n<<" variables and "<<m<<" constraints.\n";
 

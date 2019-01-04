@@ -115,7 +115,7 @@ namespace centroidal_dynamics
  * @return The mX(n+1) output cdd matrix, which contains an additional column,
  * the first one, with all zeros.
  */
-  dd_MatrixPtr cone_span_eigen_to_cdd(Cref_matrixXX input, const bool canonicalize=false, const int graspIndex = -1);
+  dd_MatrixPtr cone_span_eigen_to_cdd(Cref_matrixXX input, const bool canonicalize=false);
 
   /**
  * Compute the cross-product skew-symmetric matrix associated to the specified vector.

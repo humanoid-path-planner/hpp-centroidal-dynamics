@@ -12,7 +12,7 @@
 namespace centroidal_dynamics
 {
 
-dd_MatrixPtr cone_span_eigen_to_cdd(Cref_matrixXX input, const bool canonicalize, const int graspIndex)
+dd_MatrixPtr cone_span_eigen_to_cdd(Cref_matrixXX input, const bool canonicalize)
 {
   dd_debug = false;
   dd_MatrixPtr M=NULL;
@@ -27,41 +27,15 @@ dd_MatrixPtr cone_span_eigen_to_cdd(Cref_matrixXX input, const bool canonicalize
   M=dd_CreateMatrix(m_input, d_input);
   M->representation=rep;
   M->numbtype=NT;
-  if(graspIndex > 0)
+  for (i = 0; i < input.rows(); i++)
   {
-      for (i = graspIndex; i < input.rows(); i++)
-      {
-        dd_set_d(value, 1);
-        dd_set(M->matrix[i-graspIndex][0],value);
-        for (j = 1; j < d_input; j++)
-        {
-          dd_set_d(value, input(i,j-1));
-          dd_set(M->matrix[i][j],value);
-        }
-      }
-      for (i = 0; i < graspIndex; i++)
-      {
-        dd_set_d(value, 0);
-        dd_set(M->matrix[i][0],value);
-        for (j = 1; j < d_input; j++)
-        {
-          dd_set_d(value, input(i,j-1));
-          dd_set(M->matrix[i][j],value);
-        }
-      }
-  }
-  else
-  {
-      for (i = 0; i < input.rows(); i++)
-      {
-        dd_set_d(value, 0);
-        dd_set(M->matrix[i][0],value);
-        for (j = 1; j < d_input; j++)
-        {
-          dd_set_d(value, input(i,j-1));
-          dd_set(M->matrix[i][j],value);
-        }
-      }
+    dd_set_d(value, 0);
+    dd_set(M->matrix[i][0],value);
+    for (j = 1; j < d_input; j++)
+    {
+      dd_set_d(value, input(i,j-1));
+      dd_set(M->matrix[i][j],value);
+    }
   }
   dd_clear(value);
   if(canonicalize)

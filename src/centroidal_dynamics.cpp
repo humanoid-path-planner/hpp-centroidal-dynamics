@@ -79,13 +79,9 @@ Equilibrium::Equilibrium(const string& name, const double mass, const unsigned i
 }
 
 bool Equilibrium::computeGenerators(Cref_matrixX3 contactPoints, Cref_matrixX3 contactNormals,
-                                          double frictionCoefficient, const int graspIndex, const double maxGraspForce, const bool perturbate)
+                                          double frictionCoefficient, const bool perturbate)
 {
-    if(graspIndex != -1)
-    {
-      assert(graspIndex < contactPoints.rows());
-    }
-    long int c = graspIndex > -1 ? graspIndex : contactPoints.rows();
+    long int c = contactPoints.rows();
     unsigned int &cg = m_generatorsPerContact;
     double theta, delta_theta=2*M_PI/cg;
     const value_type pi_4 = value_type(M_PI_4);
@@ -146,29 +142,6 @@ bool Equilibrium::computeGenerators(Cref_matrixX3 contactPoints, Cref_matrixX3 c
       // project generators in 6d centroidal space
       m_G_centr.block(0,cg*i,6,cg) = A * G;
     }
-    if(graspIndex > -1)
-    {
-        Matrix3X cube(3, 8);
-        cube.col(0)= Vector3(-maxGraspForce,-maxGraspForce,-maxGraspForce);
-        cube.col(1)= Vector3( maxGraspForce,-maxGraspForce,-maxGraspForce);
-        cube.col(2)= Vector3( maxGraspForce, maxGraspForce,-maxGraspForce);
-        cube.col(3)= Vector3(-maxGraspForce, maxGraspForce,-maxGraspForce);
-        cube.col(4)= Vector3(-maxGraspForce,-maxGraspForce, maxGraspForce);
-        cube.col(5)= Vector3( maxGraspForce,-maxGraspForce, maxGraspForce);
-        cube.col(6)= Vector3( maxGraspForce, maxGraspForce, maxGraspForce);
-        cube.col(7)= Vector3(-maxGraspForce, maxGraspForce, maxGraspForce);
-        //first compute the cube constraining the grasping force.
-        for(long int i=graspIndex; i<contactPoints.rows(); i++)
-        {
-          // compute tangent directions
-          //N = contactNormals.row(i);
-          P = contactPoints.row(i);
-          // compute matrix mapping contact forces to gravito-inertial wrench
-          A.bottomRows<3>() = crossMatrix(-1.0*P);
-          // project generators in 6d centroidal space
-          m_G_centr.block(0,graspIndex*cg + 8*(i-graspIndex),6,8) = A * cube;
-        }
-    }
 
     // Compute the coefficient to convert b0 to e_max
     Vector3 f0 = Vector3::Zero();
@@ -190,22 +163,17 @@ void Equilibrium::setAlgorithm(EquilibriumAlgorithm algorithm){
 }
 
 bool Equilibrium::setNewContacts(const MatrixX3ColMajor& contactPoints, const MatrixX3ColMajor& contactNormals,
-                                       const double frictionCoefficient, const EquilibriumAlgorithm alg, const int graspIndex, const double maxGraspForce)
+                                       const double frictionCoefficient, const EquilibriumAlgorithm alg)
 {
     MatrixX3 _contactPoints  = contactPoints;
     MatrixX3 _contactNormals = contactNormals;
-    return setNewContacts(_contactPoints,_contactNormals, frictionCoefficient, alg, graspIndex, maxGraspForce);
+    return setNewContacts(_contactPoints,_contactNormals, frictionCoefficient, alg);
 }
 
 bool Equilibrium::setNewContacts(const MatrixX3& contactPoints, const MatrixX3& contactNormals,
-                                 const double frictionCoefficient, const EquilibriumAlgorithm alg, const int graspIndex, const double maxGraspForce)
+                                 const double frictionCoefficient, const EquilibriumAlgorithm alg)
 {
   assert(contactPoints.rows()==contactNormals.rows());
-  if(alg!=EQUILIBRIUM_ALGORITHM_PP && graspIndex != -1)
-  {
-    SEND_ERROR_MSG("GRASPING not implemented yet expect for EQUILIBRIUM_ALGORITHM_PP");
-    return false;
-  }
   if(alg==EQUILIBRIUM_ALGORITHM_IP)
   {
     SEND_ERROR_MSG("Algorithm IP not implemented yet");
@@ -220,12 +188,9 @@ bool Equilibrium::setNewContacts(const MatrixX3& contactPoints, const MatrixX3& 
   m_algorithm = alg;
 
   // Lists of contact generators (3 X generatorsPerContact)
-  if(graspIndex == -1)
-    m_G_centr.resize(6,contactPoints.rows()*m_generatorsPerContact);
-  else
-    m_G_centr.resize(6,graspIndex*m_generatorsPerContact+(contactPoints.rows()-graspIndex)*8);
+  m_G_centr.resize(6,contactPoints.rows()*m_generatorsPerContact);
 
-  if (!computeGenerators(contactPoints,contactNormals,frictionCoefficient, graspIndex, maxGraspForce,false))
+  if (!computeGenerators(contactPoints,contactNormals,frictionCoefficient, false))
   {
     return false;
   }
@@ -233,9 +198,9 @@ bool Equilibrium::setNewContacts(const MatrixX3& contactPoints, const MatrixX3& 
   if(m_algorithm==EQUILIBRIUM_ALGORITHM_PP)
   {
     unsigned int attempts = max_num_cdd_trials;
-    while(!computePolytopeProjection(m_G_centr, graspIndex) && attempts>0)
+    while(!computePolytopeProjection(m_G_centr) && attempts>0)
     {
-      computeGenerators(contactPoints,contactNormals,frictionCoefficient, graspIndex, maxGraspForce,true);
+      computeGenerators(contactPoints,contactNormals,frictionCoefficient,true);
       attempts--;
     }
     // resetting random because obviously libcdd always resets to 0
@@ -589,7 +554,7 @@ LP_status Equilibrium::findExtremumInDirection(Cref_vector3 direction, Ref_vecto
   SEND_ERROR_MSG("findExtremumInDirection not implemented yet");
   return LP_STATUS_ERROR;
 }
-bool Equilibrium::computePolytopeProjection(Cref_matrix6X v, const int graspIndex)
+bool Equilibrium::computePolytopeProjection(Cref_matrix6X v)
 {
 
     // todo: for the moment using ad hoc upper bound = 500 N
@@ -601,7 +566,7 @@ bool Equilibrium::computePolytopeProjection(Cref_matrix6X v, const int graspInde
         return false;
     }
 //  getProfiler().start("eigen_to_cdd");
-    dd_MatrixPtr V = cone_span_eigen_to_cdd(v.transpose(),canonicalize_cdd_matrix,graspIndex*6);
+    dd_MatrixPtr V = cone_span_eigen_to_cdd(v.transpose(),canonicalize_cdd_matrix);
 //  getProfiler().stop("eigen_to_cdd");
 
   dd_ErrorType error = dd_NoError;

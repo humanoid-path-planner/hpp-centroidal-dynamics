@@ -40,9 +40,9 @@ bool wrapSetNewContacts(Equilibrium& self, const MatrixX3ColMajor& contactPoints
 }
 
 bool wrapSetNewContactsFull(Equilibrium& self, const MatrixX3ColMajor& contactPoints, const MatrixX3ColMajor&  contactNormals,
-                      const double frictionCoefficient, const EquilibriumAlgorithm alg, const int graspIndex, const double maxGraspForce)
+                      const double frictionCoefficient, const EquilibriumAlgorithm alg)
 {
-    return self.setNewContacts(contactPoints, contactNormals, frictionCoefficient, alg, graspIndex, maxGraspForce);
+    return self.setNewContacts(contactPoints, contactNormals, frictionCoefficient, alg);
 }
 
 boost::python::tuple wrapGetPolytopeInequalities(Equilibrium& self)
