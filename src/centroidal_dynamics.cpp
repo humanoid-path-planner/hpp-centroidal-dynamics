@@ -142,6 +142,7 @@ bool Equilibrium::computeGenerators(Cref_matrixX3 contactPoints, Cref_matrixX3 c
       // project generators in 6d centroidal space
       m_G_centr.block(0,cg*i,6,cg) = A * G;
     }
+
     // Compute the coefficient to convert b0 to e_max
     Vector3 f0 = Vector3::Zero();
     for(int j=0; j<cg; j++)
@@ -173,7 +174,6 @@ bool Equilibrium::setNewContacts(const MatrixX3& contactPoints, const MatrixX3& 
                                  const double frictionCoefficient, const EquilibriumAlgorithm alg)
 {
   assert(contactPoints.rows()==contactNormals.rows());
-
   if(alg==EQUILIBRIUM_ALGORITHM_IP)
   {
     SEND_ERROR_MSG("Algorithm IP not implemented yet");
@@ -190,7 +190,7 @@ bool Equilibrium::setNewContacts(const MatrixX3& contactPoints, const MatrixX3& 
   // Lists of contact generators (3 X generatorsPerContact)
   m_G_centr.resize(6,contactPoints.rows()*m_generatorsPerContact);
 
-  if (!computeGenerators(contactPoints,contactNormals,frictionCoefficient,false))
+  if (!computeGenerators(contactPoints,contactNormals,frictionCoefficient, false))
   {
     return false;
   }
@@ -351,13 +351,22 @@ LP_status Equilibrium::computeEquilibriumRobustness(Cref_vector3 com, Cref_vecto
     return lpStatus_dual;
   }
 
-  SEND_ERROR_MSG("checkRobustEquilibrium is not implemented for the specified algorithm");
+  SEND_ERROR_MSG("computeEquilibriumRobustness is not implemented for the specified algorithm");
   return LP_STATUS_ERROR;
 }
 
+LP_status Equilibrium::checkRobustEquilibrium(Cref_vector3 com, bool &equilibrium, double e_max){
+    checkRobustEquilibrium(com,zero_acc,equilibrium,e_max);
+}
 
-LP_status Equilibrium::checkRobustEquilibrium(Cref_vector3 com, bool &equilibrium, double e_max)
+LP_status Equilibrium::checkRobustEquilibrium(Cref_vector3 com, Cref_vector3 acc, bool &equilibrium, double e_max)
 {
+    // Take the acceleration in account in D and d :
+    m_D.block<3,3>(3,0) = crossMatrix(-m_mass * (m_gravity - acc));
+    m_d.head<3>()= m_mass * (m_gravity - acc);
+    m_HD = m_H * m_D;
+    m_Hd = m_H * m_d;
+
   if(m_G_centr.cols()==0)
   {
     equilibrium=false;
@@ -545,14 +554,19 @@ LP_status Equilibrium::findExtremumInDirection(Cref_vector3 direction, Ref_vecto
   SEND_ERROR_MSG("findExtremumInDirection not implemented yet");
   return LP_STATUS_ERROR;
 }
-
 bool Equilibrium::computePolytopeProjection(Cref_matrix6X v)
 {
-    int n = (int)(v.rows());
-    int m = (int)(v.cols());
 
+    // todo: for the moment using ad hoc upper bound = 500 N
+    int n = (int)v.rows();
+    int m = (int)v.cols();
+    if (n>m)
+    {
+        SEND_ERROR_MSG("V has more lines that columns, this case is not handled!");
+        return false;
+    }
 //  getProfiler().start("eigen_to_cdd");
-  dd_MatrixPtr V = cone_span_eigen_to_cdd(v.transpose(),canonicalize_cdd_matrix);
+    dd_MatrixPtr V = cone_span_eigen_to_cdd(v.transpose(),canonicalize_cdd_matrix);
 //  getProfiler().stop("eigen_to_cdd");
 
   dd_ErrorType error = dd_NoError;
@@ -610,7 +624,6 @@ bool Equilibrium::computePolytopeProjection(Cref_matrix6X v)
         m_is_cdd_stable = false;
         return false;
     }
-
 
   return true;
 }

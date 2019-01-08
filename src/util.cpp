@@ -24,11 +24,9 @@ dd_MatrixPtr cone_span_eigen_to_cdd(Cref_matrixXX input, const bool canonicalize
   mytype value;
   dd_NumberType NT = dd_Real;
   dd_init(value);
-
   M=dd_CreateMatrix(m_input, d_input);
   M->representation=rep;
   M->numbtype=NT;
-
   for (i = 0; i < input.rows(); i++)
   {
     dd_set_d(value, 0);
@@ -50,7 +48,6 @@ dd_MatrixPtr cone_span_eigen_to_cdd(Cref_matrixXX input, const bool canonicalize
     set_free(impl_linset);
     free(newpos);
   }
-
   return M;
 }
 
@@ -164,6 +161,51 @@ std::string getDateAndTimeAsString()
   timeinfo = localtime(&rawtime);
   strftime(buffer,80,"%Y%m%d_%I%M%S",timeinfo);
   return std::string(buffer);
+}
+/*
+int fact(const int n)
+{
+    assert(n>=0);
+    int res = 1;
+    for (int i=2 ; i <= n ; ++i)
+       res *= i;
+    return res;
+}
+
+int choosenk(const int n, const int k)
+{
+    return fact(n) / (fact(k) * fact(n - k));
+}*/
+
+/* is this faster ?
+value_type choosenk(const int n, const int k)
+{
+    if(k>n/2)
+        return nchoosek(n,n-k);
+    else if(k==1)
+        return n;
+    else
+    {
+        double c = 1;
+        for(int i = 1;i<=k;i++)
+            c *= (((double)n-k+i)/((double)i));
+        return std::round(c);
+    }
+}*/
+
+value_type nchoosek(const int n, const int k)
+{
+    if(k>n/2)
+        return nchoosek(n,n-k);
+    else if(k==1)
+        return n;
+    else
+    {
+        value_type c = 1;
+        for(int i = 1;i<=k;i++)
+            c *= (((value_type)n-k+i)/((value_type)i));
+        return round(c);
+    }
 }
 
 } //namespace centroidal_dynamics

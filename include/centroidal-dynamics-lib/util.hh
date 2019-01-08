@@ -7,6 +7,8 @@
 
 #include <iostream>
 #include <fstream>
+#include <cmath>
+#include <cassert>
 
 #include <Eigen/Dense>
 #include <Eigen/src/Core/util/Macros.h>
@@ -136,6 +138,61 @@ namespace centroidal_dynamics
 
   std::string getDateAndTimeAsString();
 
+  /**
+ * Computes a binomal coefficient
+ * @return  n!/((n–k)! k!).
+ */
+  value_type nchoosek(const int n, const int k);
+
+  template < typename DerivedV, typename DerivedU>
+  void doCombs(Eigen::Matrix<typename DerivedU::Scalar,1,Eigen::Dynamic>& running,
+               int& running_i, int& running_j, Eigen::PlainObjectBase<DerivedU> & U, const Eigen::MatrixBase<DerivedV> & V,
+               int offset, int k)
+  {
+      int N = (int)(V.size());
+      if(k==0)
+      {
+          U.row(running_i) = running;
+          running_i++;
+          return;
+      }
+      for (int i = offset; i <= N - k; ++i)
+      {
+          running(running_j) = V(i);
+          running_j++;
+          doCombs(running, running_i, running_j, U, V, i+1,k-1);
+          running_j--;
+      }
+  }
+
+  /**
+ * Computes a matrix C containing all possible combinations of the elements of vector v taken k at a time.
+ * Matrix C has k columns and n!/((n–k)! k!) rows, where n is length(v).
+ * @param V  n-long vector of elements
+ * @param k  size of sub-set to consider
+ * @param U  result matrix
+ * @return nchoosek by k long matrix where each row is a unique k-size
+ * the first one, with all zeros.
+ */
+  template < typename DerivedV, typename DerivedU>
+  void nchoosek(
+    const Eigen::MatrixBase<DerivedV> & V,
+    const int k,
+    Eigen::PlainObjectBase<DerivedU> & U)
+    {
+        using namespace Eigen;
+        if(V.size() == 0)
+        {
+            U.resize(0,k);
+            return;
+        }
+        assert((V.cols() == 1 || V.rows() == 1) && "V must be a vector");
+        U.resize(nchoosek((int)(V.size()),k),k);
+        int running_i  = 0;
+        int running_j = 0;
+        Matrix<typename DerivedU::Scalar,1,Dynamic> running(1,k);
+        doCombs(running, running_i, running_j, U, V,0,k);
+    }
 } //namespace centroidal_dynamics
 
 #endif //_CENTROIDAL_DYNAMICS_LIB_UTIL_HH

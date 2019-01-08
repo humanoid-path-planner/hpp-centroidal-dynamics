@@ -29,6 +29,8 @@ class CENTROIDAL_DYNAMICS_DLLAPI Equilibrium
 public:
   const double m_mass; /// mass of the system
   const Vector3 m_gravity; ///  gravity vector
+  /** Gravito-inertial wrench generators (6 X numberOfContacts*generatorsPerContact) */
+  Matrix6X m_G_centr;
 
 private:
   static bool m_is_cdd_initialized;   /// true if cdd lib has been initialized, false otherwise
@@ -40,8 +42,6 @@ private:
 
   unsigned int  m_generatorsPerContact; /// number of generators to approximate the friction cone per contact point
 
-  /** Gravito-inertial wrench generators (6 X numberOfContacts*generatorsPerContact) */
-  Matrix6X m_G_centr;
 
   /** Inequality matrix and vector defining the gravito-inertial wrench cone H w <= h */
   MatrixXX m_H;
@@ -221,6 +221,30 @@ public:
    * @return The status of the LP solver.
    */
   LP_status checkRobustEquilibrium(Cref_vector3 com, bool &equilibrium, double e_max=0.0);
+
+
+  /**
+   * @brief Check whether the specified com position is in robust equilibrium.
+   * This amounts to solving the following feasibility LP:
+   *       find          b
+   *       minimize      1
+   *       subject to    G b = D c + d
+   *                     b >= b0
+   *  where:
+   *     b         are the coefficient of the contact force generators (f = G b)
+   *     b0        is a parameter proportional to the specified robustness measure
+   *     c         is the specified CoM position
+   *     G         is the 6xm matrix whose columns are the gravito-inertial wrench generators
+   *     D         is the 6x3 matrix mapping the CoM position in gravito-inertial wrench
+   *     d         is the 6d vector containing the gravity part of the gravito-inertial wrench
+   * @param com The 3d center of mass position to test.
+   * @param acc The 3d acceleration of the CoM.
+   * @param equilibrium True if com is in robust equilibrium, false otherwise.
+   * @param e_max Desired robustness level.
+   * @return The status of the LP solver.
+   */
+  LP_status checkRobustEquilibrium(Cref_vector3 com, Cref_vector3 acc, bool &equilibrium, double e_max=0.0);
+
 
   /**
    * @brief Compute the extremum CoM position over the line a*x + a0 that is in robust equilibrium.

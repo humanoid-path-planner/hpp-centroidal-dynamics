@@ -45,3 +45,23 @@ assert (robustness < 0), "first test should NOT be in equilibrirum"
 eq.setNewContacts(asmatrix(P),asmatrix(N),0.3,EquilibriumAlgorithm.EQUILIBRIUM_ALGORITHM_PP)
 H,h = eq.getPolytopeInequalities()
 
+#~ c= asmatrix(array([0.,0.,1.])).T
+status, stable = eq.checkRobustEquilibrium(c)
+assert (status == LP_STATUS_OPTIMAL), "checkRobustEquilibrium should not fail"
+assert (stable), "lat test should be in equilibrirum"
+
+
+from numpy import array, vstack, zeros, sqrt, cross, matrix, asmatrix
+from numpy.linalg import norm
+import numpy as np
+
+def compute_w(c, ddc, dL=array([0.,0.,0.]), m = 54., g_vec=array([0.,0.,-9.81])):
+	w1 = m * (ddc - g_vec)
+	return array(w1.tolist() + (cross(c, w1) + dL).tolist())
+	
+
+def is_stable(H,c=array([0.,0.,1.]), ddc=array([0.,0.,0.]), dL=array([0.,0.,0.]), m = 54., g_vec=array([0.,0.,-9.81]), robustness = 0.):
+	w = compute_w(c, ddc, dL, m, g_vec)	
+	return (H.dot(-w)<=-robustness).all()
+    
+assert(is_stable(H))
