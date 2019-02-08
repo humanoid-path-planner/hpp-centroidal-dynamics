@@ -3,19 +3,16 @@ cmake_minimum_required(VERSION 2.6)
 INCLUDE(cmake/base.cmake)
 INCLUDE(cmake/test.cmake)
 INCLUDE(cmake/python.cmake)
+INCLUDE(cmake/hpp.cmake)
 
-SET(PROJECT_ORG stonneau)
 SET(PROJECT_NAME hpp-centroidal-dynamics)
 SET(PROJECT_DESCRIPTION
 	 "Utility classes for testing (robust) equilibrium of a system in contact with the environment, and other centroidal dynamics methods."
  )
-SET(PROJECT_URL "https://github.com/${PROJECT_ORG}/${PROJECT_NAME}")
 
 SET(CUSTOM_HEADER_DIR "hpp/centroidal-dynamics")
 
-set(CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/cmake/;${PROJECT_SOURCE_DIR}/cmake2/")
-
-SETUP_PROJECT()
+SETUP_HPP_PROJECT()
 
 # Inhibit all warning messages.
 #set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -w")
@@ -39,7 +36,14 @@ ENDIF(BUILD_PYTHON_INTERFACE)
 ADD_REQUIRED_DEPENDENCY("eigen3")
 INCLUDE_DIRECTORIES(${EIGEN3_INCLUDE_DIR})
 
+set(CMAKE_MODULE_PATH
+  ${PROJECT_SOURCE_DIR}/cmake/find-external/CDD
+  ${PROJECT_SOURCE_DIR}/cmake/find-external/CLP
+  ${PROJECT_SOURCE_DIR}/cmake/find-external/qpOASES
+  )
+
 find_package(CDD REQUIRED)
+find_package(qpOASES REQUIRED)
 find_package(CLP)
 
 IF("${CLP_LIBRARY}" STREQUAL "CLP_LIBRARY-NOTFOUND")
@@ -49,11 +53,6 @@ else()
   add_definitions(-DCLP_FOUND)
 endif()
 
-#SEARCH_FOR_QPOASES()
-#ADD_REQUIRED_DEPENDENCY("qpOASES")
-SET(QPOASES_PREFIX ${CMAKE_PREFIX_PATH} CACHE PATH "Set the prefix where qpOASES is installed")
-FIND_LIBRARY(QPOASES_LIBRARY "qpOASES" PATHS ${QPOASES_PREFIX} PATH_SUFFIXES lib)
-FIND_PATH(QPOASES_INCLUDE_DIRS NAMES "qpOASES.hpp" PATHS ${QPOASES_PREFIX} PATH_SUFFIXES include)
 INCLUDE_DIRECTORIES(${QPOASES_INCLUDE_DIRS})
 
 
