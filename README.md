@@ -1,4 +1,8 @@
 # CentroidalDynamicsLib
+
+[![Pipeline status](https://gepgitlab.laas.fr/humanoid-path-planner/hpp-centroidal-dynamics/badges/master/pipeline.svg)](https://gepgitlab.laas.fr/humanoid-path-planner/hpp-centroidal-dynamics/commits/master)
+[![Coverage report](https://gepgitlab.laas.fr/humanoid-path-planner/hpp-centroidal-dynamics/badges/master/coverage.svg?job=doc-coverage)](http://projects.laas.fr/gepetto/doc/humanoid-path-planner/hpp-centroidal-dynamics/master/coverage/)
+
 Utility classes to check the (robust) equilibrium of a system in contact with the environment. Comes with python bindings.
 The main class that collects all the equilibrium-related algorithms is ```Equilibrium```.
 All the algorithms take as input:
