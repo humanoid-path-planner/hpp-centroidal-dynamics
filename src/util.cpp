@@ -63,7 +63,7 @@ void release_cdd_library()
   //dd_free_global_constants();
 }
 
-void uniform3(Cref_vector3 lower_bounds, Cref_vector3 upper_bounds, Ref_vector3 out)
+void uniform3(const Vector3&  lower_bounds, const Vector3&  upper_bounds, Vector3&  out)
 {
 
   assert(lower_bounds.rows()==out.rows());
@@ -118,7 +118,7 @@ void euler_matrix(double roll, double pitch, double yaw, Ref_rotation R)
 //       * angle_axis_t(yaw, Vector3::UnitZ())).toRotationMatrix();
 }
 
-bool generate_rectangle_contacts(double lx, double ly, Cref_vector3 pos, Cref_vector3 rpy,
+bool generate_rectangle_contacts(double lx, double ly, const Vector3&  pos, const Vector3&  rpy,
                                  Ref_matrix43 p, Ref_matrix43 N)
 {
   // compute rotation matrix

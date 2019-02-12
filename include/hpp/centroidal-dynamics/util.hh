@@ -31,6 +31,7 @@ namespace centroidal_dynamics
   typedef Eigen::Matrix <value_type, 2, 1>                                            Vector2;
   typedef Eigen::Matrix <value_type, 1, 2>                                            RVector2;
   typedef Eigen::Matrix <value_type, 3, 1>                                            Vector3;
+  typedef Eigen::Matrix <value_type, 3, 1, Eigen::RowMajor>                           Vector3R;
   typedef Eigen::Matrix <value_type, 1, 3>                                            RVector3;
   typedef Eigen::Matrix <value_type, 6, 1>                                            Vector6;
   typedef Eigen::Matrix <value_type, Eigen::Dynamic, 1>                               VectorX;
@@ -58,6 +59,7 @@ namespace centroidal_dynamics
 
   typedef const Eigen::Ref<const Vector2>     & Cref_vector2;
   typedef const Eigen::Ref<const Vector3>     & Cref_vector3;
+  typedef const Eigen::Ref<const Vector3>     & Cref_vector3R;
   typedef const Eigen::Ref<const Vector6>     & Cref_vector6;
   typedef const Eigen::Ref<const VectorX>     & Cref_vectorX;
   typedef const Eigen::Ref<const Rotation>    & Cref_rotation;
@@ -128,12 +130,12 @@ namespace centroidal_dynamics
   void release_cdd_library();
 
   // in some distribution the conversion Ref_matrixXX to Ref_vector3 does not compile
-  void uniform3(Cref_vector3 lower_bounds, Cref_vector3 upper_bounds, Ref_vector3 out);
+  void uniform3(const Vector3&  lower_bounds, const Vector3&  upper_bounds, Vector3&  out);
   void uniform(Cref_matrixXX lower_bounds, Cref_matrixXX upper_bounds, Ref_matrixXX out);
 
   void euler_matrix(double roll, double pitch, double yaw, Ref_rotation R);
 
-  bool generate_rectangle_contacts(double lx, double ly, Cref_vector3 pos, Cref_vector3 rpy,
+  bool generate_rectangle_contacts(double lx, double ly, const Vector3&  pos, const Vector3&  rpy,
                                    Ref_matrix43 p, Ref_matrix43 N);
 
   std::string getDateAndTimeAsString();

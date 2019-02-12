@@ -218,12 +218,12 @@ bool Equilibrium::setNewContacts(const MatrixX3& contactPoints, const MatrixX3& 
 
 static const Vector3 zero_acc = Vector3::Zero();
 
-LP_status Equilibrium::computeEquilibriumRobustness(Cref_vector3 com, double &robustness)
+LP_status Equilibrium::computeEquilibriumRobustness(const centroidal_dynamics::Vector3 &com, double &robustness)
 {
     return computeEquilibriumRobustness(com, zero_acc, robustness);
 }
 
-LP_status Equilibrium::computeEquilibriumRobustness(Cref_vector3 com, Cref_vector3 acc, double &robustness)
+LP_status Equilibrium::computeEquilibriumRobustness(const centroidal_dynamics::Vector3 &com, const centroidal_dynamics::Vector3 &acc, double &robustness)
 {
   // Take the acceleration in account in D and d :
   m_D.block<3,3>(3,0) = crossMatrix(-m_mass * (m_gravity - acc));
@@ -355,11 +355,11 @@ LP_status Equilibrium::computeEquilibriumRobustness(Cref_vector3 com, Cref_vecto
   return LP_STATUS_ERROR;
 }
 
-LP_status Equilibrium::checkRobustEquilibrium(Cref_vector3 com, bool &equilibrium, double e_max){
+LP_status Equilibrium::checkRobustEquilibrium(const Vector3& com, bool &equilibrium, double e_max){
     checkRobustEquilibrium(com,zero_acc,equilibrium,e_max);
 }
 
-LP_status Equilibrium::checkRobustEquilibrium(Cref_vector3 com, Cref_vector3 acc, bool &equilibrium, double e_max)
+LP_status Equilibrium::checkRobustEquilibrium(const Vector3& com, const Vector3& acc, bool &equilibrium, double e_max)
 {
     // Take the acceleration in account in D and d :
     m_D.block<3,3>(3,0) = crossMatrix(-m_mass * (m_gravity - acc));
@@ -417,7 +417,7 @@ LP_status Equilibrium::getPolytopeInequalities(MatrixXX& H, VectorX& h) const
     return LP_STATUS_OPTIMAL;
 }
 
-LP_status Equilibrium::findExtremumOverLine(Cref_vector3 a, Cref_vector3 a0, double e_max, Ref_vector3 com)
+LP_status Equilibrium::findExtremumOverLine(const centroidal_dynamics::Vector3 &a, const centroidal_dynamics::Vector3 &a0, double e_max, centroidal_dynamics::Vector3 &com)
 {
   const long m = m_G_centr.cols(); // number of gravito-inertial wrench generators
   if(m_G_centr.cols()==0)
@@ -547,7 +547,7 @@ LP_status Equilibrium::findExtremumOverLine(Cref_vector3 a, Cref_vector3 a0, dou
   return LP_STATUS_ERROR;
 }
 
-LP_status Equilibrium::findExtremumInDirection(Cref_vector3 direction, Ref_vector3 com, double e_max)
+LP_status Equilibrium::findExtremumInDirection(const Vector3&  direction, Vector3&  com, double e_max)
 {
   if(m_G_centr.cols()==0)
     return LP_STATUS_INFEASIBLE;

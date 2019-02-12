@@ -175,7 +175,7 @@ public:
    * system can reach infinite robustness. This is due to the fact that we are not considering
    * any upper limit for the friction cones.
    */
-  LP_status computeEquilibriumRobustness(Cref_vector3 com, double &robustness);
+  LP_status computeEquilibriumRobustness(const Vector3& com, double &robustness);
 
   /**
    * @brief Compute a measure of the robustness of the equilibrium of the specified com position.
@@ -199,7 +199,7 @@ public:
    * system can reach infinite robustness. This is due to the fact that we are not considering
    * any upper limit for the friction cones.
    */
-  LP_status computeEquilibriumRobustness(Cref_vector3 com, Cref_vector3 acc, double &robustness);
+  LP_status computeEquilibriumRobustness(const Vector3& com, const Vector3& acc, double &robustness);
 
   /**
    * @brief Check whether the specified com position is in robust equilibrium.
@@ -220,7 +220,7 @@ public:
    * @param e_max Desired robustness level.
    * @return The status of the LP solver.
    */
-  LP_status checkRobustEquilibrium(Cref_vector3 com, bool &equilibrium, double e_max=0.0);
+  LP_status checkRobustEquilibrium(const Vector3& com, bool &equilibrium, double e_max=0.0);
 
 
   /**
@@ -243,7 +243,7 @@ public:
    * @param e_max Desired robustness level.
    * @return The status of the LP solver.
    */
-  LP_status checkRobustEquilibrium(Cref_vector3 com, Cref_vector3 acc, bool &equilibrium, double e_max=0.0);
+  LP_status checkRobustEquilibrium(const Vector3& com, const Vector3& acc, bool &equilibrium, double e_max=0.0);
 
 
   /**
@@ -268,7 +268,7 @@ public:
    * system can reach infinite robustness. This is due to the fact that we are not considering
    * any upper limit for the friction cones.
   */
-  LP_status findExtremumOverLine(Cref_vector3 a, Cref_vector3 a0, double e_max, Ref_vector3 com);
+  LP_status findExtremumOverLine(const Vector3&  a, const Vector3&  a0, double e_max, Vector3& com);
 
   /**
    * @brief Find the extremum com position that is in robust equilibrium in the specified direction.
@@ -293,7 +293,7 @@ public:
    * system can reach infinite robustness. This is due to the fact that we are not considering
    * any upper limit for the friction cones.
    */
-  LP_status findExtremumInDirection(Cref_vector3 direction, Ref_vector3 com, double e_max=0.0);
+  LP_status findExtremumInDirection(const Vector3&  direction, Vector3&  com, double e_max=0.0);
 
   /**
    * @brief Retrieve the inequalities that define the admissible wrenchs
