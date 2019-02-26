@@ -13,10 +13,10 @@
 #include <Eigen/Dense>
 #include <Eigen/src/Core/util/Macros.h>
 
-#include "cdd/cddmp.h"
-#include "cdd/setoper.h"
-#include "cdd/cddtypes.h"
-#include "cdd/cdd.h"
+#include "cddmp.h"
+#include "setoper.h"
+#include "cddtypes.h"
+#include "cdd.h"
 
 namespace centroidal_dynamics
 {
