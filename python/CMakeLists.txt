@@ -18,5 +18,4 @@ INSTALL(
     TARGETS ${PY_NAME}	DESTINATION ${PYTHON_SITELIB}
     )
 
-# TODO
-#ADD_PYTHON_UNIT_TEST("python-centroidal-dynamics" "python/test/binding_tests.py" "python")
+ADD_PYTHON_UNIT_TEST("python-centroidal-dynamics" "python/test/binding_tests.py" "python")
