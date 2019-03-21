@@ -44,14 +44,14 @@ bool Solver_LP_abstract::writeLpToFile(const std::string& filename,
   assert(Aub.size()==m);
 
   std::ofstream out(filename.c_str(), std::ios::out | std::ios::binary | std::ios::trunc);
-  out.write((char*) (&n), sizeof(typename MatrixXX::Index));
-  out.write((char*) (&m), sizeof(typename MatrixXX::Index));
-  out.write((char*) c.data(), n*sizeof(typename MatrixXX::Scalar) );
-  out.write((char*) lb.data(), n*sizeof(typename MatrixXX::Scalar) );
-  out.write((char*) ub.data(), n*sizeof(typename MatrixXX::Scalar) );
-  out.write((char*) A.data(), m*n*sizeof(typename MatrixXX::Scalar) );
-  out.write((char*) Alb.data(), m*sizeof(typename MatrixXX::Scalar) );
-  out.write((char*) Aub.data(), m*sizeof(typename MatrixXX::Scalar) );
+  out.write((const char*) (&n), sizeof(typename MatrixXX::Index));
+  out.write((const char*) (&m), sizeof(typename MatrixXX::Index));
+  out.write((const char*) c.data(), n*sizeof(typename MatrixXX::Scalar) );
+  out.write((const char*) lb.data(), n*sizeof(typename MatrixXX::Scalar) );
+  out.write((const char*) ub.data(), n*sizeof(typename MatrixXX::Scalar) );
+  out.write((const char*) A.data(), m*n*sizeof(typename MatrixXX::Scalar) );
+  out.write((const char*) Alb.data(), m*sizeof(typename MatrixXX::Scalar) );
+  out.write((const char*) Aub.data(), m*sizeof(typename MatrixXX::Scalar) );
   out.close();
   return true;
 }

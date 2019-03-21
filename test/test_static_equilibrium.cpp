@@ -160,7 +160,7 @@ int test_computeEquilibriumRobustness(Equilibrium *solver_1, Equilibrium *solver
  * @param verb Verbosity level, 0 print nothing, 1 print summary, 2 print everything
  */
 int test_findExtremumOverLine(Equilibrium *solver_to_test, Equilibrium *solver_ground_truth,
-                              Cref_vector3 a0, int N_TESTS, double e_max,
+                              Cref_vector3 a0, unsigned int N_TESTS, double e_max,
                               const string& PERF_STRING_TEST, const string& PERF_STRING_GROUND_TRUTH, int verb=0)
 {
   int error_counter = 0;
@@ -230,7 +230,7 @@ int test_findExtremumOverLine(Equilibrium *solver_to_test, Equilibrium *solver_g
  * @param solver The solver to use for computing the equilibrium robustness.
  * @param comPositions Grid of CoM positions in the form of an Nx2 matrix.
  */
-void drawRobustnessGrid(int N_CONTACTS, int GRID_SIZE, Equilibrium *solver,
+void drawRobustnessGrid(unsigned int N_CONTACTS, unsigned int GRID_SIZE, Equilibrium *solver,
                         Cref_matrixXX comPositions, Cref_matrixXX p)
 {
   MatrixXi contactPointCoord(4*N_CONTACTS,2);
@@ -262,9 +262,9 @@ void drawRobustnessGrid(int N_CONTACTS, int GRID_SIZE, Equilibrium *solver,
     for(unsigned int j=0; j<GRID_SIZE; j++)
     {
       contactPointDrawn = false;
-      for(long k=0; k<4*N_CONTACTS; k++)
+      for(unsigned long k=0; k<4*N_CONTACTS; k++)
       {
-        if(contactPointCoord(k,0)==i && contactPointCoord(k,1)==j)
+        if((unsigned) contactPointCoord(k,0)== i && (unsigned) contactPointCoord(k,1)==j)
         {
           cout<<"X ";
           contactPointDrawn = true;

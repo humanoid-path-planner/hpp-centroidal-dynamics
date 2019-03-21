@@ -245,7 +245,7 @@ void Stopwatch::report(string perf_name, int precision, std::ostream& output)
 
   const int MAX_NAME_LENGTH = 60;
   string pad = "";
-  for (int i = perf_name.length(); i<MAX_NAME_LENGTH; i++)
+  for (unsigned long i = perf_name.length(); i<MAX_NAME_LENGTH; i++)
     pad.append(" ");
 
   output << perf_name << pad;
