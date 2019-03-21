@@ -1,10 +1,8 @@
 include: http://rainboard.laas.fr/project/hpp-centroidal-dynamics/.gitlab-ci.yml
 
-python_format:
-  image: python:alpine
-  before_script:
-    - pip install flake8 isort yapf
+format:
+  image: eur0c.laas.fr:5000/gepetto/buildfarm/format
   script:
     - isort -c
     - flake8 .
-    - yapf -dr .
+    - check-clang-format.sh
