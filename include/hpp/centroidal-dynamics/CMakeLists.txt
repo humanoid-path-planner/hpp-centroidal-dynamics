@@ -1,4 +1,3 @@
-# Declare Headers
 SET(${PROJECT_NAME}_HEADERS
   local_config.hh
   util.hh
@@ -12,5 +11,5 @@ SET(${PROJECT_NAME}_HEADERS
 
 INSTALL(FILES
   ${${PROJECT_NAME}_HEADERS}
-  DESTINATION include/hpp/centroidal-dynamics
+  DESTINATION include/${CUSTOM_HEADER_DIR}
   )

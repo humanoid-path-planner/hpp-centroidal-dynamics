@@ -24,32 +24,28 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 */
 
-
 #ifndef WBR_STOPWATCH_H
 #define WBR_STOPWATCH_H
 
 #include "hpp/centroidal-dynamics/Stdafx.hh"
 
 #ifndef WIN32
-	/* The classes below are exported */
-	#pragma GCC visibility push(default)
+/* The classes below are exported */
+#pragma GCC visibility push(default)
 #endif
 
 // Generic stopwatch exception class
-struct StopwatchException
-{
-public:
-  StopwatchException(std::string error) : error(error) { }
+struct StopwatchException {
+ public:
+  StopwatchException(std::string error) : error(error) {}
   std::string error;
 };
 
-
-enum StopwatchMode
-{
-  NONE	    = 0,  // Clock is not initialized
-  CPU_TIME  = 1,  // Clock calculates time ranges using ctime and CLOCKS_PER_SEC
-  REAL_TIME = 2   // Clock calculates time by asking the operating system how
-                  // much real time passed
+enum StopwatchMode {
+  NONE = 0,      // Clock is not initialized
+  CPU_TIME = 1,  // Clock calculates time ranges using ctime and CLOCKS_PER_SEC
+  REAL_TIME = 2  // Clock calculates time by asking the operating system how
+                 // much real time passed
 };
 
 /**
@@ -144,10 +140,9 @@ enum StopwatchMode
 
 */
 class Stopwatch {
-public:
-
+ public:
   /** Constructor */
-  Stopwatch(StopwatchMode _mode=NONE);
+  Stopwatch(StopwatchMode _mode = NONE);
 
   /** Destructor */
   ~Stopwatch();
@@ -174,11 +169,10 @@ public:
   void reset_all();
 
   /** Dump the data of a certain performance record */
-  void report(std::string perf_name, int precision=2,
-              std::ostream& output = std::cout);
+  void report(std::string perf_name, int precision = 2, std::ostream& output = std::cout);
 
   /** Dump the data of all the performance records */
-  void report_all(int precision=2, std::ostream& output = std::cout);
+  void report_all(int precision = 2, std::ostream& output = std::cout);
 
   /** Returns total execution time of a certain performance */
   long double get_total_time(std::string perf_name);
@@ -200,7 +194,7 @@ public:
   long double get_time_so_far(std::string perf_name);
 
   /**	Turn off clock, all the Stopwatch::* methods return without doing
-	anything after this method is called. */
+        anything after this method is called. */
   void turn_off();
 
   /** Turn on clock, restore clock operativity after a turn_off(). */
@@ -209,32 +203,23 @@ public:
   /** Take time, depends on mode */
   long double take_time();
 
-protected:
-
+ protected:
   /** Struct to hold the performance data */
   struct PerformanceData {
-
-    PerformanceData() :
-      clock_start(0),
-      total_time(0),
-      min_time(0),
-      max_time(0),
-      last_time(0),
-      paused(false),
-      stops(0) {
-    }
+    PerformanceData()
+        : clock_start(0), total_time(0), min_time(0), max_time(0), last_time(0), paused(false), stops(0) {}
 
     /** Start time */
-    long double	clock_start;
+    long double clock_start;
 
     /** Cumulative total time */
-    long double	total_time;
+    long double total_time;
 
     /** Minimum time */
-    long double	min_time;
+    long double min_time;
 
     /** Maximum time */
-    long double	max_time;
+    long double max_time;
 
     /** Last time */
     long double last_time;
@@ -243,7 +228,7 @@ protected:
     bool paused;
 
     /** How many cycles have been this stopwatch executed? */
-    int	stops;
+    int stops;
   };
 
   /** Flag to hold the clock's status */
@@ -254,14 +239,13 @@ protected:
 
   /** Pointer to the dynamic structure which holds the collection of performance
       data */
-  std::map<std::string, PerformanceData >* records_of;
-
+  std::map<std::string, PerformanceData>* records_of;
 };
 
 Stopwatch& getProfiler();
 
 #ifndef WIN32
-   #pragma GCC visibility pop
+#pragma GCC visibility pop
 #endif
 
 #endif
