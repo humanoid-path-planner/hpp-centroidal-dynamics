@@ -13,13 +13,16 @@
 #include <hpp/centroidal-dynamics/solver_LP_abstract.hh>
 #include "ClpSimplex.hpp"
 
-namespace centroidal_dynamics {
+namespace centroidal_dynamics
+{
 
-class CENTROIDAL_DYNAMICS_DLLAPI Solver_LP_clp : public Solver_LP_abstract {
- private:
+class CENTROIDAL_DYNAMICS_DLLAPI Solver_LP_clp: public Solver_LP_abstract
+{
+private:
   ClpSimplex m_model;
 
- public:
+public:
+
   Solver_LP_clp();
 
   /** Solve the linear program
@@ -27,8 +30,9 @@ class CENTROIDAL_DYNAMICS_DLLAPI Solver_LP_clp : public Solver_LP_abstract {
    *  subject to  Alb <= A x <= Aub
    *              lb <= x <= ub
    */
-  virtual LP_status solve(Cref_vectorX c, Cref_vectorX lb, Cref_vectorX ub, Cref_matrixXX A, Cref_vectorX Alb,
-                          Cref_vectorX Aub, Ref_vectorX sol);
+  virtual LP_status solve(Cref_vectorX c, Cref_vectorX lb, Cref_vectorX ub,
+                          Cref_matrixXX A, Cref_vectorX Alb, Cref_vectorX Aub,
+                          Ref_vectorX sol);
 
   /** Get the status of the solver. */
   virtual LP_status getStatus();
@@ -46,8 +50,8 @@ class CENTROIDAL_DYNAMICS_DLLAPI Solver_LP_clp : public Solver_LP_abstract {
   virtual bool setMaximumTime(double seconds);
 };
 
-}  // end namespace centroidal_dynamics
+} // end namespace centroidal_dynamics
 
-#endif  // CENTROIDAL_DYNAMICS_LIB_SOLVER_LP_CLP_HH
+#endif //CENTROIDAL_DYNAMICS_LIB_SOLVER_LP_CLP_HH
 
-#endif  // CLP_FOUND
+#endif // CLP_FOUND
