@@ -2,8 +2,8 @@
  * Copyright 2015, LAAS-CNRS
  * Author: Andrea Del Prete
  */
-#ifndef _CENTROIDAL_DYNAMICS_LIB_UTIL_HH
-#define _CENTROIDAL_DYNAMICS_LIB_UTIL_HH
+#ifndef HPP_CENTROIDAL_DYNAMICS_UTIL_HH
+#define HPP_CENTROIDAL_DYNAMICS_UTIL_HH
 
 #include <iostream>
 #include <fstream>
@@ -180,4 +180,4 @@ void nchoosek(const Eigen::MatrixBase<DerivedV>& V, const int k, Eigen::PlainObj
 }
 }  // namespace centroidal_dynamics
 
-#endif  //_CENTROIDAL_DYNAMICS_LIB_UTIL_HH
+#endif  // HPP_CENTROIDAL_DYNAMICS_UTIL_HH
