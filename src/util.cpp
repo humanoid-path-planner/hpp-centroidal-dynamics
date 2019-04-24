@@ -3,9 +3,7 @@
  * Author: Andrea Del Prete
  */
 
-#ifndef _CENTROIDAL_DYNAMICS_LIB_CONFIG_HH
-#define _CENTROIDAL_DYNAMICS_LIB_CONFIG_HH
-
+#include <ctime>
 #include <hpp/centroidal-dynamics/util.hh>
 #include <ctime>
 
@@ -208,6 +206,4 @@ value_type nchoosek(const int n, const int k)
     }
 }
 
-} //namespace centroidal_dynamics
-
-#endif //_CENTROIDAL_DYNAMICS_LIB_CONFIG_HH
+}  // namespace centroidal_dynamics

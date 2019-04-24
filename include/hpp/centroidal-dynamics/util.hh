@@ -2,8 +2,8 @@
  * Copyright 2015, LAAS-CNRS
  * Author: Andrea Del Prete
  */
-#ifndef _CENTROIDAL_DYNAMICS_LIB_UTIL_HH
-#define _CENTROIDAL_DYNAMICS_LIB_UTIL_HH
+#ifndef HPP_CENTROIDAL_DYNAMICS_UTIL_HH
+#define HPP_CENTROIDAL_DYNAMICS_UTIL_HH
 
 #include <iostream>
 #include <fstream>
@@ -174,25 +174,20 @@ namespace centroidal_dynamics
  * @return nchoosek by k long matrix where each row is a unique k-size
  * the first one, with all zeros.
  */
-  template < typename DerivedV, typename DerivedU>
-  void nchoosek(
-    const Eigen::MatrixBase<DerivedV> & V,
-    const int k,
-    Eigen::PlainObjectBase<DerivedU> & U)
-    {
-        using namespace Eigen;
-        if(V.size() == 0)
-        {
-            U.resize(0,k);
-            return;
-        }
-        assert((V.cols() == 1 || V.rows() == 1) && "V must be a vector");
-        U.resize(nchoosek((int)(V.size()),k),k);
-        int running_i  = 0;
-        int running_j = 0;
-        Matrix<typename DerivedU::Scalar,1,Dynamic> running(1,k);
-        doCombs(running, running_i, running_j, U, V,0,k);
-    }
-} //namespace centroidal_dynamics
+template <typename DerivedV, typename DerivedU>
+void nchoosek(const Eigen::MatrixBase<DerivedV>& V, const int k, Eigen::PlainObjectBase<DerivedU>& U) {
+  using namespace Eigen;
+  if (V.size() == 0) {
+    U.resize(0, k);
+    return;
+  }
+  assert((V.cols() == 1 || V.rows() == 1) && "V must be a vector");
+  U.resize(nchoosek((int)(V.size()), k), k);
+  int running_i = 0;
+  int running_j = 0;
+  Matrix<typename DerivedU::Scalar, 1, Dynamic> running(1, k);
+  doCombs(running, running_i, running_j, U, V, 0, k);
+}
+}  // namespace centroidal_dynamics
 
-#endif //_CENTROIDAL_DYNAMICS_LIB_UTIL_HH
+#endif  // HPP_CENTROIDAL_DYNAMICS_UTIL_HH

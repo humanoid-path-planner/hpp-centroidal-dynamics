@@ -3,8 +3,8 @@
  * Author: Andrea Del Prete
  */
 
-#ifndef CENTROIDAL_DYNAMICS_LIB_STATIC_EQUILIBRIUM_H
-#define CENTROIDAL_DYNAMICS_LIB_STATIC_EQUILIBRIUM_H
+#ifndef HPP_CENTROIDAL_DYNAMICS_CENTROIDAL_DYNAMICS_HH
+#define HPP_CENTROIDAL_DYNAMICS_CENTROIDAL_DYNAMICS_HH
 
 #include <Eigen/Dense>
 #include <hpp/centroidal-dynamics/local_config.hh>

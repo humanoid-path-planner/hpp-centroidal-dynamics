@@ -1,3 +1,6 @@
+#ifndef HPP_CENTROIDAL_DYNAMICS_STDAFX_HH
+#define HPP_CENTROIDAL_DYNAMICS_STDAFX_HH
+
 /*
 Copyright (c) 2010-2013 Tommaso Urli
 
@@ -30,3 +33,5 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 #include <map>
 #include <ctime>
 #include <sstream>
+
+#endif

@@ -3,8 +3,8 @@
  * Author: Andrea Del Prete
  */
 
-#ifndef __centroidal_dynamics_lib_logger_H__
-#define __centroidal_dynamics_lib_logger_H__
+#ifndef HPP_CENTROIDAL_DYNAMICS_LOGGER_HH
+#define HPP_CENTROIDAL_DYNAMICS_LOGGER_HH
 
 /* --------------------------------------------------------------------- */
 /* --- INCLUDE --------------------------------------------------------- */
@@ -185,4 +185,4 @@ namespace centroidal_dynamics
 
 } // namespace centroidal_dynamics
 
-#endif // #ifndef __sot_torque_control_trajectory_generators_H__
+#endif  // HPP_CENTROIDAL_DYNAMICS_LOGGER_HH
