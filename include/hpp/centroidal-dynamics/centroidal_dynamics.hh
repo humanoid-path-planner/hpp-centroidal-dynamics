@@ -297,7 +297,9 @@ public:
 
   /**
    * @brief Retrieve the inequalities that define the admissible wrenchs
-   * for the current contact set.
+   * for the current contact set. WARNING. The H and h matrices are defined
+   * in such a way that H w >= h is verified if w is an admissible wrench. This is different
+   * from the ICRA 15 paper from Del Prete et al., where the negative matrices are used.
    * @param H reference to the H matrix to initialize
    * @param h reference to the h vector to initialize
    * @return The status of the inequalities. If the inequalities are not defined
