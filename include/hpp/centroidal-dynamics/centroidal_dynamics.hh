@@ -11,37 +11,33 @@
 #include <hpp/centroidal-dynamics/util.hh>
 #include <hpp/centroidal-dynamics/solver_LP_abstract.hh>
 
-namespace centroidal_dynamics
-{
+namespace centroidal_dynamics {
 
-enum CENTROIDAL_DYNAMICS_DLLAPI EquilibriumAlgorithm
-{
-  EQUILIBRIUM_ALGORITHM_LP,  /// primal LP formulation
-  EQUILIBRIUM_ALGORITHM_LP2, /// another primal LP formulation
-  EQUILIBRIUM_ALGORITHM_DLP, /// dual LP formulation
-  EQUILIBRIUM_ALGORITHM_PP,  /// polytope projection algorithm
-  EQUILIBRIUM_ALGORITHM_IP,  /// incremental projection algorithm based on primal LP formulation
-  EQUILIBRIUM_ALGORITHM_DIP  /// incremental projection algorithm based on dual LP formulation
+enum CENTROIDAL_DYNAMICS_DLLAPI EquilibriumAlgorithm {
+  EQUILIBRIUM_ALGORITHM_LP,   /// primal LP formulation
+  EQUILIBRIUM_ALGORITHM_LP2,  /// another primal LP formulation
+  EQUILIBRIUM_ALGORITHM_DLP,  /// dual LP formulation
+  EQUILIBRIUM_ALGORITHM_PP,   /// polytope projection algorithm
+  EQUILIBRIUM_ALGORITHM_IP,   /// incremental projection algorithm based on primal LP formulation
+  EQUILIBRIUM_ALGORITHM_DIP   /// incremental projection algorithm based on dual LP formulation
 };
 
-class CENTROIDAL_DYNAMICS_DLLAPI Equilibrium
-{
-public:
-  const double m_mass; /// mass of the system
-  const Vector3 m_gravity; ///  gravity vector
+class CENTROIDAL_DYNAMICS_DLLAPI Equilibrium {
+ public:
+  const double m_mass;      /// mass of the system
+  const Vector3 m_gravity;  ///  gravity vector
   /** Gravito-inertial wrench generators (6 X numberOfContacts*generatorsPerContact) */
   Matrix6X m_G_centr;
 
-private:
-  static bool m_is_cdd_initialized;   /// true if cdd lib has been initialized, false otherwise
+ private:
+  static bool m_is_cdd_initialized;  /// true if cdd lib has been initialized, false otherwise
 
-  std::string                 m_name;         /// name of this object
-  EquilibriumAlgorithm  m_algorithm;    /// current algorithm used
-  SolverLP                    m_solver_type;  /// type of LP solver
-  Solver_LP_abstract*         m_solver;       /// LP solver
+  std::string m_name;                /// name of this object
+  EquilibriumAlgorithm m_algorithm;  /// current algorithm used
+  SolverLP m_solver_type;            /// type of LP solver
+  Solver_LP_abstract* m_solver;      /// LP solver
 
-  unsigned int  m_generatorsPerContact; /// number of generators to approximate the friction cone per contact point
-
+  unsigned int m_generatorsPerContact;  /// number of generators to approximate the friction cone per contact point
 
   /** Inequality matrix and vector defining the gravito-inertial wrench cone H w <= h */
   MatrixXX m_H;
@@ -49,15 +45,15 @@ private:
   /** False if a numerical instability appeared in the computation H and h*/
   bool m_is_cdd_stable;
   /** EQUILIBRIUM_ALGORITHM_PP: If double description fails,
-    * indicate the max number of attempts to compute the cone by introducing
-    * a small pertubation of the system */
+   * indicate the max number of attempts to compute the cone by introducing
+   * a small pertubation of the system */
   const unsigned max_num_cdd_trials;
   /** whether to remove redundant inequalities when computing double description matrices*/
   const bool canonicalize_cdd_matrix;
 
   /** Inequality matrix and vector defining the CoM support polygon HD com + Hd <= h */
   MatrixX3 m_HD;
-  VectorX  m_Hd;
+  VectorX m_Hd;
 
   /** Matrix and vector mapping 2d com position to GIW */
   Matrix63 m_D;
@@ -67,8 +63,8 @@ private:
   double m_b0_to_emax_coefficient;
 
   bool computePolytopeProjection(Cref_matrix6X v);
-  bool computeGenerators(Cref_matrixX3 contactPoints, Cref_matrixX3 contactNormals,
-                         double frictionCoefficient, const bool perturbate = false);
+  bool computeGenerators(Cref_matrixX3 contactPoints, Cref_matrixX3 contactNormals, double frictionCoefficient,
+                         const bool perturbate = false);
 
   /**
    * @brief Given the smallest coefficient of the contact force generators it computes
@@ -82,8 +78,8 @@ private:
 
   double convert_emax_to_b0(double emax);
 
-public:
-    EIGEN_MAKE_ALIGNED_OPERATOR_NEW
+ public:
+  EIGEN_MAKE_ALIGNED_OPERATOR_NEW
   /**
    * @brief Equilibrium constructor.
    * @param name Name of the object.
@@ -96,9 +92,8 @@ public:
    * a small pertubation of the system
    */
   Equilibrium(const std::string& name, const double mass, const unsigned int generatorsPerContact,
-                    const SolverLP solver_type = SOLVER_LP_QPOASES, bool useWarmStart=true, const unsigned int max_num_cdd_trials=0,
-                    const bool canonicalize_cdd_matrix=false);
-
+              const SolverLP solver_type = SOLVER_LP_QPOASES, bool useWarmStart = true,
+              const unsigned int max_num_cdd_trials = 0, const bool canonicalize_cdd_matrix = false);
 
   Equilibrium(const Equilibrium& other);
 
@@ -106,21 +101,21 @@ public:
    * @brief Returns the useWarmStart flag.
    * @return True if the LP solver is allowed to use warm start, false otherwise.
    */
-  bool useWarmStart(){ return m_solver->getUseWarmStart(); }
+  bool useWarmStart() { return m_solver->getUseWarmStart(); }
 
   /**
    * @brief Specifies whether the LP solver is allowed to use warm start.
    * @param uws True if the LP solver is allowed to use warm start, false otherwise.
    */
-  void setUseWarmStart(bool uws){ m_solver->setUseWarmStart(uws); }
+  void setUseWarmStart(bool uws) { m_solver->setUseWarmStart(uws); }
 
   /**
    * @brief Get the name of this object.
    * @return The name of this object.
    */
-  std::string getName(){ return m_name; }
+  std::string getName() { return m_name; }
 
-  EquilibriumAlgorithm getAlgorithm(){ return m_algorithm; }
+  EquilibriumAlgorithm getAlgorithm() { return m_algorithm; }
 
   void setAlgorithm(EquilibriumAlgorithm algorithm);
 
@@ -135,8 +130,8 @@ public:
    * @param alg Algorithm to use for testing equilibrium.
    * @return True if the operation succeeded, false otherwise.
    */
-  bool setNewContacts(const MatrixX3& contactPoints, const MatrixX3& contactNormals,
-                      const double frictionCoefficient, const EquilibriumAlgorithm alg);
+  bool setNewContacts(const MatrixX3& contactPoints, const MatrixX3& contactNormals, const double frictionCoefficient,
+                      const EquilibriumAlgorithm alg);
 
   /**
    * @brief Specify a new set of contacts.
@@ -149,10 +144,10 @@ public:
    * @param alg Algorithm to use for testing equilibrium.
    * @return True if the operation succeeded, false otherwise.
    */
-  bool setNewContacts(const MatrixX3ColMajor& contactPoints, const MatrixX3ColMajor&  contactNormals,
+  bool setNewContacts(const MatrixX3ColMajor& contactPoints, const MatrixX3ColMajor& contactNormals,
                       const double frictionCoefficient, const EquilibriumAlgorithm alg);
 
-  void setG(Cref_matrix6X G){m_G_centr = G;}
+  void setG(Cref_matrix6X G) { m_G_centr = G; }
 
   /**
    * @brief Compute a measure of the robustness of the equilibrium of the specified com position.
@@ -175,7 +170,7 @@ public:
    * system can reach infinite robustness. This is due to the fact that we are not considering
    * any upper limit for the friction cones.
    */
-  LP_status computeEquilibriumRobustness(Cref_vector3 com, double &robustness);
+  LP_status computeEquilibriumRobustness(Cref_vector3 com, double& robustness);
 
   /**
    * @brief Compute a measure of the robustness of the equilibrium of the specified com position.
@@ -199,7 +194,7 @@ public:
    * system can reach infinite robustness. This is due to the fact that we are not considering
    * any upper limit for the friction cones.
    */
-  LP_status computeEquilibriumRobustness(Cref_vector3 com, Cref_vector3 acc, double &robustness);
+  LP_status computeEquilibriumRobustness(Cref_vector3 com, Cref_vector3 acc, double& robustness);
 
   /**
    * @brief Check whether the specified com position is in robust equilibrium.
@@ -220,8 +215,7 @@ public:
    * @param e_max Desired robustness level.
    * @return The status of the LP solver.
    */
-  LP_status checkRobustEquilibrium(Cref_vector3 com, bool &equilibrium, double e_max=0.0);
-
+  LP_status checkRobustEquilibrium(Cref_vector3 com, bool& equilibrium, double e_max = 0.0);
 
   /**
    * @brief Check whether the specified com position is in robust equilibrium.
@@ -243,8 +237,7 @@ public:
    * @param e_max Desired robustness level.
    * @return The status of the LP solver.
    */
-  LP_status checkRobustEquilibrium(Cref_vector3 com, Cref_vector3 acc, bool &equilibrium, double e_max=0.0);
-
+  LP_status checkRobustEquilibrium(Cref_vector3 com, Cref_vector3 acc, bool& equilibrium, double e_max = 0.0);
 
   /**
    * @brief Compute the extremum CoM position over the line a*x + a0 that is in robust equilibrium.
@@ -267,7 +260,7 @@ public:
    * @note If the system is in force closure the status will be LP_STATUS_UNBOUNDED, meaning that the
    * system can reach infinite robustness. This is due to the fact that we are not considering
    * any upper limit for the friction cones.
-  */
+   */
   LP_status findExtremumOverLine(Cref_vector3 a, Cref_vector3 a0, double e_max, Ref_vector3 com);
 
   /**
@@ -293,7 +286,7 @@ public:
    * system can reach infinite robustness. This is due to the fact that we are not considering
    * any upper limit for the friction cones.
    */
-  LP_status findExtremumInDirection(Cref_vector3 direction, Ref_vector3 com, double e_max=0.0);
+  LP_status findExtremumInDirection(Cref_vector3 direction, Ref_vector3 com, double e_max = 0.0);
 
   /**
    * @brief Retrieve the inequalities that define the admissible wrenchs
@@ -345,10 +338,9 @@ public:
    * @param a the acceleration
    * @return true if the acceleration is admissible, false otherwise
    */
-  bool checkAdmissibleAcceleration(Cref_matrix63 H, Cref_vector6 h, Cref_vector3 a );
-
+  bool checkAdmissibleAcceleration(Cref_matrix63 H, Cref_vector6 h, Cref_vector3 a);
 };
 
-} // end namespace centroidal_dynamics
+}  // end namespace centroidal_dynamics
 
 #endif
