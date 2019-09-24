@@ -4,6 +4,7 @@ INCLUDE(cmake/base.cmake)
 INCLUDE(cmake/test.cmake)
 INCLUDE(cmake/python.cmake)
 INCLUDE(cmake/hpp.cmake)
+INCLUDE(cmake/boost.cmake)
 
 SET(PROJECT_NAME hpp-centroidal-dynamics)
 SET(PROJECT_DESCRIPTION
@@ -27,9 +28,9 @@ IF(BUILD_PYTHON_INTERFACE)
   FINDPYTHON()
   include_directories(SYSTEM ${PYTHON_INCLUDE_DIRS} )
 
-  find_package( Boost COMPONENTS python REQUIRED )
+  SET(BOOST_COMPONENTS python)
+  SEARCH_FOR_BOOST()
   include_directories(SYSTEM ${Boost_INCLUDE_DIR} )
-
 ENDIF(BUILD_PYTHON_INTERFACE)
 
 ADD_REQUIRED_DEPENDENCY("eigen3")
