@@ -7,8 +7,8 @@ INCLUDE(cmake/hpp.cmake)
 
 SET(PROJECT_NAME hpp-centroidal-dynamics)
 SET(PROJECT_DESCRIPTION
-	 "Utility classes for testing (robust) equilibrium of a system in contact with the environment, and other centroidal dynamics methods."
- )
+  "Utility classes for testing (robust) equilibrium of a system in contact with the environment, and other centroidal dynamics methods."
+  )
 
 SET(CUSTOM_HEADER_DIR "hpp/centroidal-dynamics")
 
@@ -23,13 +23,12 @@ MESSAGE( STATUS "CMAKE_CXX_FLAGS: " ${CMAKE_CXX_FLAGS} )
 
 OPTION (BUILD_PYTHON_INTERFACE "Build the python binding" ON)
 IF(BUILD_PYTHON_INTERFACE)
-# search for python
-	FINDPYTHON(2.7 EXACT REQUIRED)
-	find_package( PythonLibs 2.7 REQUIRED )
-	include_directories( ${PYTHON_INCLUDE_DIRS} )
+  # search for python
+  FINDPYTHON()
+  include_directories(SYSTEM ${PYTHON_INCLUDE_DIRS} )
 
-	find_package( Boost COMPONENTS python REQUIRED )
-	include_directories( ${Boost_INCLUDE_DIR} )
+  find_package( Boost COMPONENTS python REQUIRED )
+  include_directories(SYSTEM ${Boost_INCLUDE_DIR} )
 
 ENDIF(BUILD_PYTHON_INTERFACE)
 
@@ -54,8 +53,8 @@ else()
 endif()
 
 IF(CLP_FOUND)
-    ADD_DEFINITIONS(-DCLP_FOUND)
-    INCLUDE_DIRECTORIES(SYSTEM "${CLP_INCLUDE_DIR}")
+  ADD_DEFINITIONS(-DCLP_FOUND)
+  INCLUDE_DIRECTORIES(SYSTEM "${CLP_INCLUDE_DIR}")
 ENDIF()
 
 
@@ -63,7 +62,7 @@ ADD_SUBDIRECTORY (include/${CUSTOM_HEADER_DIR})
 add_subdirectory (src)
 add_subdirectory (test)
 IF(BUILD_PYTHON_INTERFACE)
-	add_subdirectory (python)
+  add_subdirectory (python)
 ENDIF(BUILD_PYTHON_INTERFACE)
 
 SETUP_HPP_PROJECT_FINALIZE()
