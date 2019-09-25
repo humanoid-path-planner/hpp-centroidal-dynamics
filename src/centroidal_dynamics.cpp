@@ -325,7 +325,7 @@ LP_status Equilibrium::computeEquilibriumRobustness(Cref_vector3 com, Cref_vecto
 }
 
 LP_status Equilibrium::checkRobustEquilibrium(Cref_vector3 com, bool& equilibrium, double e_max) {
-  checkRobustEquilibrium(com, zero_acc, equilibrium, e_max);
+  return checkRobustEquilibrium(com, zero_acc, equilibrium, e_max);
 }
 
 LP_status Equilibrium::checkRobustEquilibrium(Cref_vector3 com, Cref_vector3 acc, bool& equilibrium, double e_max) {
