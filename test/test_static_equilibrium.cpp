@@ -42,7 +42,7 @@ int test_computeEquilibriumRobustness_vs_checkEquilibrium(Equilibrium* solver_1,
   bool equilibrium;
   for (unsigned int i = 0; i < comPositions.rows(); i++) {
     if (!PERF_STRING_1.empty()) getProfiler().start(PERF_STRING_1);
-    status = solver_1->computeEquilibriumRobustness(comPositions.row(i), rob);
+    status = solver_1->computeEquilibriumRobustness(comPositions.row(i).transpose(), rob);
     if (!PERF_STRING_1.empty()) getProfiler().stop(PERF_STRING_1);
 
     if (status != LP_STATUS_OPTIMAL) {
@@ -54,7 +54,7 @@ int test_computeEquilibriumRobustness_vs_checkEquilibrium(Equilibrium* solver_1,
     }
 
     if (!PERF_STRING_2.empty()) getProfiler().start(PERF_STRING_2);
-    status = solver_2->checkRobustEquilibrium(comPositions.row(i), equilibrium);
+    status = solver_2->checkRobustEquilibrium(comPositions.row(i).transpose(), equilibrium);
     if (!PERF_STRING_2.empty()) getProfiler().stop(PERF_STRING_2);
 
     if (status != LP_STATUS_OPTIMAL) {
@@ -99,7 +99,7 @@ int test_computeEquilibriumRobustness(Equilibrium* solver_1, Equilibrium* solver
   LP_status status;
   for (unsigned int i = 0; i < comPositions.rows(); i++) {
     getProfiler().start(PERF_STRING_1);
-    status = solver_1->computeEquilibriumRobustness(comPositions.row(i), rob_1);
+    status = solver_1->computeEquilibriumRobustness(comPositions.row(i).transpose(), rob_1);
     getProfiler().stop(PERF_STRING_1);
 
     if (status != LP_STATUS_OPTIMAL) {
@@ -111,7 +111,7 @@ int test_computeEquilibriumRobustness(Equilibrium* solver_1, Equilibrium* solver
     }
 
     getProfiler().start(PERF_STRING_2);
-    status = solver_2->computeEquilibriumRobustness(comPositions.row(i), rob_2);
+    status = solver_2->computeEquilibriumRobustness(comPositions.row(i).transpose(), rob_2);
     getProfiler().stop(PERF_STRING_2);
 
     if (status != LP_STATUS_OPTIMAL) {
@@ -257,7 +257,7 @@ void drawRobustnessGrid(int N_CONTACTS, int GRID_SIZE, Equilibrium* solver, Cref
   double rob;
   LP_status status;
   for (unsigned int i = 0; i < comPositions.rows(); i++) {
-    status = solver->computeEquilibriumRobustness(comPositions.row(i), rob);
+    status = solver->computeEquilibriumRobustness(comPositions.row(i).transpose(), rob);
     if (status != LP_STATUS_OPTIMAL) {
       SEND_ERROR_MSG("Faild to compute equilibrium robustness of com position " + toString(comPositions.row(i)) +
                      ", error code " + toString(status));
@@ -296,8 +296,8 @@ void generateContacts(unsigned int N_CONTACTS, double MIN_CONTACT_DISTANCE, doub
 
     //     generate contact orientation
     uniform(RPY_LOWER_BOUNDS, RPY_UPPER_BOUNDS, contact_rpy.row(i));
-    generate_rectangle_contacts(LX, LY, contact_pos.row(i), contact_rpy.row(i), p.middleRows<4>(i * 4),
-                                N.middleRows<4>(i * 4));
+    generate_rectangle_contacts(LX, LY, contact_pos.row(i).transpose(), contact_rpy.row(i).transpose(),
+                                p.middleRows<4>(i * 4), N.middleRows<4>(i * 4));
     //    printf("Contact surface %d position (%.3f,%.3f,%.3f) ", i, contact_pos(i,0), contact_pos(i,1),
     //    contact_pos(i,2)); printf("Orientation (%.3f,%.3f,%.3f)\n", contact_rpy(i,0), contact_rpy(i,1),
     //    contact_rpy(i,2));
