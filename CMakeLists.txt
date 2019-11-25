@@ -1,19 +1,19 @@
-cmake_minimum_required(VERSION 2.6)
-
-INCLUDE(cmake/base.cmake)
-INCLUDE(cmake/test.cmake)
-INCLUDE(cmake/python.cmake)
-INCLUDE(cmake/hpp.cmake)
-INCLUDE(cmake/boost.cmake)
+cmake_minimum_required(VERSION 3.0)
 
 SET(PROJECT_NAME hpp-centroidal-dynamics)
 SET(PROJECT_DESCRIPTION
   "Utility classes for testing (robust) equilibrium of a system in contact with the environment, and other centroidal dynamics methods."
   )
 
+INCLUDE(cmake/hpp.cmake)
+INCLUDE(cmake/test.cmake)
+INCLUDE(cmake/python.cmake)
+INCLUDE(cmake/boost.cmake)
+
 SET(CUSTOM_HEADER_DIR "hpp/centroidal-dynamics")
 
-SETUP_HPP_PROJECT()
+COMPUTE_PROJECT_ARGS(PROJECT_ARGS LANGUAGES CXX)
+PROJECT(${PROJECT_NAME} ${PROJECT_ARGS})
 
 # Inhibit all warning messages.
 #set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -w")
@@ -65,5 +65,3 @@ add_subdirectory (test)
 IF(BUILD_PYTHON_INTERFACE)
   add_subdirectory (python)
 ENDIF(BUILD_PYTHON_INTERFACE)
-
-SETUP_HPP_PROJECT_FINALIZE()
