@@ -1,40 +1,38 @@
-cmake_minimum_required(VERSION 3.0)
+CMAKE_MINIMUM_REQUIRED(VERSION 3.1)
 
+# Project properties
 SET(PROJECT_NAME hpp-centroidal-dynamics)
 SET(PROJECT_DESCRIPTION
   "Utility classes for testing (robust) equilibrium of a system in contact with the environment, and other centroidal dynamics methods."
   )
 
+# Project options
+OPTION(BUILD_PYTHON_INTERFACE "Build the python bindings" ON)
+
+# Project configuration
+SET(PROJECT_USE_CMAKE_EXPORT TRUE)
+SET(CUSTOM_HEADER_DIR "hpp/centroidal-dynamics")
+SET(CXX_DISABLE_WERROR TRUE)
+
+# JRL-cmakemodule setup
 INCLUDE(cmake/hpp.cmake)
-INCLUDE(cmake/test.cmake)
 INCLUDE(cmake/python.cmake)
 INCLUDE(cmake/boost.cmake)
 
-SET(CUSTOM_HEADER_DIR "hpp/centroidal-dynamics")
-
+# Project definition
 COMPUTE_PROJECT_ARGS(PROJECT_ARGS LANGUAGES CXX)
 PROJECT(${PROJECT_NAME} ${PROJECT_ARGS})
 
-# Inhibit all warning messages.
-#set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -w")
-
-# remove flag that makes all warnings into errors
-string (REPLACE "-Werror" "" CMAKE_CXX_FLAGS ${CMAKE_CXX_FLAGS})
-MESSAGE( STATUS "CMAKE_CXX_FLAGS: " ${CMAKE_CXX_FLAGS} )
-
-OPTION (BUILD_PYTHON_INTERFACE "Build the python binding" ON)
 IF(BUILD_PYTHON_INTERFACE)
-  # search for python
   FINDPYTHON()
-  include_directories(SYSTEM ${PYTHON_INCLUDE_DIRS} )
-
+  STRING(REGEX REPLACE "-" "_" PY_NAME ${PROJECT_NAME})
+  ADD_PROJECT_DEPENDENCY(eigenpy REQUIRED)
   SET(BOOST_COMPONENTS python)
   SEARCH_FOR_BOOST()
-  include_directories(SYSTEM ${Boost_INCLUDE_DIR} )
 ENDIF(BUILD_PYTHON_INTERFACE)
 
-ADD_REQUIRED_DEPENDENCY("eigen3")
-INCLUDE_DIRECTORIES(${EIGEN3_INCLUDE_DIR})
+# Project dependencies
+ADD_PROJECT_DEPENDENCY(Eigen3 REQUIRED PKG_CONFIG_REQUIRES eigen3)
 
 set(CMAKE_MODULE_PATH
   ${PROJECT_SOURCE_DIR}/cmake/find-external/CDD
@@ -47,21 +45,50 @@ find_package(qpOASES REQUIRED)
 find_package(CLP)
 
 IF("${CLP_LIBRARY}" STREQUAL "CLP_LIBRARY-NOTFOUND")
-  message(STATUS "CLP_LIBRARY equal to CLP_LIBRARY-NOTFOUND so I assume CLP was not found ")
-else()
+  MESSAGE(STATUS "CLP_LIBRARY equal to CLP_LIBRARY-NOTFOUND so I assume CLP was not found ")
+ELSE()
   message(STATUS "CLP library found, defining macro CLP_FOUND")
   add_definitions(-DCLP_FOUND)
-endif()
-
-IF(CLP_FOUND)
-  ADD_DEFINITIONS(-DCLP_FOUND)
-  INCLUDE_DIRECTORIES(SYSTEM "${CLP_INCLUDE_DIR}")
 ENDIF()
 
+# Main Library
+SET(${PROJECT_NAME}_HEADERS
+  include/${CUSTOM_HEADER_DIR}/local_config.hh
+  include/${CUSTOM_HEADER_DIR}/util.hh
+  include/${CUSTOM_HEADER_DIR}/logger.hh
+  include/${CUSTOM_HEADER_DIR}/solver_LP_abstract.hh
+  include/${CUSTOM_HEADER_DIR}/solver_LP_qpoases.hh
+  include/${CUSTOM_HEADER_DIR}/solver_LP_clp.hh
+  include/${CUSTOM_HEADER_DIR}/centroidal_dynamics.hh
+  include/${CUSTOM_HEADER_DIR}/stop-watch.hh
+  )
 
-ADD_SUBDIRECTORY (include/${CUSTOM_HEADER_DIR})
-add_subdirectory (src)
-add_subdirectory (test)
+SET(${PROJECT_NAME}_SOURCES
+  src/centroidal_dynamics.cpp
+  src/solver_LP_abstract.cpp
+  src/solver_LP_qpoases.cpp
+  src/solver_LP_clp.cpp
+  src/util.cpp
+  src/logger.cpp
+  src/stop-watch.cpp
+  )
+
+ADD_LIBRARY(${PROJECT_NAME} SHARED
+  ${${PROJECT_NAME}_SOURCES} ${${PROJECT_NAME}_HEADERS})
+TARGET_INCLUDE_DIRECTORIES(${PROJECT_NAME} PUBLIC $<INSTALL_INTERFACE:include>)
+TARGET_INCLUDE_DIRECTORIES(${PROJECT_NAME} SYSTEM PUBLIC
+    ${EIGEN3_INCLUDE_DIR} ${CDD_INCLUDE_DIRS} ${qpOASES_INCLUDE_DIRS})
+TARGET_LINK_LIBRARIES(${PROJECT_NAME} ${CDD_LIBRARIES} ${qpOASES_LIBRARY})
+
+IF(CLP_FOUND)
+  TARGET_INCLUDE_DIRECTORIES(${PROJECT_NAME} SYSTEM "${CLP_INCLUDE_DIR}")
+  TARGET_LINK_LIBRARIES(${PROJECT_NAME} ${CLP_LIBRARIES}
+    /usr/lib/libCoinUtils.so)
+ENDIF(CLP_FOUND)
+
+INSTALL(TARGETS ${PROJECT_NAME} EXPORT ${TARGETS_EXPORT_NAME} DESTINATION lib)
+
+ADD_SUBDIRECTORY(test)
 IF(BUILD_PYTHON_INTERFACE)
-  add_subdirectory (python)
+  ADD_SUBDIRECTORY(python)
 ENDIF(BUILD_PYTHON_INTERFACE)
