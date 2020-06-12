@@ -51,6 +51,8 @@ class CENTROIDAL_DYNAMICS_DLLAPI Solver_LP_abstract {
     m_useWarmStart = true;
   }
 
+  virtual ~Solver_LP_abstract() {};
+
   /**
    * @brief Create a new LP solver of the specified type.
    * @param solverType Type of LP solver.
