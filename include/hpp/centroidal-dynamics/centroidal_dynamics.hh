@@ -97,7 +97,7 @@ class CENTROIDAL_DYNAMICS_DLLAPI Equilibrium {
 
   Equilibrium(const Equilibrium& other);
 
-  ~Equilibrium() { delete m_solver };
+  ~Equilibrium();
 
   /**
    * @brief Returns the useWarmStart flag.

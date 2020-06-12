@@ -25,7 +25,7 @@ class CENTROIDAL_DYNAMICS_DLLAPI Solver_LP_qpoases : public Solver_LP_abstract {
  public:
   Solver_LP_qpoases();
 
-  virtual ~Solver_LP_qpoases() {};
+  virtual ~Solver_LP_qpoases() {}
 
   /** Solve the linear program
    *  minimize    c' x
