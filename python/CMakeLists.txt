@@ -1,5 +1,5 @@
 # Define the wrapper library that wraps our library
-ADD_LIBRARY(${PY_NAME} SHARED centroidal_dynamics_python)
+ADD_LIBRARY(${PY_NAME} SHARED centroidal_dynamics_python.cpp)
 TARGET_LINK_LIBRARIES(${PY_NAME} ${PROJECT_NAME} eigenpy::eigenpy)
 # don't prepend wrapper library name with lib
 SET_TARGET_PROPERTIES(${PY_NAME} PROPERTIES PREFIX "")
