@@ -1,7 +1,7 @@
 <?xml version='1.0'?>
 <package format='2'>
     <name>hpp-centroidal-dynamics</name>
-    <version>4.11.0</version>
+    <version>4.12.0</version>
     <description>Testing equilibrium of a system in contact with the environment</description>
 
     <maintainer email='guilhem.saurel@laas.fr'>Guilhem Saurel</maintainer>
