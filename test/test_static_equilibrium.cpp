@@ -275,7 +275,8 @@ void drawRobustnessGrid(int N_CONTACTS, int GRID_SIZE, Equilibrium* solver, Cref
 
 void generateContacts(unsigned int N_CONTACTS, double MIN_CONTACT_DISTANCE, double LX, double LY,
                       RVector3& CONTACT_POINT_LOWER_BOUNDS, RVector3& CONTACT_POINT_UPPER_BOUNDS,
-                      RVector3& RPY_LOWER_BOUNDS, RVector3& RPY_UPPER_BOUNDS, centroidal_dynamics::MatrixX3& p, centroidal_dynamics::MatrixX3& N) {
+                      RVector3& RPY_LOWER_BOUNDS, RVector3& RPY_UPPER_BOUNDS, centroidal_dynamics::MatrixX3& p,
+                      centroidal_dynamics::MatrixX3& N) {
   MatrixXX contact_pos = MatrixXX::Zero(N_CONTACTS, 3);
   MatrixXX contact_rpy = MatrixXX::Zero(N_CONTACTS, 3);
   p.setZero(4 * N_CONTACTS, 3);  // contact points

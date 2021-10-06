@@ -72,9 +72,7 @@ Equilibrium::Equilibrium(const string& name, const double mass, const unsigned i
   m_D.block<3, 3>(3, 0) = crossMatrix(-m_mass * m_gravity);
 }
 
-Equilibrium::~Equilibrium(){
-  delete m_solver;
-}
+Equilibrium::~Equilibrium() { delete m_solver; }
 
 bool Equilibrium::computeGenerators(Cref_matrixX3 contactPoints, Cref_matrixX3 contactNormals,
                                     double frictionCoefficient, const bool perturbate) {
