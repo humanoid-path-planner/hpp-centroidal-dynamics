@@ -213,9 +213,9 @@ void Stopwatch::report(string perf_name, int precision, std::ostream& output) {
 
   PerformanceData& perf_info = records_of->find(perf_name)->second;
 
-  const int MAX_NAME_LENGTH = 60;
+  const long unsigned int MAX_NAME_LENGTH = 60;
   string pad = "";
-  for (int i = perf_name.length(); i < MAX_NAME_LENGTH; i++) pad.append(" ");
+  for (long unsigned int i = perf_name.length(); i < MAX_NAME_LENGTH; i++) pad.append(" ");
 
   output << perf_name << pad;
   output << std::fixed << std::setprecision(precision) << (perf_info.min_time * 1e3) << "\t";

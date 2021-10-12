@@ -55,10 +55,10 @@ BOOST_PYTHON_MODULE(hpp_centroidal_dynamics) {
   /** BEGIN eigenpy init**/
   eigenpy::enableEigenPy();
 
-  eigenpy::enableEigenPySpecific<MatrixX3ColMajor, MatrixX3ColMajor>();
-  eigenpy::enableEigenPySpecific<MatrixXXColMajor, MatrixXXColMajor>();
-  eigenpy::enableEigenPySpecific<Vector3, Vector3>();
-  eigenpy::enableEigenPySpecific<VectorX, VectorX>();
+  // eigenpy::enableEigenPySpecific<MatrixX3ColMajor, MatrixX3ColMajor>();
+  // eigenpy::enableEigenPySpecific<MatrixXXColMajor, MatrixXXColMajor>();
+  // eigenpy::enableEigenPySpecific<Vector3, Vector3>();
+  // eigenpy::enableEigenPySpecific<VectorX, VectorX>();
   /*eigenpy::exposeAngleAxis();
   eigenpy::exposeQuaternion();*/
 
