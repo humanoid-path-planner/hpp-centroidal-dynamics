@@ -19,12 +19,12 @@ bool Equilibrium::m_is_cdd_initialized = false;
 Equilibrium::Equilibrium(const Equilibrium& other)
     : m_mass(other.m_mass),
       m_gravity(other.m_gravity),
+      m_G_centr(other.m_G_centr),
       m_name(other.m_name),
       m_algorithm(other.m_algorithm),
       m_solver_type(other.m_solver_type),
       m_solver(Solver_LP_abstract::getNewSolver(other.m_solver_type)),
       m_generatorsPerContact(other.m_generatorsPerContact),
-      m_G_centr(other.m_G_centr),
       m_H(other.m_H),
       m_h(other.m_h),
       m_is_cdd_stable(other.m_is_cdd_stable),
@@ -72,9 +72,7 @@ Equilibrium::Equilibrium(const string& name, const double mass, const unsigned i
   m_D.block<3, 3>(3, 0) = crossMatrix(-m_mass * m_gravity);
 }
 
-Equilibrium::~Equilibrium(){
-  delete m_solver;
-}
+Equilibrium::~Equilibrium() { delete m_solver; }
 
 bool Equilibrium::computeGenerators(Cref_matrixX3 contactPoints, Cref_matrixX3 contactNormals,
                                     double frictionCoefficient, const bool perturbate) {
@@ -120,7 +118,7 @@ bool Equilibrium::computeGenerators(Cref_matrixX3 contactPoints, Cref_matrixX3 c
 
     // compute generators
     theta = pi_4;
-    for (int j = 0; j < cg; j++) {
+    for (unsigned int j = 0; j < cg; j++) {
       G.col(j) = frictionCoefficient * sin(theta) * T1 + frictionCoefficient * cos(theta) * T2 +
                  contactNormals.row(i).transpose();
       G.col(j).normalize();
@@ -134,7 +132,7 @@ bool Equilibrium::computeGenerators(Cref_matrixX3 contactPoints, Cref_matrixX3 c
 
   // Compute the coefficient to convert b0 to e_max
   Vector3 f0 = Vector3::Zero();
-  for (int j = 0; j < cg; j++) f0 += G.col(j);  // sum of the contact generators
+  for (unsigned int j = 0; j < cg; j++) f0 += G.col(j);  // sum of the contact generators
   // Compute the distance between the friction cone boundaries and
   // the sum of the contact generators, which is e_max when b0=1.
   // When b0!=1 we just multiply b0 times this value.
@@ -186,7 +184,7 @@ bool Equilibrium::setNewContacts(const MatrixX3& contactPoints, const MatrixX3& 
       attempts--;
     }
     // resetting random because obviously libcdd always resets to 0
-    srand(time(NULL));
+    srand((unsigned int)time(NULL));
     if (!m_is_cdd_stable) {
       return false;
     }
@@ -503,7 +501,7 @@ LP_status Equilibrium::findExtremumOverLine(Cref_vector3 a, Cref_vector3 a0, dou
   return LP_STATUS_ERROR;
 }
 
-LP_status Equilibrium::findExtremumInDirection(Cref_vector3 direction, Ref_vector3 com, double e_max) {
+LP_status Equilibrium::findExtremumInDirection(Cref_vector3 /*direction*/, Ref_vector3 /*com*/, double /*e_max*/) {
   if (m_G_centr.cols() == 0) return LP_STATUS_INFEASIBLE;
   SEND_ERROR_MSG("findExtremumInDirection not implemented yet");
   return LP_STATUS_ERROR;
