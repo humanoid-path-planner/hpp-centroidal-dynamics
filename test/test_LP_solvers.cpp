@@ -6,10 +6,10 @@
 #ifdef CLP_FOUND
 #include <hpp/centroidal-dynamics/solver_LP_clp.hh>
 
-#include "ClpSimplex.hpp"
-#include "CoinBuild.hpp"
-#include "CoinModel.hpp"
-#include "CoinTime.hpp"
+#include "coin/ClpSimplex.hpp"
+#include "coin/CoinBuild.hpp"
+#include "coin/CoinModel.hpp"
+#include "coin/CoinTime.hpp"
 #endif
 
 #include <hpp/centroidal-dynamics/logger.hh>
@@ -348,7 +348,7 @@ void test_small_LP() {
   double row2Value[] = {1.0, -5.0, 1.0};
   model.addRow(3, row2Index, row2Value, 1.0, 1.0);
 
-  int n = model.getdimVarXs();
+  int n = model.getNumCols();
   int m = model.getNumRows();
   cout << "Problem has " << n << " variables and " << m << " constraints.\n";
 

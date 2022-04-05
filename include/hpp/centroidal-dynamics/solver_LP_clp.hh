@@ -12,7 +12,7 @@
 #include <hpp/centroidal-dynamics/solver_LP_abstract.hh>
 #include <hpp/centroidal-dynamics/util.hh>
 
-#include "ClpSimplex.hpp"
+#include "coin/ClpSimplex.hpp"
 
 namespace centroidal_dynamics {
 

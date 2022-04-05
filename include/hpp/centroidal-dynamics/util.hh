@@ -13,10 +13,9 @@
 #include <fstream>
 #include <iostream>
 
-#include "cdd.h"
-#include "cddmp.h"
-#include "cddtypes.h"
 #include "setoper.h"
+// cdd.h needs to be included after setoper.h
+#include "cdd.h"
 
 namespace centroidal_dynamics {
 

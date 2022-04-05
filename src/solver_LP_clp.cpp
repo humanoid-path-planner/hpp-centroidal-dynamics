@@ -7,7 +7,7 @@
 
 #include <hpp/centroidal-dynamics/solver_LP_clp.hh>
 
-#include "CoinBuild.hpp"
+#include "coin/CoinBuild.hpp"
 
 namespace centroidal_dynamics {
 
