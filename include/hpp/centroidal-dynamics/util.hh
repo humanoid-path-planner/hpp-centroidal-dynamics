@@ -5,9 +5,10 @@
 #ifndef HPP_CENTROIDAL_DYNAMICS_UTIL_HH
 #define HPP_CENTROIDAL_DYNAMICS_UTIL_HH
 
+#include <Eigen/Dense>
+// Macros.h needs to be included after Dense
 #include <Eigen/src/Core/util/Macros.h>
 
-#include <Eigen/Dense>
 #include <cassert>
 #include <cmath>
 #include <fstream>
