@@ -3,8 +3,8 @@
  * Author: Andrea Del Prete
  */
 
-#include <hpp/centroidal-dynamics/solver_LP_qpoases.hh>
 #include <hpp/centroidal-dynamics/logger.hh>
+#include <hpp/centroidal-dynamics/solver_LP_qpoases.hh>
 
 USING_NAMESPACE_QPOASES
 
@@ -19,8 +19,10 @@ Solver_LP_qpoases::Solver_LP_qpoases() : Solver_LP_abstract() {
   m_options.enableEqualities = BT_TRUE;
 }
 
-LP_status Solver_LP_qpoases::solve(Cref_vectorX c, Cref_vectorX lb, Cref_vectorX ub, Cref_matrixXX A, Cref_vectorX Alb,
-                                   Cref_vectorX Aub, Ref_vectorX sol) {
+LP_status Solver_LP_qpoases::solve(Cref_vectorX c, Cref_vectorX lb,
+                                   Cref_vectorX ub, Cref_matrixXX A,
+                                   Cref_vectorX Alb, Cref_vectorX Aub,
+                                   Ref_vectorX sol) {
   int n = (int)c.size();  // number of variables
   int m = (int)A.rows();  // number of constraints
   assert(lb.size() == n);
@@ -40,13 +42,14 @@ LP_status Solver_LP_qpoases::solve(Cref_vectorX c, Cref_vectorX lb, Cref_vectorX
   }
 
   if (!m_useWarmStart || !m_init_succeeded) {
-    m_status =
-        m_solver.init(NULL, c.data(), A.data(), lb.data(), ub.data(), Alb.data(), Aub.data(), iters, &solutionTime);
+    m_status = m_solver.init(NULL, c.data(), A.data(), lb.data(), ub.data(),
+                             Alb.data(), Aub.data(), iters, &solutionTime);
     if (m_status == SUCCESSFUL_RETURN) m_init_succeeded = true;
   } else {
     // this doesn't work if I pass NULL instead of m_H.data()
-    m_status = m_solver.hotstart(m_H.data(), c.data(), A.data(), lb.data(), ub.data(), Alb.data(), Aub.data(), iters,
-                                 &solutionTime);
+    m_status =
+        m_solver.hotstart(m_H.data(), c.data(), A.data(), lb.data(), ub.data(),
+                          Alb.data(), Aub.data(), iters, &solutionTime);
     if (m_status != SUCCESSFUL_RETURN) m_init_succeeded = false;
   }
 

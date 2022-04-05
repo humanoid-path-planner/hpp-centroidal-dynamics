@@ -4,19 +4,19 @@
  */
 
 #ifdef CLP_FOUND
+#include <hpp/centroidal-dynamics/solver_LP_clp.hh>
+
 #include "ClpSimplex.hpp"
-#include "CoinTime.hpp"
 #include "CoinBuild.hpp"
 #include "CoinModel.hpp"
-#include <hpp/centroidal-dynamics/solver_LP_clp.hh>
+#include "CoinTime.hpp"
 #endif
 
-#include <qpOASES.hpp>
-#include <hpp/centroidal-dynamics/solver_LP_qpoases.hh>
 #include <hpp/centroidal-dynamics/logger.hh>
-
-#include <iostream>
+#include <hpp/centroidal-dynamics/solver_LP_qpoases.hh>
 #include <iomanip>
+#include <iostream>
+#include <qpOASES.hpp>
 
 using namespace std;
 using namespace centroidal_dynamics;
@@ -44,7 +44,8 @@ void test_addRows() {
     int i;
     // Virtuous way
     // First objective
-    for (i = 0; i < 2; i++) model.setObjectiveCoefficient(objIndex[i], objValue[i]);
+    for (i = 0; i < 2; i++)
+      model.setObjectiveCoefficient(objIndex[i], objValue[i]);
     // Now bounds (lower will be zero by default but do again)
     for (i = 0; i < 3; i++) {
       model.setColumnLower(i, 0.0);
@@ -94,7 +95,8 @@ void test_addRows() {
       buildObject.addRow(3, row2Index, row2Value, 1.0, 1.0);
     }
     model.addRows(buildObject);
-    printf("Time for 10000 addRow using CoinBuild is %g\n", CoinCpuTime() - time1);
+    printf("Time for 10000 addRow using CoinBuild is %g\n",
+           CoinCpuTime() - time1);
     model.dual();
     model = modelSave;
     int del[] = {0, 1, 2};
@@ -108,7 +110,8 @@ void test_addRows() {
       buildObject2.addRow(3, row2Index, row2Value, 1.0, 1.0);
     }
     model.addRows(buildObject2, true);
-    printf("Time for 10000 addRow using CoinBuild+-1 is %g\n", CoinCpuTime() - time1);
+    printf("Time for 10000 addRow using CoinBuild+-1 is %g\n",
+           CoinCpuTime() - time1);
     model.dual();
     model = modelSave;
     model.deleteRows(2, del);
@@ -121,7 +124,8 @@ void test_addRows() {
       modelObject2.addRow(3, row2Index, row2Value, 1.0, 1.0);
     }
     model.addRows(modelObject2, true);
-    printf("Time for 10000 addRow using CoinModel+-1 is %g\n", CoinCpuTime() - time1);
+    printf("Time for 10000 addRow using CoinModel+-1 is %g\n",
+           CoinCpuTime() - time1);
     model.dual();
     model = ClpSimplex();
     // Now use build +-1
@@ -133,7 +137,8 @@ void test_addRows() {
       modelObject3.addRow(3, row2Index, row2Value, 1.0, 1.0);
     }
     model.loadProblem(modelObject3, true);
-    printf("Time for 10000 addRow using CoinModel load +-1 is %g\n", CoinCpuTime() - time1);
+    printf("Time for 10000 addRow using CoinModel load +-1 is %g\n",
+           CoinCpuTime() - time1);
     model.writeMps("xx.mps");
     model.dual();
     model = modelSave;
@@ -146,7 +151,8 @@ void test_addRows() {
       modelObject.addRow(3, row2Index, row2Value, 1.0, 1.0);
     }
     model.addRows(modelObject);
-    printf("Time for 10000 addRow using CoinModel is %g\n", CoinCpuTime() - time1);
+    printf("Time for 10000 addRow using CoinModel is %g\n",
+           CoinCpuTime() - time1);
     model.dual();
     model.writeMps("b.mps");
     // Method using least memory - but most complicated
@@ -200,10 +206,12 @@ void test_addRows() {
       starts[numberColumns] = put;
       // assign to matrix
       CoinPackedMatrix *matrix = new CoinPackedMatrix(true, 0.0, 0.0);
-      matrix->assignMatrix(true, numberRows, numberColumns, numberElements, elements, rows, starts, lengths);
+      matrix->assignMatrix(true, numberRows, numberColumns, numberElements,
+                           elements, rows, starts, lengths);
       ClpPackedMatrix *clpMatrix = new ClpPackedMatrix(matrix);
       model2.replaceMatrix(clpMatrix, true);
-      printf("Time for 10000 addRow using hand written code is %g\n", CoinCpuTime() - time1);
+      printf("Time for 10000 addRow using hand written code is %g\n",
+             CoinCpuTime() - time1);
       // If matrix is really big could switch off creation of row copy
       // model2.setSpecialOptions(256);
     }
@@ -225,42 +233,55 @@ void test_addRows() {
 
     int iColumn;
 
-    std::cout << "               Primal          Dual         Lower         Upper          Cost" << std::endl;
+    std::cout << "               Primal          Dual         Lower         "
+                 "Upper          Cost"
+              << std::endl;
 
     for (iColumn = 0; iColumn < numberColumns; iColumn++) {
       double value;
       std::cout << std::setw(6) << iColumn << " ";
       value = columnPrimal[iColumn];
       if (fabs(value) < 1.0e5)
-        std::cout << setiosflags(std::ios::fixed | std::ios::showpoint) << std::setw(14) << value;
+        std::cout << setiosflags(std::ios::fixed | std::ios::showpoint)
+                  << std::setw(14) << value;
       else
-        std::cout << setiosflags(std::ios::scientific) << std::setw(14) << value;
+        std::cout << setiosflags(std::ios::scientific) << std::setw(14)
+                  << value;
       value = columnDual[iColumn];
       if (fabs(value) < 1.0e5)
-        std::cout << setiosflags(std::ios::fixed | std::ios::showpoint) << std::setw(14) << value;
+        std::cout << setiosflags(std::ios::fixed | std::ios::showpoint)
+                  << std::setw(14) << value;
       else
-        std::cout << setiosflags(std::ios::scientific) << std::setw(14) << value;
+        std::cout << setiosflags(std::ios::scientific) << std::setw(14)
+                  << value;
       value = columnLower[iColumn];
       if (fabs(value) < 1.0e5)
-        std::cout << setiosflags(std::ios::fixed | std::ios::showpoint) << std::setw(14) << value;
+        std::cout << setiosflags(std::ios::fixed | std::ios::showpoint)
+                  << std::setw(14) << value;
       else
-        std::cout << setiosflags(std::ios::scientific) << std::setw(14) << value;
+        std::cout << setiosflags(std::ios::scientific) << std::setw(14)
+                  << value;
       value = columnUpper[iColumn];
       if (fabs(value) < 1.0e5)
-        std::cout << setiosflags(std::ios::fixed | std::ios::showpoint) << std::setw(14) << value;
+        std::cout << setiosflags(std::ios::fixed | std::ios::showpoint)
+                  << std::setw(14) << value;
       else
-        std::cout << setiosflags(std::ios::scientific) << std::setw(14) << value;
+        std::cout << setiosflags(std::ios::scientific) << std::setw(14)
+                  << value;
       value = columnObjective[iColumn];
       if (fabs(value) < 1.0e5)
-        std::cout << setiosflags(std::ios::fixed | std::ios::showpoint) << std::setw(14) << value;
+        std::cout << setiosflags(std::ios::fixed | std::ios::showpoint)
+                  << std::setw(14) << value;
       else
-        std::cout << setiosflags(std::ios::scientific) << std::setw(14) << value;
+        std::cout << setiosflags(std::ios::scientific) << std::setw(14)
+                  << value;
 
       std::cout << std::endl;
     }
     std::cout << "--------------------------------------" << std::endl;
     // Test CoinAssert
-    std::cout << "If Clp compiled without NDEBUG below should give assert, if with NDEBUG or COIN_ASSERT CoinError"
+    std::cout << "If Clp compiled without NDEBUG below should give assert, if "
+                 "with NDEBUG or COIN_ASSERT CoinError"
               << std::endl;
     model = modelSave;
     model.deleteRows(2, del);
@@ -277,7 +298,8 @@ void test_addRows() {
     model.addRows(buildObject3, true);
   } catch (CoinError e) {
     e.print();
-    if (e.lineNumber() >= 0) std::cout << "This was from a CoinAssert" << std::endl;
+    if (e.lineNumber() >= 0)
+      std::cout << "This was from a CoinAssert" << std::endl;
   }
 }
 
@@ -304,7 +326,8 @@ void test_small_LP() {
   int i;
   // Virtuous way
   // First objective
-  for (i = 0; i < 2; i++) model.setObjectiveCoefficient(objIndex[i], objValue[i]);
+  for (i = 0; i < 2; i++)
+    model.setObjectiveCoefficient(objIndex[i], objValue[i]);
   // Now bounds (lower will be zero by default but do again)
   for (i = 0; i < 3; i++) {
     model.setColumnLower(i, 0.0);
@@ -336,8 +359,9 @@ void test_small_LP() {
   if (model.isProvenOptimal()) {
     cout << "Found optimal solution!" << endl;
     cout << "Objective value is " << model.getObjValue() << endl;
-    cout << "Model status is " << model.status() << " after " << model.numberIterations()
-         << " iterations - objective is " << model.objectiveValue() << endl;
+    cout << "Model status is " << model.status() << " after "
+         << model.numberIterations() << " iterations - objective is "
+         << model.objectiveValue() << endl;
     const double *solution;
     solution = model.getColSolution();
     // We could then print the solution or examine it.
@@ -375,12 +399,14 @@ int main() {
     if (res == 0)
       cout << "[INFO] LP solved correctly\n";
     else
-      cout << "[ERROR] QpOases could not solve the LP problem, error code: " << res << endl;
+      cout << "[ERROR] QpOases could not solve the LP problem, error code: "
+           << res << endl;
   }
 
   {
     cout << "\nTEST READ-WRITE METHODS OF SOLVER_LP_ABSTRACT\n";
-    Solver_LP_abstract *solverOases = Solver_LP_abstract::getNewSolver(SOLVER_LP_QPOASES);
+    Solver_LP_abstract *solverOases =
+        Solver_LP_abstract::getNewSolver(SOLVER_LP_QPOASES);
     const int n = 3;
     const int m = 4;
     const char *filename = "small_3_x_4_LP.dat";
@@ -407,47 +433,64 @@ int main() {
     cout << "Check lower bound vector lb: " << lb.isApprox(lb2) << endl;
     cout << "Check upper bound vector ub: " << ub.isApprox(ub2) << endl;
     cout << "Check constraint matrix A: " << A.isApprox(A2) << endl;
-    cout << "Check constraint lower bound vector Alb: " << Alb.isApprox(Alb2) << endl;
-    cout << "Check constraint upper bound vector Aub: " << Aub.isApprox(Aub2) << endl;
+    cout << "Check constraint lower bound vector Alb: " << Alb.isApprox(Alb2)
+         << endl;
+    cout << "Check constraint upper bound vector Aub: " << Aub.isApprox(Aub2)
+         << endl;
   }
 
   {
     cout << "\nTEST QP OASES ON SOME LP PROBLEMS\n";
     string file_path = "../test_data/";
-    Solver_LP_abstract *solverOases = Solver_LP_abstract::getNewSolver(SOLVER_LP_QPOASES);
+    Solver_LP_abstract *solverOases =
+        Solver_LP_abstract::getNewSolver(SOLVER_LP_QPOASES);
     const int PROBLEM_NUMBER = 14;
     string problem_filenames[PROBLEM_NUMBER] = {
-        "DLP_findExtremumOverLine20151103_112611",     "DLP_findExtremumOverLine20151103_115627",
-        "DLP_findExtremumOverLine20151103_014022",     "DLP_findExtremumOverLine_32_generators",
-        "DLP_findExtremumOverLine_64_generators",      "DLP_findExtremumOverLine_128_generators",
-        "DLP_findExtremumOverLine_128_generators_bis", "LP_findExtremumOverLine20151103_112610",
-        "LP_findExtremumOverLine20151103_112611",      "LP_findExtremumOverLine20151103_014022",
-        "LP_findExtremumOverLine_32_generators",       "LP_findExtremumOverLine_64_generators",
-        "LP_findExtremumOverLine_128_generators",      "LP_findExtremumOverLine_128_generators_bis"};
+        "DLP_findExtremumOverLine20151103_112611",
+        "DLP_findExtremumOverLine20151103_115627",
+        "DLP_findExtremumOverLine20151103_014022",
+        "DLP_findExtremumOverLine_32_generators",
+        "DLP_findExtremumOverLine_64_generators",
+        "DLP_findExtremumOverLine_128_generators",
+        "DLP_findExtremumOverLine_128_generators_bis",
+        "LP_findExtremumOverLine20151103_112610",
+        "LP_findExtremumOverLine20151103_112611",
+        "LP_findExtremumOverLine20151103_014022",
+        "LP_findExtremumOverLine_32_generators",
+        "LP_findExtremumOverLine_64_generators",
+        "LP_findExtremumOverLine_128_generators",
+        "LP_findExtremumOverLine_128_generators_bis"};
     VectorX c, lb, ub, Alb, Aub, realSol, sol;
     MatrixXX A;
     for (int i = 0; i < PROBLEM_NUMBER; i++) {
       string &problem_filename = problem_filenames[i];
-      if (!solverOases->readLpFromFile(file_path + problem_filename + ".dat", c, lb, ub, A, Alb, Aub)) {
+      if (!solverOases->readLpFromFile(file_path + problem_filename + ".dat", c,
+                                       lb, ub, A, Alb, Aub)) {
         SEND_ERROR_MSG("Error while reading LP from file " + problem_filename);
         return -1;
       }
       string solution_filename = problem_filename + "_solution";
-      if (!readMatrixFromFile(file_path + solution_filename + ".dat", realSol)) {
-        SEND_ERROR_MSG("Error while reading LP solution from file " + solution_filename);
+      if (!readMatrixFromFile(file_path + solution_filename + ".dat",
+                              realSol)) {
+        SEND_ERROR_MSG("Error while reading LP solution from file " +
+                       solution_filename);
         // return -1;
       }
       sol.resize(c.size());
       solverOases->solve(c, lb, ub, A, Alb, Aub, sol);
       if (sol.isApprox(realSol, EPS)) {
-        cout << "[INFO] Solution of problem " << problem_filename << " (" << c.size() << " var, " << A.rows()
+        cout << "[INFO] Solution of problem " << problem_filename << " ("
+             << c.size() << " var, " << A.rows()
              << " constr) is equal to the expected value!\n";
       } else {
         if (fabs(c.dot(sol) - c.dot(realSol)) < EPS)
-          cout << "[WARNING] Solution of problem " << problem_filename << " (" << c.size() << " var, " << A.rows()
-               << " constr) is different from expected but it has the same cost\n";
+          cout << "[WARNING] Solution of problem " << problem_filename << " ("
+               << c.size() << " var, " << A.rows()
+               << " constr) is different from expected but it has the same "
+                  "cost\n";
         else {
-          cout << "[ERROR] Solution of problem " << problem_filename << " (" << c.size() << " var, " << A.rows()
+          cout << "[ERROR] Solution of problem " << problem_filename << " ("
+               << c.size() << " var, " << A.rows()
                << " constr) is different from the expected value:\n";
           cout << "\tSolution found    " << sol.transpose() << endl;
           cout << "\tExpected solution " << realSol.transpose() << endl;

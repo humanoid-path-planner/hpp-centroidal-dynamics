@@ -10,10 +10,11 @@
 /* --- INCLUDE --------------------------------------------------------- */
 /* --------------------------------------------------------------------- */
 
-#include <hpp/centroidal-dynamics/local_config.hh>
-#include <sstream>
 #include <Eigen/Dense>
+#include <hpp/centroidal-dynamics/local_config.hh>
 #include <map>
+#include <sstream>
+
 #include "boost/assign.hpp"
 
 namespace centroidal_dynamics {
@@ -43,7 +44,8 @@ namespace centroidal_dynamics {
 #define SEND_WARNING_MSG(msg) SEND_MSG(msg, MSG_TYPE_WARNING)
 #define SEND_ERROR_MSG(msg) SEND_MSG(msg, MSG_TYPE_ERROR)
 #define SEND_DEBUG_STREAM_MSG(msg)
-#define SEND_INFO_STREAM_MSG(msg) #define SEND_WARNING_STREAM_MSG(msg) SEND_MSG(msg, MSG_TYPE_WARNING_STREAM)
+#define SEND_INFO_STREAM_MSG(msg) \
+#define SEND_WARNING_STREAM_MSG(msg) SEND_MSG(msg, MSG_TYPE_WARNING_STREAM)
 #define SEND_ERROR_STREAM_MSG(msg) SEND_MSG(msg, MSG_TYPE_ERROR_STREAM)
 #endif
 
@@ -90,7 +92,8 @@ std::string toString(const T& v) {
 }
 
 template <typename T>
-std::string toString(const std::vector<T>& v, const std::string separator = ", ") {
+std::string toString(const std::vector<T>& v,
+                     const std::string separator = ", ") {
   std::stringstream ss;
   for (int i = 0; i < v.size() - 1; i++) ss << v[i] << separator;
   ss << v[v.size() - 1];
@@ -98,7 +101,8 @@ std::string toString(const std::vector<T>& v, const std::string separator = ", "
 }
 
 template <typename T, int n>
-std::string toString(const Eigen::MatrixBase<T>& v, const std::string separator = ", ") {
+std::string toString(const Eigen::MatrixBase<T>& v,
+                     const std::string separator = ", ") {
   if (v.rows() > v.cols()) return toString(v.transpose(), separator);
   std::stringstream ss;
   ss << v;
@@ -132,7 +136,8 @@ class CENTROIDAL_DYNAMICS_DLLAPI Logger {
    * the point where sendMsg is called so that streaming messages are
    * printed only every streamPrintPeriod iterations.
    */
-  void sendMsg(std::string msg, MsgType type, const char* file = "", int line = 0);
+  void sendMsg(std::string msg, MsgType type, const char* file = "",
+               int line = 0);
 
   /** Set the sampling time at which the method countdown()
    * is going to be called. */
@@ -145,26 +150,36 @@ class CENTROIDAL_DYNAMICS_DLLAPI Logger {
   void setVerbosity(LoggerVerbosity lv);
 
  protected:
-  LoggerVerbosity m_lv;        /// verbosity of the logger
-  double m_timeSample;         /// specify the period of call of the countdown method
+  LoggerVerbosity m_lv;  /// verbosity of the logger
+  double m_timeSample;   /// specify the period of call of the countdown method
   double m_streamPrintPeriod;  /// specify the time period of the stream prints
-  double m_printCountdown;     /// every time this is < 0 (i.e. every _streamPrintPeriod sec) print stuff
+  double m_printCountdown;     /// every time this is < 0 (i.e. every
+                               /// _streamPrintPeriod sec) print stuff
 
-  /** Pointer to the dynamic structure which holds the collection of streaming messages */
+  /** Pointer to the dynamic structure which holds the collection of streaming
+   * messages */
   std::map<std::string, double> m_stream_msg_counters;
 
   bool isStreamMsg(MsgType m) {
-    return m == MSG_TYPE_ERROR_STREAM || m == MSG_TYPE_DEBUG_STREAM || m == MSG_TYPE_INFO_STREAM ||
-           m == MSG_TYPE_WARNING_STREAM;
+    return m == MSG_TYPE_ERROR_STREAM || m == MSG_TYPE_DEBUG_STREAM ||
+           m == MSG_TYPE_INFO_STREAM || m == MSG_TYPE_WARNING_STREAM;
   }
 
-  bool isDebugMsg(MsgType m) { return m == MSG_TYPE_DEBUG_STREAM || m == MSG_TYPE_DEBUG; }
+  bool isDebugMsg(MsgType m) {
+    return m == MSG_TYPE_DEBUG_STREAM || m == MSG_TYPE_DEBUG;
+  }
 
-  bool isInfoMsg(MsgType m) { return m == MSG_TYPE_INFO_STREAM || m == MSG_TYPE_INFO; }
+  bool isInfoMsg(MsgType m) {
+    return m == MSG_TYPE_INFO_STREAM || m == MSG_TYPE_INFO;
+  }
 
-  bool isWarningMsg(MsgType m) { return m == MSG_TYPE_WARNING_STREAM || m == MSG_TYPE_WARNING; }
+  bool isWarningMsg(MsgType m) {
+    return m == MSG_TYPE_WARNING_STREAM || m == MSG_TYPE_WARNING;
+  }
 
-  bool isErrorMsg(MsgType m) { return m == MSG_TYPE_ERROR_STREAM || m == MSG_TYPE_ERROR; }
+  bool isErrorMsg(MsgType m) {
+    return m == MSG_TYPE_ERROR_STREAM || m == MSG_TYPE_ERROR;
+  }
 };
 
 /** Method to get the logger (singleton). */

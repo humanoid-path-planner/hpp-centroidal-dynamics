@@ -9,8 +9,9 @@
 #define CENTROIDAL_DYNAMICS_LIB_SOLVER_LP_CLP_HH
 
 #include <hpp/centroidal-dynamics/local_config.hh>
-#include <hpp/centroidal-dynamics/util.hh>
 #include <hpp/centroidal-dynamics/solver_LP_abstract.hh>
+#include <hpp/centroidal-dynamics/util.hh>
+
 #include "ClpSimplex.hpp"
 
 namespace centroidal_dynamics {
@@ -27,8 +28,9 @@ class CENTROIDAL_DYNAMICS_DLLAPI Solver_LP_clp : public Solver_LP_abstract {
    *  subject to  Alb <= A x <= Aub
    *              lb <= x <= ub
    */
-  virtual LP_status solve(Cref_vectorX c, Cref_vectorX lb, Cref_vectorX ub, Cref_matrixXX A, Cref_vectorX Alb,
-                          Cref_vectorX Aub, Ref_vectorX sol);
+  virtual LP_status solve(Cref_vectorX c, Cref_vectorX lb, Cref_vectorX ub,
+                          Cref_matrixXX A, Cref_vectorX Alb, Cref_vectorX Aub,
+                          Ref_vectorX sol);
 
   /** Get the status of the solver. */
   virtual LP_status getStatus();

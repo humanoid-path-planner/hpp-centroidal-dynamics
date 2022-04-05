@@ -1,44 +1,53 @@
+#include <boost/python.hpp>
+#include <eigenpy/eigenpy.hpp>
+#include <eigenpy/memory.hpp>
+
 #include "hpp/centroidal-dynamics/centroidal_dynamics.hh"
 #include "hpp/centroidal-dynamics/util.hh"
-
-#include <eigenpy/memory.hpp>
-#include <eigenpy/eigenpy.hpp>
-
-#include <boost/python.hpp>
 
 EIGENPY_DEFINE_STRUCT_ALLOCATOR_SPECIALIZATION(centroidal_dynamics::Equilibrium)
 
 namespace centroidal_dynamics {
 using namespace boost::python;
 
-boost::python::tuple wrapComputeQuasiEquilibriumRobustness(Equilibrium& self, const Vector3& com) {
+boost::python::tuple wrapComputeQuasiEquilibriumRobustness(Equilibrium& self,
+                                                           const Vector3& com) {
   double robustness;
   LP_status status = self.computeEquilibriumRobustness(com, robustness);
   return boost::python::make_tuple(status, robustness);
 }
 
-boost::python::tuple wrapComputeEquilibriumRobustness(Equilibrium& self, const Vector3& com, const Vector3& acc) {
+boost::python::tuple wrapComputeEquilibriumRobustness(Equilibrium& self,
+                                                      const Vector3& com,
+                                                      const Vector3& acc) {
   double robustness;
   LP_status status = self.computeEquilibriumRobustness(com, acc, robustness);
   return boost::python::make_tuple(status, robustness);
 }
 
-boost::python::tuple wrapCheckRobustEquilibrium(Equilibrium& self, const Vector3& com) {
+boost::python::tuple wrapCheckRobustEquilibrium(Equilibrium& self,
+                                                const Vector3& com) {
   bool robustness;
   LP_status status = self.checkRobustEquilibrium(com, robustness);
   return boost::python::make_tuple(status, robustness);
 }
 
-bool wrapSetNewContacts(Equilibrium& self, const MatrixX3ColMajor& contactPoints,
-                        const MatrixX3ColMajor& contactNormals, const double frictionCoefficient,
+bool wrapSetNewContacts(Equilibrium& self,
+                        const MatrixX3ColMajor& contactPoints,
+                        const MatrixX3ColMajor& contactNormals,
+                        const double frictionCoefficient,
                         const EquilibriumAlgorithm alg) {
-  return self.setNewContacts(contactPoints, contactNormals, frictionCoefficient, alg);
+  return self.setNewContacts(contactPoints, contactNormals, frictionCoefficient,
+                             alg);
 }
 
-bool wrapSetNewContactsFull(Equilibrium& self, const MatrixX3ColMajor& contactPoints,
-                            const MatrixX3ColMajor& contactNormals, const double frictionCoefficient,
+bool wrapSetNewContactsFull(Equilibrium& self,
+                            const MatrixX3ColMajor& contactPoints,
+                            const MatrixX3ColMajor& contactNormals,
+                            const double frictionCoefficient,
                             const EquilibriumAlgorithm alg) {
-  return self.setNewContacts(contactPoints, contactNormals, frictionCoefficient, alg);
+  return self.setNewContacts(contactPoints, contactNormals, frictionCoefficient,
+                             alg);
 }
 
 boost::python::tuple wrapGetPolytopeInequalities(Equilibrium& self) {
@@ -71,7 +80,9 @@ BOOST_PYTHON_MODULE(hpp_centroidal_dynamics) {
       .value("SOLVER_LP_CLP", SOLVER_LP_CLP)
       .export_values();
 #else
-  enum_<SolverLP>("SolverLP").value("SOLVER_LP_QPOASES", SOLVER_LP_QPOASES).export_values();
+  enum_<SolverLP>("SolverLP")
+      .value("SOLVER_LP_QPOASES", SOLVER_LP_QPOASES)
+      .export_values();
 #endif
 
   enum_<EquilibriumAlgorithm>("EquilibriumAlgorithm")
@@ -95,19 +106,22 @@ BOOST_PYTHON_MODULE(hpp_centroidal_dynamics) {
   /** END enum types **/
 
   // bool (Equilibrium::*setNewContacts)
-  //        (const MatrixX3ColMajor&, const MatrixX3ColMajor&, const double, const EquilibriumAlgorithm, const int
-  //        graspIndex, const double maxGraspForce) = &Equilibrium::setNewContacts;
+  //        (const MatrixX3ColMajor&, const MatrixX3ColMajor&, const double,
+  //        const EquilibriumAlgorithm, const int graspIndex, const double
+  //        maxGraspForce) = &Equilibrium::setNewContacts;
 
   class_<Equilibrium>(
       "Equilibrium",
-      init<std::string, double, unsigned int, optional<SolverLP, bool, const unsigned int, const bool> >())
+      init<std::string, double, unsigned int,
+           optional<SolverLP, bool, const unsigned int, const bool> >())
       .def("useWarmStart", &Equilibrium::useWarmStart)
       .def("setUseWarmStart", &Equilibrium::setUseWarmStart)
       .def("getName", &Equilibrium::getName)
       .def("getAlgorithm", &Equilibrium::getAlgorithm)
       .def("setNewContacts", wrapSetNewContacts)
       .def("setNewContacts", wrapSetNewContactsFull)
-      .def("computeEquilibriumRobustness", wrapComputeQuasiEquilibriumRobustness)
+      .def("computeEquilibriumRobustness",
+           wrapComputeQuasiEquilibriumRobustness)
       .def("computeEquilibriumRobustness", wrapComputeEquilibriumRobustness)
       .def("checkRobustEquilibrium", wrapCheckRobustEquilibrium)
       .def("getPolytopeInequalities", wrapGetPolytopeInequalities);

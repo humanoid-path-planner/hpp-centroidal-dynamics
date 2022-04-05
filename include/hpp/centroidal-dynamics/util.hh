@@ -5,18 +5,18 @@
 #ifndef HPP_CENTROIDAL_DYNAMICS_UTIL_HH
 #define HPP_CENTROIDAL_DYNAMICS_UTIL_HH
 
-#include <iostream>
-#include <fstream>
-#include <cmath>
-#include <cassert>
-
-#include <Eigen/Dense>
 #include <Eigen/src/Core/util/Macros.h>
 
-#include "cddmp.h"
-#include "setoper.h"
-#include "cddtypes.h"
+#include <Eigen/Dense>
+#include <cassert>
+#include <cmath>
+#include <fstream>
+#include <iostream>
+
 #include "cdd.h"
+#include "cddmp.h"
+#include "cddtypes.h"
+#include "setoper.h"
 
 namespace centroidal_dynamics {
 
@@ -44,7 +44,9 @@ typedef Eigen::Matrix<value_type, 6, Eigen::Dynamic, Eigen::RowMajor> Matrix6X;
 typedef Eigen::Matrix<value_type, 6, 2, Eigen::RowMajor> Matrix62;
 typedef Eigen::Matrix<value_type, 6, 3, Eigen::RowMajor> Matrix63;
 typedef Eigen::Matrix<value_type, Eigen::Dynamic, 6, Eigen::RowMajor> MatrixX6;
-typedef Eigen::Matrix<value_type, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor> MatrixXX;
+typedef Eigen::Matrix<value_type, Eigen::Dynamic, Eigen::Dynamic,
+                      Eigen::RowMajor>
+    MatrixXX;
 
 typedef Eigen::Ref<Vector2> Ref_vector2;
 typedef Eigen::Ref<Vector3> Ref_vector3;
@@ -67,8 +69,11 @@ typedef const Eigen::Ref<const Matrix63>& Cref_matrix63;
 typedef const Eigen::Ref<const MatrixXX>& Cref_matrixXX;
 
 /**Column major definitions for compatibility with classical eigen use**/
-typedef Eigen::Matrix<value_type, Eigen::Dynamic, 3, Eigen::ColMajor> MatrixX3ColMajor;
-typedef Eigen::Matrix<value_type, Eigen::Dynamic, Eigen::Dynamic, Eigen::ColMajor> MatrixXXColMajor;
+typedef Eigen::Matrix<value_type, Eigen::Dynamic, 3, Eigen::ColMajor>
+    MatrixX3ColMajor;
+typedef Eigen::Matrix<value_type, Eigen::Dynamic, Eigen::Dynamic,
+                      Eigen::ColMajor>
+    MatrixXXColMajor;
 typedef const Eigen::Ref<const MatrixX3ColMajor>& Cref_matrixX3ColMajor;
 typedef Eigen::Ref<MatrixXXColMajor>& ref_matrixXXColMajor;
 
@@ -77,12 +82,14 @@ typedef Eigen::Ref<MatrixXXColMajor>& ref_matrixXXColMajor;
  */
 template <class Matrix>
 bool writeMatrixToFile(const std::string& filename, const Matrix& matrix) {
-  std::ofstream out(filename.c_str(), std::ios::out | std::ios::binary | std::ios::trunc);
+  std::ofstream out(filename.c_str(),
+                    std::ios::out | std::ios::binary | std::ios::trunc);
   if (!out.is_open()) return false;
   typename Matrix::Index rows = matrix.rows(), cols = matrix.cols();
   out.write((char*)(&rows), sizeof(typename Matrix::Index));
   out.write((char*)(&cols), sizeof(typename Matrix::Index));
-  out.write((char*)matrix.data(), rows * cols * sizeof(typename Matrix::Scalar));
+  out.write((char*)matrix.data(),
+            rows * cols * sizeof(typename Matrix::Scalar));
   out.close();
   return true;
 }
@@ -110,10 +117,12 @@ bool readMatrixFromFile(const std::string& filename, Matrix& matrix) {
  * @return The mX(n+1) output cdd matrix, which contains an additional column,
  * the first one, with all zeros.
  */
-dd_MatrixPtr cone_span_eigen_to_cdd(Cref_matrixXX input, const bool canonicalize = false);
+dd_MatrixPtr cone_span_eigen_to_cdd(Cref_matrixXX input,
+                                    const bool canonicalize = false);
 
 /**
- * Compute the cross-product skew-symmetric matrix associated to the specified vector.
+ * Compute the cross-product skew-symmetric matrix associated to the specified
+ * vector.
  */
 Rotation crossMatrix(Cref_vector3 x);
 
@@ -121,13 +130,17 @@ void init_cdd_library();
 
 void release_cdd_library();
 
-// in some distribution the conversion Ref_matrixXX to Ref_vector3 does not compile
-void uniform3(Cref_vector3 lower_bounds, Cref_vector3 upper_bounds, Ref_vector3 out);
-void uniform(Cref_matrixXX lower_bounds, Cref_matrixXX upper_bounds, Ref_matrixXX out);
+// in some distribution the conversion Ref_matrixXX to Ref_vector3 does not
+// compile
+void uniform3(Cref_vector3 lower_bounds, Cref_vector3 upper_bounds,
+              Ref_vector3 out);
+void uniform(Cref_matrixXX lower_bounds, Cref_matrixXX upper_bounds,
+             Ref_matrixXX out);
 
 void euler_matrix(double roll, double pitch, double yaw, Ref_rotation R);
 
-bool generate_rectangle_contacts(double lx, double ly, Cref_vector3 pos, Cref_vector3 rpy, Ref_matrix43 p,
+bool generate_rectangle_contacts(double lx, double ly, Cref_vector3 pos,
+                                 Cref_vector3 rpy, Ref_matrix43 p,
                                  Ref_matrix43 N);
 
 std::string getDateAndTimeAsString();
@@ -139,8 +152,10 @@ std::string getDateAndTimeAsString();
 value_type nchoosek(const int n, const int k);
 
 template <typename DerivedV, typename DerivedU>
-void doCombs(Eigen::Matrix<typename DerivedU::Scalar, 1, Eigen::Dynamic>& running, int& running_i, int& running_j,
-             Eigen::PlainObjectBase<DerivedU>& U, const Eigen::MatrixBase<DerivedV>& V, int offset, int k) {
+void doCombs(
+    Eigen::Matrix<typename DerivedU::Scalar, 1, Eigen::Dynamic>& running,
+    int& running_i, int& running_j, Eigen::PlainObjectBase<DerivedU>& U,
+    const Eigen::MatrixBase<DerivedV>& V, int offset, int k) {
   int N = (int)(V.size());
   if (k == 0) {
     U.row(running_i) = running;
@@ -156,8 +171,9 @@ void doCombs(Eigen::Matrix<typename DerivedU::Scalar, 1, Eigen::Dynamic>& runnin
 }
 
 /**
- * Computes a matrix C containing all possible combinations of the elements of vector v taken k at a time.
- * Matrix C has k columns and n!/((n–k)! k!) rows, where n is length(v).
+ * Computes a matrix C containing all possible combinations of the elements of
+ * vector v taken k at a time. Matrix C has k columns and n!/((n–k)! k!) rows,
+ * where n is length(v).
  * @param V  n-long vector of elements
  * @param k  size of sub-set to consider
  * @param U  result matrix
@@ -165,7 +181,8 @@ void doCombs(Eigen::Matrix<typename DerivedU::Scalar, 1, Eigen::Dynamic>& runnin
  * the first one, with all zeros.
  */
 template <typename DerivedV, typename DerivedU>
-void nchoosek(const Eigen::MatrixBase<DerivedV>& V, const int k, Eigen::PlainObjectBase<DerivedU>& U) {
+void nchoosek(const Eigen::MatrixBase<DerivedV>& V, const int k,
+              Eigen::PlainObjectBase<DerivedU>& U) {
   using namespace Eigen;
   if (V.size() == 0) {
     U.resize(0, k);

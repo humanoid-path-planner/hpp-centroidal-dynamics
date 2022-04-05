@@ -5,11 +5,11 @@
 
 #include <ctime>
 #include <hpp/centroidal-dynamics/util.hh>
-#include <ctime>
 
 namespace centroidal_dynamics {
 
-dd_MatrixPtr cone_span_eigen_to_cdd(Cref_matrixXX input, const bool canonicalize) {
+dd_MatrixPtr cone_span_eigen_to_cdd(Cref_matrixXX input,
+                                    const bool canonicalize) {
   dd_debug = false;
   dd_MatrixPtr M = NULL;
   dd_rowrange i;
@@ -53,24 +53,30 @@ void release_cdd_library() {
   // dd_free_global_constants();
 }
 
-void uniform3(Cref_vector3 lower_bounds, Cref_vector3 upper_bounds, Ref_vector3 out) {
+void uniform3(Cref_vector3 lower_bounds, Cref_vector3 upper_bounds,
+              Ref_vector3 out) {
   assert(lower_bounds.rows() == out.rows());
   assert(upper_bounds.rows() == out.rows());
   assert(lower_bounds.cols() == out.cols());
   assert(upper_bounds.cols() == out.cols());
   for (int i = 0; i < out.rows(); i++)
     for (int j = 0; j < out.cols(); j++)
-      out(i, j) = (rand() / value_type(RAND_MAX)) * (upper_bounds(i, j) - lower_bounds(i, j)) + lower_bounds(i, j);
+      out(i, j) = (rand() / value_type(RAND_MAX)) *
+                      (upper_bounds(i, j) - lower_bounds(i, j)) +
+                  lower_bounds(i, j);
 }
 
-void uniform(Cref_matrixXX lower_bounds, Cref_matrixXX upper_bounds, Ref_matrixXX out) {
+void uniform(Cref_matrixXX lower_bounds, Cref_matrixXX upper_bounds,
+             Ref_matrixXX out) {
   assert(lower_bounds.rows() == out.rows());
   assert(upper_bounds.rows() == out.rows());
   assert(lower_bounds.cols() == out.cols());
   assert(upper_bounds.cols() == out.cols());
   for (int i = 0; i < out.rows(); i++)
     for (int j = 0; j < out.cols(); j++)
-      out(i, j) = (rand() / value_type(RAND_MAX)) * (upper_bounds(i, j) - lower_bounds(i, j)) + lower_bounds(i, j);
+      out(i, j) = (rand() / value_type(RAND_MAX)) *
+                      (upper_bounds(i, j) - lower_bounds(i, j)) +
+                  lower_bounds(i, j);
 }
 
 void euler_matrix(double roll, double pitch, double yaw, Ref_rotation R) {
@@ -102,7 +108,8 @@ void euler_matrix(double roll, double pitch, double yaw, Ref_rotation R) {
   //       * angle_axis_t(yaw, Vector3::UnitZ())).toRotationMatrix();
 }
 
-bool generate_rectangle_contacts(double lx, double ly, Cref_vector3 pos, Cref_vector3 rpy, Ref_matrix43 p,
+bool generate_rectangle_contacts(double lx, double ly, Cref_vector3 pos,
+                                 Cref_vector3 rpy, Ref_matrix43 p,
                                  Ref_matrix43 N) {
   // compute rotation matrix
   Rotation R;
@@ -181,7 +188,8 @@ value_type nchoosek(const int n, const int k) {
     return n;
   else {
     value_type c = 1;
-    for (int i = 1; i <= k; i++) c *= (((value_type)n - k + i) / ((value_type)i));
+    for (int i = 1; i <= k; i++)
+      c *= (((value_type)n - k + i) / ((value_type)i));
     return round(c);
   }
 }

@@ -3,12 +3,12 @@
  * Author: Andrea Del Prete
  */
 
+#include <ctime>
 #include <hpp/centroidal-dynamics/centroidal_dynamics.hh>
 #include <hpp/centroidal-dynamics/logger.hh>
 #include <hpp/centroidal-dynamics/stop-watch.hh>
 #include <iostream>
 #include <vector>
-#include <ctime>
 
 using namespace std;
 
@@ -38,8 +38,10 @@ Equilibrium::Equilibrium(const Equilibrium& other)
   m_solver->setUseWarmStart(other.m_solver->getUseWarmStart());
 }
 
-Equilibrium::Equilibrium(const string& name, const double mass, const unsigned int generatorsPerContact,
-                         const SolverLP solver_type, const bool useWarmStart, const unsigned int max_num_cdd_trials,
+Equilibrium::Equilibrium(const string& name, const double mass,
+                         const unsigned int generatorsPerContact,
+                         const SolverLP solver_type, const bool useWarmStart,
+                         const unsigned int max_num_cdd_trials,
                          const bool canonicalize_cdd_matrix)
     : m_mass(mass),
       m_gravity(0., 0., -9.81),
@@ -59,7 +61,8 @@ Equilibrium::Equilibrium(const string& name, const double mass, const unsigned i
 
   m_generatorsPerContact = generatorsPerContact;
   if (generatorsPerContact < 3) {
-    SEND_WARNING_MSG("Algorithm cannot work with less than 3 generators per contact!");
+    SEND_WARNING_MSG(
+        "Algorithm cannot work with less than 3 generators per contact!");
     m_generatorsPerContact = 3;
   }
 
@@ -74,15 +77,19 @@ Equilibrium::Equilibrium(const string& name, const double mass, const unsigned i
 
 Equilibrium::~Equilibrium() { delete m_solver; }
 
-bool Equilibrium::computeGenerators(Cref_matrixX3 contactPoints, Cref_matrixX3 contactNormals,
-                                    double frictionCoefficient, const bool perturbate) {
+bool Equilibrium::computeGenerators(Cref_matrixX3 contactPoints,
+                                    Cref_matrixX3 contactNormals,
+                                    double frictionCoefficient,
+                                    const bool perturbate) {
   long int c = contactPoints.rows();
   unsigned int& cg = m_generatorsPerContact;
   double theta, delta_theta = 2 * M_PI / cg;
   const value_type pi_4 = value_type(M_PI_4);
   // perturbation for libcdd
   const value_type epsilon = 2 * 1e-3;
-  if (perturbate) frictionCoefficient = frictionCoefficient + (rand() / value_type(RAND_MAX)) * epsilon;
+  if (perturbate)
+    frictionCoefficient =
+        frictionCoefficient + (rand() / value_type(RAND_MAX)) * epsilon;
   // Tangent directions
   Vector3 T1, T2, N;
   // contact point
@@ -94,7 +101,8 @@ bool Equilibrium::computeGenerators(Cref_matrixX3 contactPoints, Cref_matrixX3 c
   for (long int i = 0; i < c; i++) {
     // check that contact normals have norm 1
     if (fabs(contactNormals.row(i).norm() - 1.0) > 1e-4) {
-      SEND_ERROR_MSG("Contact normals should have norm 1, this has norm %f" + toString(contactNormals.row(i).norm()));
+      SEND_ERROR_MSG("Contact normals should have norm 1, this has norm %f" +
+                     toString(contactNormals.row(i).norm()));
       return false;
     }
     // compute tangent directions
@@ -119,10 +127,12 @@ bool Equilibrium::computeGenerators(Cref_matrixX3 contactPoints, Cref_matrixX3 c
     // compute generators
     theta = pi_4;
     for (unsigned int j = 0; j < cg; j++) {
-      G.col(j) = frictionCoefficient * sin(theta) * T1 + frictionCoefficient * cos(theta) * T2 +
+      G.col(j) = frictionCoefficient * sin(theta) * T1 +
+                 frictionCoefficient * cos(theta) * T2 +
                  contactNormals.row(i).transpose();
       G.col(j).normalize();
-      //      SEND_DEBUG_MSG("Contact "+toString(i)+" generator "+toString(j)+" = "+toString(G.col(j).transpose()));
+      //      SEND_DEBUG_MSG("Contact "+toString(i)+" generator "+toString(j)+"
+      //      = "+toString(G.col(j).transpose()));
       theta += delta_theta;
     }
 
@@ -132,11 +142,13 @@ bool Equilibrium::computeGenerators(Cref_matrixX3 contactPoints, Cref_matrixX3 c
 
   // Compute the coefficient to convert b0 to e_max
   Vector3 f0 = Vector3::Zero();
-  for (unsigned int j = 0; j < cg; j++) f0 += G.col(j);  // sum of the contact generators
+  for (unsigned int j = 0; j < cg; j++)
+    f0 += G.col(j);  // sum of the contact generators
   // Compute the distance between the friction cone boundaries and
   // the sum of the contact generators, which is e_max when b0=1.
   // When b0!=1 we just multiply b0 times this value.
-  // This value depends only on the number of generators and the friction coefficient
+  // This value depends only on the number of generators and the friction
+  // coefficient
   m_b0_to_emax_coefficient = (f0.cross(G.col(0))).norm();
   return true;
 }
@@ -144,20 +156,26 @@ bool Equilibrium::computeGenerators(Cref_matrixX3 contactPoints, Cref_matrixX3 c
 void Equilibrium::setAlgorithm(EquilibriumAlgorithm algorithm) {
   if (algorithm == EQUILIBRIUM_ALGORITHM_PP && m_G_centr.rows() > 0)
     SEND_DEBUG_MSG(
-        "Cannot set algorithm to PP after setting contacts, you should call again setNewContact with PP algorithm");
+        "Cannot set algorithm to PP after setting contacts, you should call "
+        "again setNewContact with PP algorithm");
   else
     m_algorithm = algorithm;
 }
 
-bool Equilibrium::setNewContacts(const MatrixX3ColMajor& contactPoints, const MatrixX3ColMajor& contactNormals,
-                                 const double frictionCoefficient, const EquilibriumAlgorithm alg) {
+bool Equilibrium::setNewContacts(const MatrixX3ColMajor& contactPoints,
+                                 const MatrixX3ColMajor& contactNormals,
+                                 const double frictionCoefficient,
+                                 const EquilibriumAlgorithm alg) {
   MatrixX3 _contactPoints = contactPoints;
   MatrixX3 _contactNormals = contactNormals;
-  return setNewContacts(_contactPoints, _contactNormals, frictionCoefficient, alg);
+  return setNewContacts(_contactPoints, _contactNormals, frictionCoefficient,
+                        alg);
 }
 
-bool Equilibrium::setNewContacts(const MatrixX3& contactPoints, const MatrixX3& contactNormals,
-                                 const double frictionCoefficient, const EquilibriumAlgorithm alg) {
+bool Equilibrium::setNewContacts(const MatrixX3& contactPoints,
+                                 const MatrixX3& contactNormals,
+                                 const double frictionCoefficient,
+                                 const EquilibriumAlgorithm alg) {
   assert(contactPoints.rows() == contactNormals.rows());
   if (alg == EQUILIBRIUM_ALGORITHM_IP) {
     SEND_ERROR_MSG("Algorithm IP not implemented yet");
@@ -173,14 +191,16 @@ bool Equilibrium::setNewContacts(const MatrixX3& contactPoints, const MatrixX3& 
   // Lists of contact generators (3 X generatorsPerContact)
   m_G_centr.resize(6, contactPoints.rows() * m_generatorsPerContact);
 
-  if (!computeGenerators(contactPoints, contactNormals, frictionCoefficient, false)) {
+  if (!computeGenerators(contactPoints, contactNormals, frictionCoefficient,
+                         false)) {
     return false;
   }
 
   if (m_algorithm == EQUILIBRIUM_ALGORITHM_PP) {
     unsigned int attempts = max_num_cdd_trials;
     while (!computePolytopeProjection(m_G_centr) && attempts > 0) {
-      computeGenerators(contactPoints, contactNormals, frictionCoefficient, true);
+      computeGenerators(contactPoints, contactNormals, frictionCoefficient,
+                        true);
       attempts--;
     }
     // resetting random because obviously libcdd always resets to 0
@@ -197,30 +217,34 @@ bool Equilibrium::setNewContacts(const MatrixX3& contactPoints, const MatrixX3& 
 
 static const Vector3 zero_acc = Vector3::Zero();
 
-LP_status Equilibrium::computeEquilibriumRobustness(Cref_vector3 com, double& robustness) {
+LP_status Equilibrium::computeEquilibriumRobustness(Cref_vector3 com,
+                                                    double& robustness) {
   return computeEquilibriumRobustness(com, zero_acc, robustness);
 }
 
-LP_status Equilibrium::computeEquilibriumRobustness(Cref_vector3 com, Cref_vector3 acc, double& robustness) {
+LP_status Equilibrium::computeEquilibriumRobustness(Cref_vector3 com,
+                                                    Cref_vector3 acc,
+                                                    double& robustness) {
   // Take the acceleration in account in D and d :
   m_D.block<3, 3>(3, 0) = crossMatrix(-m_mass * (m_gravity - acc));
   m_d.head<3>() = m_mass * (m_gravity - acc);
 
-  const long m = m_G_centr.cols();  // number of gravito-inertial wrench generators
+  const long m =
+      m_G_centr.cols();  // number of gravito-inertial wrench generators
   if (m == 0) return LP_STATUS_INFEASIBLE;
 
   if (m_algorithm == EQUILIBRIUM_ALGORITHM_LP) {
-    /* Compute the robustness measure of the equilibrium of a specified CoM position
+    /* Compute the robustness measure of the equilibrium of a specified CoM
+     position
      * by solving the following LP:
           find          b, b0
           minimize      -b0
           subject to    D c + d <= G b    <= D c + d
                         0       <= b - b0 <= Inf
         where
-          b         are the coefficient of the contact force generators (f = V b)
-          b0        is the robustness measure
-          c         is the CoM position
-          G         is the matrix whose columns are the gravito-inertial wrench generators
+          b         are the coefficient of the contact force generators (f = V
+     b) b0        is the robustness measure c         is the CoM position G is
+     the matrix whose columns are the gravito-inertial wrench generators
     */
     VectorX b_b0(m + 1);
     VectorX c = VectorX::Zero(m + 1);
@@ -242,22 +266,24 @@ LP_status Equilibrium::computeEquilibriumRobustness(Cref_vector3 com, Cref_vecto
       return lpStatus;
     }
 
-    SEND_DEBUG_MSG("Primal LP problem could not be solved: " + toString(lpStatus));
+    SEND_DEBUG_MSG("Primal LP problem could not be solved: " +
+                   toString(lpStatus));
     return lpStatus;
   }
 
   if (m_algorithm == EQUILIBRIUM_ALGORITHM_LP2) {
-    /* Compute the robustness measure of the equilibrium of a specified CoM position
+    /* Compute the robustness measure of the equilibrium of a specified CoM
+     position
      * by solving the following LP:
             find          b, b0
             minimize      -b0
             subject to    D c + d <= G (b + 1*b0) <= D c + d
                           0       <= b            <= Inf
           where
-            b         are the (delta) coefficient of the contact force generators (f = G (b+b0))
-            b0        is the robustness measure
-            c         is the CoM position
-            G         is the matrix whose columns are the gravito-inertial wrench generators
+            b         are the (delta) coefficient of the contact force
+     generators (f = G (b+b0)) b0        is the robustness measure c         is
+     the CoM position G         is the matrix whose columns are the
+     gravito-inertial wrench generators
       */
     VectorX b_b0(m + 1);
     VectorX c = VectorX::Zero(m + 1);
@@ -277,21 +303,19 @@ LP_status Equilibrium::computeEquilibriumRobustness(Cref_vector3 com, Cref_vecto
       return lpStatus_primal;
     }
 
-    SEND_DEBUG_MSG("Primal LP problem could not be solved: " + toString(lpStatus_primal));
+    SEND_DEBUG_MSG("Primal LP problem could not be solved: " +
+                   toString(lpStatus_primal));
     return lpStatus_primal;
   }
 
   if (m_algorithm == EQUILIBRIUM_ALGORITHM_DLP) {
-    /*Compute the robustness measure of the equilibrium of a specified CoM position
-      by solving the following dual LP:
-        find          v
-        minimize      (d+D*com)' v
-        subject to    G' v >= 0
-                      1' G' v = 1
-      where
+    /*Compute the robustness measure of the equilibrium of a specified CoM
+      position by solving the following dual LP: find          v minimize
+      (d+D*com)' v subject to    G' v >= 0 1' G' v = 1 where
         -(d+D c)' v   is the robustness measure
         c             is the CoM position
-        G             is the matrix whose columns are the gravito-inertial wrench generators
+        G             is the matrix whose columns are the gravito-inertial
+      wrench generators
      */
     Vector6 v;
     Vector6 c = m_D * com + m_d;
@@ -310,7 +334,8 @@ LP_status Equilibrium::computeEquilibriumRobustness(Cref_vector3 com, Cref_vecto
       robustness = convert_b0_to_emax(m_solver->getObjectiveValue());
       return lpStatus_dual;
     }
-    SEND_DEBUG_MSG("Dual LP problem for com position " + toString(com.transpose()) +
+    SEND_DEBUG_MSG("Dual LP problem for com position " +
+                   toString(com.transpose()) +
                    " could not be solved: " + toString(lpStatus_dual));
 
     // switch UNFEASIBLE and UNBOUNDED flags because we are solving dual problem
@@ -322,15 +347,20 @@ LP_status Equilibrium::computeEquilibriumRobustness(Cref_vector3 com, Cref_vecto
     return lpStatus_dual;
   }
 
-  SEND_ERROR_MSG("computeEquilibriumRobustness is not implemented for the specified algorithm");
+  SEND_ERROR_MSG(
+      "computeEquilibriumRobustness is not implemented for the specified "
+      "algorithm");
   return LP_STATUS_ERROR;
 }
 
-LP_status Equilibrium::checkRobustEquilibrium(Cref_vector3 com, bool& equilibrium, double e_max) {
+LP_status Equilibrium::checkRobustEquilibrium(Cref_vector3 com,
+                                              bool& equilibrium, double e_max) {
   return checkRobustEquilibrium(com, zero_acc, equilibrium, e_max);
 }
 
-LP_status Equilibrium::checkRobustEquilibrium(Cref_vector3 com, Cref_vector3 acc, bool& equilibrium, double e_max) {
+LP_status Equilibrium::checkRobustEquilibrium(Cref_vector3 com,
+                                              Cref_vector3 acc,
+                                              bool& equilibrium, double e_max) {
   // Take the acceleration in account in D and d :
   m_D.block<3, 3>(3, 0) = crossMatrix(-m_mass * (m_gravity - acc));
   m_d.head<3>() = m_mass * (m_gravity - acc);
@@ -346,7 +376,8 @@ LP_status Equilibrium::checkRobustEquilibrium(Cref_vector3 com, Cref_vector3 acc
     return LP_STATUS_ERROR;
   }
   if (m_algorithm != EQUILIBRIUM_ALGORITHM_PP) {
-    SEND_ERROR_MSG("checkRobustEquilibrium is only implemented for the PP algorithm");
+    SEND_ERROR_MSG(
+        "checkRobustEquilibrium is only implemented for the PP algorithm");
     return LP_STATUS_ERROR;
   }
 
@@ -363,7 +394,8 @@ LP_status Equilibrium::checkRobustEquilibrium(Cref_vector3 com, Cref_vector3 acc
 
 LP_status Equilibrium::getPolytopeInequalities(MatrixXX& H, VectorX& h) const {
   if (m_algorithm != EQUILIBRIUM_ALGORITHM_PP) {
-    SEND_ERROR_MSG("getPolytopeInequalities is only implemented for the PP algorithm");
+    SEND_ERROR_MSG(
+        "getPolytopeInequalities is only implemented for the PP algorithm");
     return LP_STATUS_ERROR;
   }
   if (!m_is_cdd_stable) {
@@ -378,24 +410,27 @@ LP_status Equilibrium::getPolytopeInequalities(MatrixXX& H, VectorX& h) const {
   return LP_STATUS_OPTIMAL;
 }
 
-LP_status Equilibrium::findExtremumOverLine(Cref_vector3 a, Cref_vector3 a0, double e_max, Ref_vector3 com) {
-  const long m = m_G_centr.cols();  // number of gravito-inertial wrench generators
+LP_status Equilibrium::findExtremumOverLine(Cref_vector3 a, Cref_vector3 a0,
+                                            double e_max, Ref_vector3 com) {
+  const long m =
+      m_G_centr.cols();  // number of gravito-inertial wrench generators
   if (m_G_centr.cols() == 0) return LP_STATUS_INFEASIBLE;
 
   double b0 = convert_emax_to_b0(e_max);
 
   if (m_algorithm == EQUILIBRIUM_ALGORITHM_LP) {
-    /* Compute the extremum CoM position over the line a*p + a0 that is in robust equilibrium
+    /* Compute the extremum CoM position over the line a*p + a0 that is in
+     robust equilibrium
      * by solving the following LP:
           find          b, p
           minimize      -p
           subject to    D (a p + a0) + d <= G (b + b0) <= D (a p + a0) + d
                         0       <= b <= Inf
         where
-          b0+b      are the coefficient of the contact force generators (f = G (b0+b))
-          b0        is the robustness measure
-          p         is the line parameter
-          G         is the matrix whose columns are the gravito-inertial wrench generators
+          b0+b      are the coefficient of the contact force generators (f = G
+     (b0+b)) b0        is the robustness measure p         is the line parameter
+          G         is the matrix whose columns are the gravito-inertial wrench
+     generators
     */
     VectorX b_p(m + 1);
     VectorX c = VectorX::Zero(m + 1);
@@ -428,21 +463,26 @@ LP_status Equilibrium::findExtremumOverLine(Cref_vector3 a, Cref_vector3 a0, dou
     }
 
     com = a0;
-    SEND_DEBUG_MSG("Primal LP problem could not be solved suggesting that no equilibrium position with robustness " +
-                   toString(e_max) + " exists over the line starting from " + toString(a0.transpose()) +
-                   " in direction " + toString(a.transpose()) + ", solver error code: " + toString(lpStatus_primal));
+    SEND_DEBUG_MSG(
+        "Primal LP problem could not be solved suggesting that no equilibrium "
+        "position with robustness " +
+        toString(e_max) + " exists over the line starting from " +
+        toString(a0.transpose()) + " in direction " + toString(a.transpose()) +
+        ", solver error code: " + toString(lpStatus_primal));
     return lpStatus_primal;
   }
 
   if (m_algorithm == EQUILIBRIUM_ALGORITHM_DLP) {
-    /* Compute the extremum CoM position over the line a*x + a0 that is in robust equilibrium
+    /* Compute the extremum CoM position over the line a*x + a0 that is in
+     robust equilibrium
      * by solving the following dual LP:
           find          v
           minimize      (D a0 + d -G b0)' v
           subject to    0  <= G' v    <= Inf
                         -1 <= a' D' v <= -1
         where
-          G         is the matrix whose columns are the gravito-inertial wrench generators
+          G         is the matrix whose columns are the gravito-inertial wrench
+     generators
     */
     Vector6 v;
     Vector6 c = m_D * a0 + m_d - m_G_centr * VectorX::Ones(m) * b0;
@@ -471,10 +511,13 @@ LP_status Equilibrium::findExtremumOverLine(Cref_vector3 a, Cref_vector3 a0, dou
         SEND_ERROR_MSG("Error while writing LP solution to file " + filename);
 #endif
 
-      // since QP oases cannot detect unboundedness we check here whether the objective value is a large negative value
+      // since QP oases cannot detect unboundedness we check here whether the
+      // objective value is a large negative value
       if (m_solver_type == SOLVER_LP_QPOASES && p < -1e7) {
-        SEND_DEBUG_MSG("Dual LP problem with robustness " + toString(e_max) + " over the line starting from " +
-                       toString(a0.transpose()) + " in direction " + toString(a.transpose()) +
+        SEND_DEBUG_MSG("Dual LP problem with robustness " + toString(e_max) +
+                       " over the line starting from " +
+                       toString(a0.transpose()) + " in direction " +
+                       toString(a.transpose()) +
                        " has large negative objective value: " + toString(p) +
                        " suggesting it is probably unbounded.");
         lpStatus_dual = LP_STATUS_UNBOUNDED;
@@ -484,9 +527,12 @@ LP_status Equilibrium::findExtremumOverLine(Cref_vector3 a, Cref_vector3 a0, dou
     }
 
     com = a0;
-    SEND_DEBUG_MSG("Dual LP problem could not be solved suggesting that no equilibrium position with robustness " +
-                   toString(e_max) + " exists over the line starting from " + toString(a0.transpose()) +
-                   " in direction " + toString(a.transpose()) + ", solver error code: " + toString(lpStatus_dual));
+    SEND_DEBUG_MSG(
+        "Dual LP problem could not be solved suggesting that no equilibrium "
+        "position with robustness " +
+        toString(e_max) + " exists over the line starting from " +
+        toString(a0.transpose()) + " in direction " + toString(a.transpose()) +
+        ", solver error code: " + toString(lpStatus_dual));
 
     // switch UNFEASIBLE and UNBOUNDED flags because we are solving dual problem
     if (lpStatus_dual == LP_STATUS_INFEASIBLE)
@@ -497,11 +543,14 @@ LP_status Equilibrium::findExtremumOverLine(Cref_vector3 a, Cref_vector3 a0, dou
     return lpStatus_dual;
   }
 
-  SEND_ERROR_MSG("findExtremumOverLine is not implemented for the specified algorithm");
+  SEND_ERROR_MSG(
+      "findExtremumOverLine is not implemented for the specified algorithm");
   return LP_STATUS_ERROR;
 }
 
-LP_status Equilibrium::findExtremumInDirection(Cref_vector3 /*direction*/, Ref_vector3 /*com*/, double /*e_max*/) {
+LP_status Equilibrium::findExtremumInDirection(Cref_vector3 /*direction*/,
+                                               Ref_vector3 /*com*/,
+                                               double /*e_max*/) {
   if (m_G_centr.cols() == 0) return LP_STATUS_INFEASIBLE;
   SEND_ERROR_MSG("findExtremumInDirection not implemented yet");
   return LP_STATUS_ERROR;
@@ -515,7 +564,8 @@ bool Equilibrium::computePolytopeProjection(Cref_matrix6X v) {
     return false;
   }
   //  getProfiler().start("eigen_to_cdd");
-  dd_MatrixPtr V = cone_span_eigen_to_cdd(v.transpose(), canonicalize_cdd_matrix);
+  dd_MatrixPtr V =
+      cone_span_eigen_to_cdd(v.transpose(), canonicalize_cdd_matrix);
   //  getProfiler().stop("eigen_to_cdd");
 
   dd_ErrorType error = dd_NoError;
@@ -552,10 +602,12 @@ bool Equilibrium::computePolytopeProjection(Cref_matrix6X v) {
   m_h.resize(rowsize + eq_rows.size());
   for (int i = 0; i < rowsize; ++i) {
     m_h(i) = (value_type)(*(b_A->matrix[i][0]));
-    for (int j = 1; j < b_A->colsize; ++j) m_H(i, j - 1) = -(value_type)(*(b_A->matrix[i][j]));
+    for (int j = 1; j < b_A->colsize; ++j)
+      m_H(i, j - 1) = -(value_type)(*(b_A->matrix[i][j]));
   }
   int i = 0;
-  for (std::vector<long int>::const_iterator cit = eq_rows.begin(); cit != eq_rows.end(); ++cit, ++i) {
+  for (std::vector<long int>::const_iterator cit = eq_rows.begin();
+       cit != eq_rows.end(); ++cit, ++i) {
     m_h(rowsize + i) = -m_h((int)(*cit));
     m_H(rowsize + i) = -m_H((int)(*cit));
   }
@@ -569,11 +621,16 @@ bool Equilibrium::computePolytopeProjection(Cref_matrix6X v) {
   return true;
 }
 
-double Equilibrium::convert_b0_to_emax(double b0) { return (b0 * m_b0_to_emax_coefficient); }
+double Equilibrium::convert_b0_to_emax(double b0) {
+  return (b0 * m_b0_to_emax_coefficient);
+}
 
-double Equilibrium::convert_emax_to_b0(double emax) { return (emax / m_b0_to_emax_coefficient); }
+double Equilibrium::convert_emax_to_b0(double emax) {
+  return (emax / m_b0_to_emax_coefficient);
+}
 
-LP_status Equilibrium::findMaximumAcceleration(Cref_matrix63 H, Cref_vector6 h, Cref_vector3 v, double& alpha0) {
+LP_status Equilibrium::findMaximumAcceleration(Cref_matrix63 H, Cref_vector6 h,
+                                               Cref_vector3 v, double& alpha0) {
   int m = (int)m_G_centr.cols();  // 4* number of contacts
   VectorX b_a0(m);
   VectorX c = VectorX::Zero(m);
@@ -603,11 +660,13 @@ LP_status Equilibrium::findMaximumAcceleration(Cref_matrix63 H, Cref_vector6 h, 
     return lpStatus;
   }
   alpha0 = 0.0;
-  // SEND_DEBUG_MSG("Primal LP problem could not be solved: "+toString(lpStatus));
+  // SEND_DEBUG_MSG("Primal LP problem could not be solved:
+  // "+toString(lpStatus));
   return lpStatus;
 }
 
-bool Equilibrium::checkAdmissibleAcceleration(Cref_matrix63 H, Cref_vector6 h, Cref_vector3 a) {
+bool Equilibrium::checkAdmissibleAcceleration(Cref_matrix63 H, Cref_vector6 h,
+                                              Cref_vector3 a) {
   int m = (int)m_G_centr.cols();  // number of contact * generator per contacts
   VectorX b(m);
   VectorX c = VectorX::Zero(m);
@@ -625,7 +684,8 @@ bool Equilibrium::checkAdmissibleAcceleration(Cref_matrix63 H, Cref_vector6 h, C
   if (lpStatus == LP_STATUS_OPTIMAL || lpStatus == LP_STATUS_UNBOUNDED) {
     return true;
   } else {
-    // SEND_DEBUG_MSG("Primal LP problem could not be solved: "+toString(lpStatus));
+    // SEND_DEBUG_MSG("Primal LP problem could not be solved:
+    // "+toString(lpStatus));
     return false;
   }
 }
