@@ -1,0 +1,17 @@
+# format (Guilhem Saurel, 2022-04-05)
+dff4d63db251496c701d89241783197da0605fc6
+
+# clang-format (Guilhem Saurel, 2021-10-06)
+32aab997ec72aefe6a91a01a7bb6575abc654fc7
+
+# [CI] format enforcement is now build in the buildfarm (Guilhem Saurel, 2019-03-21)
+0712ca6f229dfd9d973387c6f545317ef5b03b5e
+
+# [CI] enforce c++ format (Guilhem Saurel, 2019-03-21)
+312e1ff9e4c6011ee46d7c51f1ad3ddc2337c36f
+
+# [Style] clang-format -i **.{cpp,hh} (Guilhem Saurel, 2019-03-21)
+d357fb18b888aeca461a6259d0edcc56ed007c54
+
+# [CI][Python][Style] enforce format (Guilhem Saurel, 2019-03-21)
+e66325370e2e2731f320541d378facd822398719
