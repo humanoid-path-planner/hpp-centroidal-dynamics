@@ -6,13 +6,17 @@
 #ifdef CLP_FOUND
 
 #include <hpp/centroidal-dynamics/solver_LP_clp.hh>
-#include "CoinBuild.hpp"
+
+#include "coin/CoinBuild.hpp"
 
 namespace centroidal_dynamics {
 
-Solver_LP_clp::Solver_LP_clp() : Solver_LP_abstract() { m_model.setLogLevel(0); }
+Solver_LP_clp::Solver_LP_clp() : Solver_LP_abstract() {
+  m_model.setLogLevel(0);
+}
 
-LP_status Solver_LP_clp::solve(Cref_vectorX c, Cref_vectorX lb, Cref_vectorX ub, Cref_matrixXX A, Cref_vectorX Alb,
+LP_status Solver_LP_clp::solve(Cref_vectorX c, Cref_vectorX lb, Cref_vectorX ub,
+                               Cref_matrixXX A, Cref_vectorX Alb,
                                Cref_vectorX Aub, Ref_vectorX sol) {
   int n = (int)c.size();  // number of variables
   int m = (int)A.rows();  // number of constraints

@@ -65,8 +65,9 @@ class CENTROIDAL_DYNAMICS_DLLAPI Solver_LP_abstract {
    *  subject to  Alb <= A x <= Aub
    *              lb <= x <= ub
    */
-  virtual LP_status solve(Cref_vectorX c, Cref_vectorX lb, Cref_vectorX ub, Cref_matrixXX A, Cref_vectorX Alb,
-                          Cref_vectorX Aub, Ref_vectorX sol) = 0;
+  virtual LP_status solve(Cref_vectorX c, Cref_vectorX lb, Cref_vectorX ub,
+                          Cref_matrixXX A, Cref_vectorX Alb, Cref_vectorX Aub,
+                          Ref_vectorX sol) = 0;
 
   /**
    * @brief Solve the linear program described in the specified file.
@@ -90,13 +91,13 @@ class CENTROIDAL_DYNAMICS_DLLAPI Solver_LP_abstract {
    * @param Aub
    * @return True if the operation succeeded, false otherwise.
    */
-  virtual bool writeLpToFile(const std::string &filename, Cref_vectorX c, Cref_vectorX lb, Cref_vectorX ub,
-                             Cref_matrixXX A, Cref_vectorX Alb, Cref_vectorX Aub);
+  virtual bool writeLpToFile(const std::string &filename, Cref_vectorX c,
+                             Cref_vectorX lb, Cref_vectorX ub, Cref_matrixXX A,
+                             Cref_vectorX Alb, Cref_vectorX Aub);
 
   /**
-   * @brief Read the data describing a Linear Program from the specified binary file.
-   * The vectors and matrices are resized inside the method.
-   *  minimize    c' x
+   * @brief Read the data describing a Linear Program from the specified binary
+   * file. The vectors and matrices are resized inside the method. minimize c' x
    *  subject to  Alb <= A x <= Aub
    *              lb <= x <= ub
    * @param filename
@@ -108,7 +109,8 @@ class CENTROIDAL_DYNAMICS_DLLAPI Solver_LP_abstract {
    * @param Aub
    * @return True if the operation succeeded, false otherwise.
    */
-  virtual bool readLpFromFile(const std::string &filename, VectorX &c, VectorX &lb, VectorX &ub, MatrixXX &A,
+  virtual bool readLpFromFile(const std::string &filename, VectorX &c,
+                              VectorX &lb, VectorX &ub, MatrixXX &A,
                               VectorX &Alb, VectorX &Aub);
 
   /** Get the status of the solver. */
@@ -123,7 +125,9 @@ class CENTROIDAL_DYNAMICS_DLLAPI Solver_LP_abstract {
   /** Return true if the solver is allowed to warm start, false otherwise. */
   virtual bool getUseWarmStart() { return m_useWarmStart; }
   /** Specify whether the solver is allowed to use warm-start techniques. */
-  virtual void setUseWarmStart(bool useWarmStart) { m_useWarmStart = useWarmStart; }
+  virtual void setUseWarmStart(bool useWarmStart) {
+    m_useWarmStart = useWarmStart;
+  }
 
   /** Get the current maximum number of iterations performed by the solver. */
   virtual unsigned int getMaximumIterations() { return m_maxIter; }

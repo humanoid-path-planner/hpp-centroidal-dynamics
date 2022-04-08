@@ -169,7 +169,8 @@ class Stopwatch {
   void reset_all();
 
   /** Dump the data of a certain performance record */
-  void report(std::string perf_name, int precision = 2, std::ostream& output = std::cout);
+  void report(std::string perf_name, int precision = 2,
+              std::ostream& output = std::cout);
 
   /** Dump the data of all the performance records */
   void report_all(int precision = 2, std::ostream& output = std::cout);
@@ -207,7 +208,13 @@ class Stopwatch {
   /** Struct to hold the performance data */
   struct PerformanceData {
     PerformanceData()
-        : clock_start(0), total_time(0), min_time(0), max_time(0), last_time(0), paused(false), stops(0) {}
+        : clock_start(0),
+          total_time(0),
+          min_time(0),
+          max_time(0),
+          last_time(0),
+          paused(false),
+          stops(0) {}
 
     /** Start time */
     long double clock_start;

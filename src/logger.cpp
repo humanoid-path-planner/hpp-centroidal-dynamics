@@ -10,10 +10,11 @@
 #endif
 
 #include <stdio.h>
-#include <iostream>
-#include <iomanip>  // std::setprecision
+
 #include <boost/algorithm/string.hpp>
 #include <hpp/centroidal-dynamics/logger.hh>
+#include <iomanip>  // std::setprecision
+#include <iostream>
 
 namespace centroidal_dynamics {
 using namespace std;
@@ -24,7 +25,9 @@ Logger& getLogger() {
 }
 
 Logger::Logger(double timeSample, double streamPrintPeriod)
-    : m_timeSample(timeSample), m_streamPrintPeriod(streamPrintPeriod), m_printCountdown(0.0) {
+    : m_timeSample(timeSample),
+      m_streamPrintPeriod(streamPrintPeriod),
+      m_printCountdown(0.0) {
 #ifdef LOGGER_VERBOSITY_ERROR
   m_lv = VERBOSITY_ERROR;
 #endif
@@ -47,8 +50,9 @@ void Logger::countdown() {
 void Logger::sendMsg(string msg, MsgType type, const char* file, int line) {
   //    if(m_lv==VERBOSITY_NONE ||
   //       (m_lv==VERBOSITY_ERROR && !isErrorMsg(type)) ||
-  //       (m_lv==VERBOSITY_WARNING_ERROR && !(isWarningMsg(type) || isErrorMsg(type))) ||
-  //       (m_lv==VERBOSITY_INFO_WARNING_ERROR && isDebugMsg(type)))
+  //       (m_lv==VERBOSITY_WARNING_ERROR && !(isWarningMsg(type) ||
+  //       isErrorMsg(type))) || (m_lv==VERBOSITY_INFO_WARNING_ERROR &&
+  //       isDebugMsg(type)))
   //      return;
 
   // if print is allowed by current verbosity level
