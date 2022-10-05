@@ -1,14 +1,15 @@
 # Define the wrapper library that wraps our library
-ADD_LIBRARY(${PY_NAME} SHARED centroidal_dynamics_python.cpp)
-TARGET_LINK_LIBRARIES(${PY_NAME} ${PROJECT_NAME} eigenpy::eigenpy)
+add_library(${PY_NAME} SHARED centroidal_dynamics_python.cpp)
+target_link_libraries(${PY_NAME} ${PROJECT_NAME} eigenpy::eigenpy)
 # don't prepend wrapper library name with lib
-SET_TARGET_PROPERTIES(${PY_NAME} PROPERTIES PREFIX "")
+set_target_properties(${PY_NAME} PROPERTIES PREFIX "")
 
-IF(APPLE)
+if(APPLE)
   # We need to change the extension for python bindings
-  SET_TARGET_PROPERTIES(${PY_NAME} PROPERTIES SUFFIX ".so")
-ENDIF(APPLE)
+  set_target_properties(${PY_NAME} PROPERTIES SUFFIX ".so")
+endif(APPLE)
 
-INSTALL(TARGETS ${PY_NAME} DESTINATION ${PYTHON_SITELIB})
+install(TARGETS ${PY_NAME} DESTINATION ${PYTHON_SITELIB})
 
-ADD_PYTHON_UNIT_TEST("python-centroidal-dynamics" "python/test/binding_tests.py" "python")
+add_python_unit_test("python-centroidal-dynamics"
+                     "python/test/binding_tests.py" "python")
