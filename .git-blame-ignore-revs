@@ -15,3 +15,5 @@ d357fb18b888aeca461a6259d0edcc56ed007c54
 
 # [CI][Python][Style] enforce format (Guilhem Saurel, 2019-03-21)
 e66325370e2e2731f320541d378facd822398719
+# pre-commit run -a (Guilhem Saurel, 2022-10-05)
+968615e4593aaa890ac315af90709ef1980930f4
