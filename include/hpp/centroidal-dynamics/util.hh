@@ -20,7 +20,7 @@
 
 namespace centroidal_dynamics {
 
-//#define USE_FLOAT 1;
+// #define USE_FLOAT 1;
 #ifdef USE_FLOAT
 typedef float value_type;
 #else

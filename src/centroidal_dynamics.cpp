@@ -448,7 +448,7 @@ LP_status Equilibrium::findExtremumOverLine(Cref_vector3 a, Cref_vector3 a0,
     if (lpStatus_primal == LP_STATUS_OPTIMAL) {
       com = a0 + a * b_p(m);
 
-//#define WRITE_LPS_TO_FILE
+// #define WRITE_LPS_TO_FILE
 #ifdef WRITE_LPS_TO_FILE
       string date_time = getDateAndTimeAsString();
       string filename = "LP_findExtremumOverLine" + date_time + ".dat";
