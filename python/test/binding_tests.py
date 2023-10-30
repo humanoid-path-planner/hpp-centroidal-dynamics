@@ -1,13 +1,12 @@
 import unittest
 
-from numpy import array, asmatrix, cross
-
 from hpp_centroidal_dynamics import (
     LP_STATUS_OPTIMAL,
     Equilibrium,
     EquilibriumAlgorithm,
     SolverLP,
 )
+from numpy import array, asmatrix, cross
 
 
 class TestCentroidalDynamics(unittest.TestCase):
