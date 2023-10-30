@@ -45,7 +45,7 @@ namespace centroidal_dynamics {
 #define SEND_ERROR_MSG(msg) SEND_MSG(msg, MSG_TYPE_ERROR)
 #define SEND_DEBUG_STREAM_MSG(msg)
 #define SEND_INFO_STREAM_MSG(msg) \
-#define SEND_WARNING_STREAM_MSG(msg) SEND_MSG(msg, MSG_TYPE_WARNING_STREAM)
+  #define SEND_WARNING_STREAM_MSG(msg) SEND_MSG(msg, MSG_TYPE_WARNING_STREAM)
 #define SEND_ERROR_STREAM_MSG(msg) SEND_MSG(msg, MSG_TYPE_ERROR_STREAM)
 #endif
 
