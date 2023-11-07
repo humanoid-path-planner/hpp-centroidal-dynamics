@@ -1,4 +1,4 @@
-# CentroidalDynamicsLib
+# HPP Centroidal Dynamics
 
 [![Pipeline status](https://gitlab.laas.fr/humanoid-path-planner/hpp-centroidal-dynamics/badges/master/pipeline.svg)](https://gitlab.laas.fr/humanoid-path-planner/hpp-centroidal-dynamics/commits/master)
 [![Coverage report](https://gitlab.laas.fr/humanoid-path-planner/hpp-centroidal-dynamics/badges/master/coverage.svg?job=doc-coverage)](https://gepettoweb.laas.fr/doc/humanoid-path-planner/hpp-centroidal-dynamics/master/coverage/)
