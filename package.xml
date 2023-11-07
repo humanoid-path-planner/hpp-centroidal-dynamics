@@ -5,7 +5,7 @@
     <description>Testing equilibrium of a system in contact with the environment</description>
 
     <maintainer email='guilhem.saurel@laas.fr'>Guilhem Saurel</maintainer>
-    <license>BSD</license>
+    <license>GPL</license>
 
     <author>Andrea Del Prete</author>
     <author>Pierre Fernbach</author>
