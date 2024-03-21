@@ -1,5 +1,30 @@
-[tool.black]
-exclude = "cmake"
+[build-system]
+build-backend = "cmeel.build"
+requires = [
+  "cmeel-boost[build] ~= 1.83.0",
+  "cmeel-cddlib[build] ~= 0.94.13",
+  "cmeel-clp[build] ~= 1.17.9.1",
+  "cmeel-coinutils[build] ~= 2.11.10",
+  "cmeel-qpoases[build] ~= 3.2.1",
+  "cmeel[build]",
+  "eigenpy[build] ~= 3.1"
+]
+
+[project]
+dependencies = [
+  "cmeel-boost ~= 1.83.0",
+  "cmeel-cddlib ~= 0.94.13",
+  "cmeel-clp ~= 1.17.9.1",
+  "cmeel-qpoases ~= 3.2.1",
+  "eigenpy ~= 3.1"
+]
+description = "Utility classes for testing (robust) equilibrium of a system in contact with the environment, and other centroidal dynamics methods."
+license = "BSD-2-Clause"
+name = "hpp-centroidal-dynamics"
+version = "5.0.0"
 
 [tool.isort]
 profile = "black"
+
+[tool.tomlsort]
+all = true
