@@ -23,9 +23,6 @@ license = "BSD-2-Clause"
 name = "hpp-centroidal-dynamics"
 version = "5.0.0"
 
-[tool.isort]
-profile = "black"
-
 [tool.ruff]
 extend-exclude = ["cmake"]
 
