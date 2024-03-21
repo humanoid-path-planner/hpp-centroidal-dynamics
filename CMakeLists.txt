@@ -33,11 +33,13 @@ add_project_dependency(Eigen3 REQUIRED)
 set(CMAKE_MODULE_PATH
     ${PROJECT_SOURCE_DIR}/cmake/find-external/CDD
     ${PROJECT_SOURCE_DIR}/cmake/find-external/CLP
+    ${PROJECT_SOURCE_DIR}/cmake/find-external/CoinUtils
     ${PROJECT_SOURCE_DIR}/cmake/find-external/qpOASES)
 
-find_package(CDD REQUIRED)
-find_package(qpOASES REQUIRED)
-find_package(CLP)
+add_project_dependency(CDD REQUIRED FIND_EXTERNAL CDD)
+add_project_dependency(qpOASES REQUIRED FIND_EXTERNAL qpOASES)
+add_project_dependency(CLP FIND_EXTERNAL CLP)
+add_project_dependency(CoinUtils FIND_EXTERNAL CoinUtils)
 
 if("${CLP_LIBRARY}" STREQUAL "CLP_LIBRARY-NOTFOUND")
   message(
@@ -72,16 +74,12 @@ set(${PROJECT_NAME}_SOURCES
 add_library(${PROJECT_NAME} SHARED ${${PROJECT_NAME}_SOURCES}
                                    ${${PROJECT_NAME}_HEADERS})
 target_include_directories(${PROJECT_NAME} PUBLIC $<INSTALL_INTERFACE:include>)
-target_include_directories(
-  ${PROJECT_NAME} SYSTEM PUBLIC ${EIGEN3_INCLUDE_DIR} ${CDD_INCLUDE_DIRS}
-                                ${qpOASES_INCLUDE_DIRS})
-target_link_libraries(${PROJECT_NAME} ${CDD_LIBRARIES} ${qpOASES_LIBRARY})
+target_link_libraries(${PROJECT_NAME} PUBLIC Eigen3::Eigen qpOASES::qpOASES
+                                             CDD::CDD)
 
-if(CLP_FOUND)
-  target_include_directories(${PROJECT_NAME} SYSTEM PUBLIC "${CLP_INCLUDE_DIR}")
-  target_link_libraries(${PROJECT_NAME} ${CLP_LIBRARIES}
-                        /usr/lib/libCoinUtils.so)
-endif(CLP_FOUND)
+if(CLP_FOUND AND CoinUtils_FOUND)
+  target_link_libraries(${PROJECT_NAME} PUBLIC CLP::CLP CoinUtils::CoinUtils)
+endif()
 
 install(
   TARGETS ${PROJECT_NAME}
