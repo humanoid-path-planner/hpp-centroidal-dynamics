@@ -62,10 +62,10 @@ endif(BUILD_PYTHON_INTERFACE)
 add_project_dependency(Eigen3 REQUIRED)
 
 set(CMAKE_MODULE_PATH
-    ${PROJECT_SOURCE_DIR}/cmake/find-external/CDD
-    ${PROJECT_SOURCE_DIR}/cmake/find-external/CLP
-    ${PROJECT_SOURCE_DIR}/cmake/find-external/CoinUtils
-    ${PROJECT_SOURCE_DIR}/cmake/find-external/qpOASES)
+    ${JRL_CMAKE_MODULES}/find-external/CDD
+    ${JRL_CMAKE_MODULES}/find-external/CLP
+    ${JRL_CMAKE_MODULES}/find-external/CoinUtils
+    ${JRL_CMAKE_MODULES}/find-external/qpOASES)
 
 add_project_dependency(CDD REQUIRED FIND_EXTERNAL CDD)
 add_project_dependency(qpOASES REQUIRED FIND_EXTERNAL qpOASES)
