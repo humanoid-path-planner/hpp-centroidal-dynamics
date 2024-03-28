@@ -8,6 +8,7 @@ set(PROJECT_DESCRIPTION
 
 # Project options
 option(BUILD_PYTHON_INTERFACE "Build the python bindings" ON)
+option(BUILD_WITH_CLP "Build the python bindings" OFF)
 
 # Project configuration
 set(PROJECT_USE_CMAKE_EXPORT TRUE)
@@ -68,17 +69,14 @@ set(CMAKE_MODULE_PATH
 
 add_project_dependency(CDD REQUIRED FIND_EXTERNAL CDD)
 add_project_dependency(qpOASES REQUIRED FIND_EXTERNAL qpOASES)
-add_project_dependency(CLP FIND_EXTERNAL CLP)
-add_project_dependency(CoinUtils FIND_EXTERNAL CoinUtils)
 
-if("${CLP_LIBRARY}" STREQUAL "CLP_LIBRARY-NOTFOUND")
-  message(
-    STATUS
-      "CLP_LIBRARY equal to CLP_LIBRARY-NOTFOUND so I assume CLP was not found "
-  )
-else()
-  message(STATUS "CLP library found, defining macro CLP_FOUND")
+if(BUILD_WITH_CLP)
+  add_project_dependency(CLP REQUIRED FIND_EXTERNAL CLP)
+  add_project_dependency(CoinUtils REQUIRED FIND_EXTERNAL CoinUtils)
+  message(STATUS "Building with coin-or clp: ${CLP_PREFIX}")
   add_definitions(-DCLP_FOUND)
+else()
+  message(STATUS "Building without coin-or clp")
 endif()
 
 # Main Library
@@ -108,8 +106,8 @@ target_include_directories(
 target_link_libraries(${PROJECT_NAME} PUBLIC Eigen3::Eigen qpOASES::qpOASES
                                              CDD::CDD)
 
-if(CLP_FOUND AND CoinUtils_FOUND)
-  target_link_libraries(${PROJECT_NAME} PUBLIC CLP::CLP CoinUtils::CoinUtils)
+if(BUILD_WITH_CLP)
+  target_link_libraries(${PROJECT_NAME} PUBLIC CoinUtils::CoinUtils CLP::CLP)
 endif()
 
 install(
