@@ -29,6 +29,7 @@ endif(BUILD_PYTHON_INTERFACE)
 
 # Project dependencies
 add_project_dependency(Eigen3 REQUIRED)
+add_project_dependency(Boost REQUIRED)
 
 set(CMAKE_MODULE_PATH
     ${PROJECT_SOURCE_DIR}/cmake/find-external/CDD
@@ -75,7 +76,7 @@ target_include_directories(${PROJECT_NAME} PUBLIC $<INSTALL_INTERFACE:include>)
 target_include_directories(
   ${PROJECT_NAME} SYSTEM PUBLIC ${EIGEN3_INCLUDE_DIR} ${CDD_INCLUDE_DIRS}
                                 ${qpOASES_INCLUDE_DIRS})
-target_link_libraries(${PROJECT_NAME} ${CDD_LIBRARIES} ${qpOASES_LIBRARY})
+target_link_libraries(${PROJECT_NAME} ${CDD_LIBRARIES} ${qpOASES_LIBRARY} Boost::boost)
 
 if(CLP_FOUND)
   target_include_directories(${PROJECT_NAME} SYSTEM PUBLIC "${CLP_INCLUDE_DIR}")
