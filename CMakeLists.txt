@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.1)
+cmake_minimum_required(VERSION 3.10)
 
 # Project properties
 set(PROJECT_NAME hpp-centroidal-dynamics)
@@ -8,15 +8,46 @@ set(PROJECT_DESCRIPTION
 
 # Project options
 option(BUILD_PYTHON_INTERFACE "Build the python bindings" ON)
+option(BUILD_WITH_CLP "Build the python bindings" OFF)
 
 # Project configuration
 set(PROJECT_USE_CMAKE_EXPORT TRUE)
 set(CUSTOM_HEADER_DIR "hpp/centroidal-dynamics")
 set(CXX_DISABLE_WERROR TRUE)
 
-# JRL-cmakemodule setup
-include(cmake/hpp.cmake)
-include(cmake/boost.cmake)
+# Check if the submodule cmake have been initialized
+set(JRL_CMAKE_MODULES "${CMAKE_CURRENT_LIST_DIR}/cmake")
+if(EXISTS "${JRL_CMAKE_MODULES}/base.cmake")
+  message(STATUS "JRL cmakemodules found in 'cmake/' git submodule")
+else()
+  find_package(jrl-cmakemodules QUIET CONFIG)
+  if(jrl-cmakemodules_FOUND)
+    get_property(
+      JRL_CMAKE_MODULES
+      TARGET jrl-cmakemodules::jrl-cmakemodules
+      PROPERTY INTERFACE_INCLUDE_DIRECTORIES)
+    message(STATUS "JRL cmakemodules found on system at ${JRL_CMAKE_MODULES}")
+  elseif(${CMAKE_VERSION} VERSION_LESS "3.14.0")
+    message(
+      FATAL_ERROR
+        "\nCan't find jrl-cmakemodules. Please either:\n"
+        "  - use git submodule: 'git submodule update --init'\n"
+        "  - or install https://github.com/jrl-umi3218/jrl-cmakemodules\n"
+        "  - or upgrade your CMake version to >= 3.14 to allow automatic fetching\n"
+    )
+  else()
+    message(STATUS "JRL cmakemodules not found. Let's fetch it.")
+    include(FetchContent)
+    FetchContent_Declare(
+      "jrl-cmakemodules"
+      GIT_REPOSITORY "https://github.com/jrl-umi3218/jrl-cmakemodules.git")
+    FetchContent_MakeAvailable("jrl-cmakemodules")
+    FetchContent_GetProperties("jrl-cmakemodules" SOURCE_DIR JRL_CMAKE_MODULES)
+  endif()
+endif()
+
+include("${JRL_CMAKE_MODULES}/hpp.cmake")
+include("${JRL_CMAKE_MODULES}/boost.cmake")
 
 # Project definition
 compute_project_args(PROJECT_ARGS LANGUAGES CXX)
@@ -32,22 +63,21 @@ add_project_dependency(Eigen3 REQUIRED)
 add_project_dependency(Boost REQUIRED)
 
 set(CMAKE_MODULE_PATH
-    ${PROJECT_SOURCE_DIR}/cmake/find-external/CDD
-    ${PROJECT_SOURCE_DIR}/cmake/find-external/CLP
-    ${PROJECT_SOURCE_DIR}/cmake/find-external/qpOASES)
+    ${JRL_CMAKE_MODULES}/find-external/CDD
+    ${JRL_CMAKE_MODULES}/find-external/CLP
+    ${JRL_CMAKE_MODULES}/find-external/CoinUtils
+    ${JRL_CMAKE_MODULES}/find-external/qpOASES)
 
-find_package(CDD REQUIRED)
-find_package(qpOASES REQUIRED)
-find_package(CLP)
+add_project_dependency(CDD REQUIRED FIND_EXTERNAL CDD)
+add_project_dependency(qpOASES REQUIRED FIND_EXTERNAL qpOASES)
 
-if("${CLP_LIBRARY}" STREQUAL "CLP_LIBRARY-NOTFOUND")
-  message(
-    STATUS
-      "CLP_LIBRARY equal to CLP_LIBRARY-NOTFOUND so I assume CLP was not found "
-  )
-else()
-  message(STATUS "CLP library found, defining macro CLP_FOUND")
+if(BUILD_WITH_CLP)
+  add_project_dependency(CLP REQUIRED FIND_EXTERNAL CLP)
+  add_project_dependency(CoinUtils REQUIRED FIND_EXTERNAL CoinUtils)
+  message(STATUS "Building with coin-or clp: ${CLP_PREFIX}")
   add_definitions(-DCLP_FOUND)
+else()
+  message(STATUS "Building without coin-or clp")
 endif()
 
 # Main Library
@@ -72,17 +102,14 @@ set(${PROJECT_NAME}_SOURCES
 
 add_library(${PROJECT_NAME} SHARED ${${PROJECT_NAME}_SOURCES}
                                    ${${PROJECT_NAME}_HEADERS})
-target_include_directories(${PROJECT_NAME} PUBLIC $<INSTALL_INTERFACE:include>)
 target_include_directories(
-  ${PROJECT_NAME} SYSTEM PUBLIC ${EIGEN3_INCLUDE_DIR} ${CDD_INCLUDE_DIRS}
-                                ${qpOASES_INCLUDE_DIRS})
-target_link_libraries(${PROJECT_NAME} ${CDD_LIBRARIES} ${qpOASES_LIBRARY} Boost::boost)
+  ${PROJECT_NAME} PUBLIC $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>)
+target_link_libraries(${PROJECT_NAME} PUBLIC Eigen3::Eigen qpOASES::qpOASES
+                                             CDD::CDD Boost::Boost)
 
-if(CLP_FOUND)
-  target_include_directories(${PROJECT_NAME} SYSTEM PUBLIC "${CLP_INCLUDE_DIR}")
-  target_link_libraries(${PROJECT_NAME} ${CLP_LIBRARIES}
-                        /usr/lib/libCoinUtils.so)
-endif(CLP_FOUND)
+if(BUILD_WITH_CLP)
+  target_link_libraries(${PROJECT_NAME} PUBLIC CoinUtils::CoinUtils CLP::CLP)
+endif()
 
 install(
   TARGETS ${PROJECT_NAME}
