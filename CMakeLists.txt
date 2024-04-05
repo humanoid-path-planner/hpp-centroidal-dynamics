@@ -105,15 +105,7 @@ add_library(${PROJECT_NAME} SHARED ${${PROJECT_NAME}_SOURCES}
 target_include_directories(
   ${PROJECT_NAME} PUBLIC $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>)
 target_link_libraries(${PROJECT_NAME} PUBLIC Eigen3::Eigen qpOASES::qpOASES
-                                             CDD::CDD)
-modernize_target_link_libraries(
-  ${PROJECT_NAME}
-  SCOPE
-  PUBLIC
-  TARGETS
-  Boost::Boost
-  INCLUDE_DIRS
-  ${BOOST_INCLUDEDIR})
+                                             CDD::CDD Boost::Boost)
 
 if(BUILD_WITH_CLP)
   target_link_libraries(${PROJECT_NAME} PUBLIC CoinUtils::CoinUtils CLP::CLP)
