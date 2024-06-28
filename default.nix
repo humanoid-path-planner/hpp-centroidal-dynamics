@@ -1,7 +1,6 @@
 {
   lib,
   cmake,
-  boost,
   cddlib,
   clp,
   jrl-cmakemodules,
@@ -30,13 +29,13 @@ python3Packages.buildPythonPackage {
   strictDeps = true;
 
   nativeBuildInputs = [ cmake ];
-  propagatedNativeBuildInputs = [ jrl-cmakemodules ];
   buildInputs = [
     cddlib
     clp
     qpoases
   ];
   propagatedBuildInputs = [
+    jrl-cmakemodules
     python3Packages.boost
     python3Packages.eigenpy
   ];
