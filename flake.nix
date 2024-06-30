@@ -27,7 +27,10 @@
       perSystem =
         { self', pkgs, ... }:
         {
-          packages.default = pkgs.callPackage ./. { };
+          packages = {
+            inherit (pkgs) cachix;
+            default = pkgs.callPackage ./. { };
+          };
           devShells.default = pkgs.mkShell { inputsFrom = [ self'.packages.default ]; };
         };
     };
