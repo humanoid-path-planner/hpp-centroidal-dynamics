@@ -27,7 +27,7 @@ LP_status Solver_LP_clp::solve(Cref_vectorX c, Cref_vectorX lb, Cref_vectorX ub,
   assert(Aub.size() == m);
 
   m_model.resize(0, n);
-  int *rowIndex = new int[n];
+  int* rowIndex = new int[n];
 
   for (int i = 0; i < n; i++) {
     m_model.setObjectiveCoefficient(i, c(i));
@@ -53,7 +53,7 @@ LP_status Solver_LP_clp::solve(Cref_vectorX c, Cref_vectorX lb, Cref_vectorX ub,
   //  m_model.dual();
 
   if (m_model.isProvenOptimal()) {
-    const double *solution = m_model.getColSolution();
+    const double* solution = m_model.getColSolution();
     for (int i = 0; i < n; i++) sol(i) = solution[i];
   }
 
@@ -69,7 +69,7 @@ LP_status Solver_LP_clp::getStatus() {
 double Solver_LP_clp::getObjectiveValue() { return m_model.objectiveValue(); }
 
 void Solver_LP_clp::getDualSolution(Ref_vectorX res) {
-  const double *tmp = m_model.dualRowSolution();
+  const double* tmp = m_model.dualRowSolution();
   for (int i = 0; i < res.size(); i++) res(i) = tmp[i];
 }
 

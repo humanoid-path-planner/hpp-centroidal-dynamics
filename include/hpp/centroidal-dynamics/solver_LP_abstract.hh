@@ -58,7 +58,7 @@ class CENTROIDAL_DYNAMICS_DLLAPI Solver_LP_abstract {
    * @param solverType Type of LP solver.
    * @return A pointer to the new solver.
    */
-  static Solver_LP_abstract *getNewSolver(SolverLP solverType);
+  static Solver_LP_abstract* getNewSolver(SolverLP solverType);
 
   /** Solve the linear program
    *  minimize    c' x
@@ -75,7 +75,7 @@ class CENTROIDAL_DYNAMICS_DLLAPI Solver_LP_abstract {
    * @param sol Output solution of the LP.
    * @return A flag describing the final status of the solver.
    */
-  virtual LP_status solve(const std::string &filename, Ref_vectorX sol);
+  virtual LP_status solve(const std::string& filename, Ref_vectorX sol);
 
   /**
    * @brief Write the specified Linear Program to binary file.
@@ -91,7 +91,7 @@ class CENTROIDAL_DYNAMICS_DLLAPI Solver_LP_abstract {
    * @param Aub
    * @return True if the operation succeeded, false otherwise.
    */
-  virtual bool writeLpToFile(const std::string &filename, Cref_vectorX c,
+  virtual bool writeLpToFile(const std::string& filename, Cref_vectorX c,
                              Cref_vectorX lb, Cref_vectorX ub, Cref_matrixXX A,
                              Cref_vectorX Alb, Cref_vectorX Aub);
 
@@ -109,9 +109,9 @@ class CENTROIDAL_DYNAMICS_DLLAPI Solver_LP_abstract {
    * @param Aub
    * @return True if the operation succeeded, false otherwise.
    */
-  virtual bool readLpFromFile(const std::string &filename, VectorX &c,
-                              VectorX &lb, VectorX &ub, MatrixXX &A,
-                              VectorX &Alb, VectorX &Aub);
+  virtual bool readLpFromFile(const std::string& filename, VectorX& c,
+                              VectorX& lb, VectorX& ub, MatrixXX& A,
+                              VectorX& Alb, VectorX& Aub);
 
   /** Get the status of the solver. */
   virtual LP_status getStatus() = 0;
