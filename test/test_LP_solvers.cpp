@@ -168,17 +168,17 @@ void test_addRows() {
       int numberElements = numberRows * numberColumns;
       // Arrays will be set to default values
       model2.resize(numberRows, numberColumns);
-      double *elements = new double[numberElements];
-      CoinBigIndex *starts = new CoinBigIndex[numberColumns + 1];
-      int *rows = new int[numberElements];
+      double* elements = new double[numberElements];
+      CoinBigIndex* starts = new CoinBigIndex[numberColumns + 1];
+      int* rows = new int[numberElements];
       ;
-      int *lengths = new int[numberColumns];
+      int* lengths = new int[numberColumns];
       // Now fill in - totally unsafe but ....
       // no need as defaults to 0.0 double * columnLower = model2.columnLower();
-      double *columnUpper = model2.columnUpper();
-      double *objective = model2.objective();
-      double *rowLower = model2.rowLower();
-      double *rowUpper = model2.rowUpper();
+      double* columnUpper = model2.columnUpper();
+      double* objective = model2.objective();
+      double* rowLower = model2.rowLower();
+      double* rowUpper = model2.rowUpper();
       // Columns - objective was packed
       for (k = 0; k < 2; k++) {
         int iColumn = objIndex[k];
@@ -205,10 +205,10 @@ void test_addRows() {
       }
       starts[numberColumns] = put;
       // assign to matrix
-      CoinPackedMatrix *matrix = new CoinPackedMatrix(true, 0.0, 0.0);
+      CoinPackedMatrix* matrix = new CoinPackedMatrix(true, 0.0, 0.0);
       matrix->assignMatrix(true, numberRows, numberColumns, numberElements,
                            elements, rows, starts, lengths);
-      ClpPackedMatrix *clpMatrix = new ClpPackedMatrix(matrix);
+      ClpPackedMatrix* clpMatrix = new ClpPackedMatrix(matrix);
       model2.replaceMatrix(clpMatrix, true);
       printf("Time for 10000 addRow using hand written code is %g\n",
              CoinCpuTime() - time1);
@@ -221,15 +221,15 @@ void test_addRows() {
     int numberColumns = model.numberColumns();
 
     // Alternatively getColSolution()
-    double *columnPrimal = model.primalColumnSolution();
+    double* columnPrimal = model.primalColumnSolution();
     // Alternatively getReducedCost()
-    double *columnDual = model.dualColumnSolution();
+    double* columnDual = model.dualColumnSolution();
     // Alternatively getColLower()
-    double *columnLower = model.columnLower();
+    double* columnLower = model.columnLower();
     // Alternatively getColUpper()
-    double *columnUpper = model.columnUpper();
+    double* columnUpper = model.columnUpper();
     // Alternatively getObjCoefficients()
-    double *columnObjective = model.objective();
+    double* columnObjective = model.objective();
 
     int iColumn;
 
@@ -362,7 +362,7 @@ void test_small_LP() {
     cout << "Model status is " << model.status() << " after "
          << model.numberIterations() << " iterations - objective is "
          << model.objectiveValue() << endl;
-    const double *solution;
+    const double* solution;
     solution = model.getColSolution();
     // We could then print the solution or examine it.
     cout << "Solution is: ";
@@ -405,11 +405,11 @@ int main() {
 
   {
     cout << "\nTEST READ-WRITE METHODS OF SOLVER_LP_ABSTRACT\n";
-    Solver_LP_abstract *solverOases =
+    Solver_LP_abstract* solverOases =
         Solver_LP_abstract::getNewSolver(SOLVER_LP_QPOASES);
     const int n = 3;
     const int m = 4;
-    const char *filename = "small_3_x_4_LP.dat";
+    const char* filename = "small_3_x_4_LP.dat";
     VectorX c = VectorX::Random(n);
     VectorX lb = -100 * VectorX::Ones(n);
     VectorX ub = 100 * VectorX::Ones(n);
@@ -442,7 +442,7 @@ int main() {
   {
     cout << "\nTEST QP OASES ON SOME LP PROBLEMS\n";
     string file_path = "../test_data/";
-    Solver_LP_abstract *solverOases =
+    Solver_LP_abstract* solverOases =
         Solver_LP_abstract::getNewSolver(SOLVER_LP_QPOASES);
     const int PROBLEM_NUMBER = 14;
     string problem_filenames[PROBLEM_NUMBER] = {
@@ -463,7 +463,7 @@ int main() {
     VectorX c, lb, ub, Alb, Aub, realSol, sol;
     MatrixXX A;
     for (int i = 0; i < PROBLEM_NUMBER; i++) {
-      string &problem_filename = problem_filenames[i];
+      string& problem_filename = problem_filenames[i];
       if (!solverOases->readLpFromFile(file_path + problem_filename + ".dat", c,
                                        lb, ub, A, Alb, Aub)) {
         SEND_ERROR_MSG("Error while reading LP from file " + problem_filename);
@@ -507,7 +507,7 @@ int main() {
   test_addRows();
   test_small_LP();
 
-  Solver_LP_abstract *solver = Solver_LP_abstract::getNewSolver(SOLVER_LP_CLP);
+  Solver_LP_abstract* solver = Solver_LP_abstract::getNewSolver(SOLVER_LP_CLP);
   Vector3 c, lb, ub, x;
   MatrixXX A(2, 3);
   Vector2 Alb, Aub;
