@@ -57,7 +57,7 @@ class TestCentroidalDynamics(unittest.TestCase):
         eq.setNewContacts(
             asmatrix(P), asmatrix(N), 0.3, EquilibriumAlgorithm.EQUILIBRIUM_ALGORITHM_PP
         )
-        H, h = eq.getPolytopeInequalities()
+        H, _h = eq.getPolytopeInequalities()
 
         # c= asmatrix(array([0.,0.,1.])).T
         status, stable = eq.checkRobustEquilibrium(c)
