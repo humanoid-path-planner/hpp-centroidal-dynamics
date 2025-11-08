@@ -12,34 +12,38 @@
 
   outputs =
     inputs:
-    inputs.flake-parts.lib.mkFlake { inherit inputs; } {
-      systems = import inputs.systems;
-      imports = [ inputs.gepetto.flakeModule ];
-      perSystem =
-        {
-          lib,
-          pkgs,
-          self',
-          ...
-        }:
-        {
-          packages = {
-            default = self'.packages.hpp-centroidal-dynamics;
-            hpp-centroidal-dynamics = pkgs.python3Packages.hpp-centroidal-dynamics.overrideAttrs {
-              src = lib.fileset.toSource {
-                root = ./.;
-                fileset = lib.fileset.unions [
-                  ./CMakeLists.txt
-                  ./include
-                  ./package.xml
-                  ./python
-                  ./src
-                  ./test
-                  ./test_data
-                ];
-              };
+    inputs.flake-parts.lib.mkFlake { inherit inputs; } (
+      { lib, self, ... }:
+      {
+        systems = import inputs.systems;
+        imports = [
+          inputs.gepetto.flakeModule
+          { gepetto-pkgs.overlays = [ self.overlays.default ]; }
+        ];
+        flake.overlays.default = _final: prev: {
+          hpp-centroidal-dynamics = prev.hpp-centroidal-dynamics.overrideAttrs {
+            src = lib.fileset.toSource {
+              root = ./.;
+              fileset = lib.fileset.unions [
+                ./CMakeLists.txt
+                ./include
+                ./package.xml
+                ./python
+                ./src
+                ./test
+                ./test_data
+              ];
             };
           };
         };
-    };
+        perSystem =
+          { pkgs, self', ... }:
+          {
+            packages = {
+              default = self'.packages.hpp-centroidal-dynamics;
+              hpp-centroidal-dynamics = pkgs.python3Packages.hpp-centroidal-dynamics;
+            };
+          };
+      }
+    );
 }
