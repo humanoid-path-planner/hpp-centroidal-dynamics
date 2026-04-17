@@ -1,41 +1,27 @@
 {
   description = "Utility classes to check the (robust) equilibrium of a system in contact with the environment.";
 
-  inputs = {
-    gepetto.url = "github:gepetto/nix";
-    gazebros2nix.follows = "gepetto/gazebros2nix";
-    flake-parts.follows = "gepetto/flake-parts";
-    nixpkgs.follows = "gepetto/nixpkgs";
-    nix-ros-overlay.follows = "gepetto/nix-ros-overlay";
-    systems.follows = "gepetto/systems";
-    treefmt-nix.follows = "gepetto/treefmt-nix";
-  };
+  inputs.gepetto.url = "github:gepetto/nix";
 
   outputs =
     inputs:
-    inputs.flake-parts.lib.mkFlake { inherit inputs; } (
+    inputs.gepetto.lib.mkFlakoboros inputs (
       { lib, ... }:
       {
-        systems = import inputs.systems;
-        imports = [
-          inputs.gepetto.flakeModule
-          {
-            gazebros2nix.overrides.hpp-centroidal-dynamics = _final: {
-              src = lib.fileset.toSource {
-                root = ./.;
-                fileset = lib.fileset.unions [
-                  ./CMakeLists.txt
-                  ./include
-                  ./package.xml
-                  ./python
-                  ./src
-                  ./test
-                  ./test_data
-                ];
-              };
-            };
-          }
-        ];
+        overrideAttrs.hpp-centroidal-dynamics = {
+          src = lib.fileset.toSource {
+            root = ./.;
+            fileset = lib.fileset.unions [
+              ./CMakeLists.txt
+              ./include
+              ./package.xml
+              ./python
+              ./src
+              ./test
+              ./test_data
+            ];
+          };
+        };
       }
     );
 }
