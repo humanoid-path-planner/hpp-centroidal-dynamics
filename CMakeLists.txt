@@ -71,15 +71,13 @@ add_project_dependency(qpOASES QUIET FIND_EXTERNAL qpOASES)
 
 if(CLP_FOUND)
     add_project_dependency(CoinUtils REQUIRED FIND_EXTERNAL CoinUtils)
-    message(STATUS "Building with coin-or clp: ${CLP_PREFIX}")
-    add_definitions(-DCLP_FOUND)
+    message(STATUS "Building with coin-or clp")
 else()
     message(STATUS "Building without coin-or clp")
 endif()
 
 if(qpOASES_FOUND)
-    message(STATUS "Building with qpOASES: ${qpOASES_PREFIX}")
-    add_definitions(-DqpOASES_FOUND)
+    message(STATUS "Building with qpOASES")
 else()
     message(STATUS "Building without qpOASES")
 endif()
@@ -127,10 +125,12 @@ target_link_libraries(
 
 if(CLP_FOUND)
     target_link_libraries(${PROJECT_NAME} PUBLIC CoinUtils::CoinUtils CLP::CLP)
+    target_compile_definitions(${PROJECT_NAME} PUBLIC CLP_FOUND)
 endif()
 
 if(qpOASES_FOUND)
     target_link_libraries(${PROJECT_NAME} PUBLIC qpOASES::qpOASES)
+    target_compile_definitions(${PROJECT_NAME} PUBLIC qpOASES_FOUND)
 endif()
 
 install(TARGETS ${PROJECT_NAME} EXPORT ${TARGETS_EXPORT_NAME} DESTINATION lib)
