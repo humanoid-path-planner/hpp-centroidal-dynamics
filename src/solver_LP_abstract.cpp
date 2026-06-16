@@ -5,11 +5,13 @@
 
 #include <hpp/centroidal-dynamics/logger.hh>
 #include <hpp/centroidal-dynamics/solver_LP_abstract.hh>
-#include <hpp/centroidal-dynamics/solver_LP_qpoases.hh>
 #include <iostream>
 
 #ifdef CLP_FOUND
 #include <hpp/centroidal-dynamics/solver_LP_clp.hh>
+#endif
+#ifdef qpOASES_FOUND
+#include <hpp/centroidal-dynamics/solver_LP_qpoases.hh>
 #endif
 
 using namespace std;
@@ -17,7 +19,9 @@ using namespace std;
 namespace centroidal_dynamics {
 
 Solver_LP_abstract* Solver_LP_abstract::getNewSolver(SolverLP solverType) {
+#ifdef qpOASES_FOUND
   if (solverType == SOLVER_LP_QPOASES) return new Solver_LP_qpoases();
+#endif
 
 #ifdef CLP_FOUND
   if (solverType == SOLVER_LP_CLP) return new Solver_LP_clp();

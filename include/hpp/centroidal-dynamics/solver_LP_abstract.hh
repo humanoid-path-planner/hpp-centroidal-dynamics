@@ -16,11 +16,8 @@ namespace centroidal_dynamics {
  * Available LP solvers.
  */
 enum CENTROIDAL_DYNAMICS_DLLAPI SolverLP {
-  SOLVER_LP_QPOASES = 0
-#ifdef CLP_FOUND
-  ,
+  SOLVER_LP_QPOASES = 0,
   SOLVER_LP_CLP = 1
-#endif
 };
 
 /**

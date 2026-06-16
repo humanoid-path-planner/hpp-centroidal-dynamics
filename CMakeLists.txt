@@ -6,9 +6,6 @@ set(PROJECT_DESCRIPTION
     "Utility classes for testing (robust) equilibrium of a system in contact with the environment, and other centroidal dynamics methods."
 )
 
-# Project options
-option(BUILD_WITH_CLP "Build the python bindings" OFF)
-
 # Project configuration
 set(PROJECT_USE_CMAKE_EXPORT TRUE)
 set(CUSTOM_HEADER_DIR "hpp/centroidal-dynamics")
@@ -69,15 +66,26 @@ set(CMAKE_MODULE_PATH
 )
 
 add_project_dependency(CDD REQUIRED FIND_EXTERNAL CDD)
-add_project_dependency(qpOASES REQUIRED FIND_EXTERNAL qpOASES)
+add_project_dependency(CLP QUIET FIND_EXTERNAL CLP)
+add_project_dependency(qpOASES QUIET FIND_EXTERNAL qpOASES)
 
-if(BUILD_WITH_CLP)
-    add_project_dependency(CLP REQUIRED FIND_EXTERNAL CLP)
+if(CLP_FOUND)
     add_project_dependency(CoinUtils REQUIRED FIND_EXTERNAL CoinUtils)
     message(STATUS "Building with coin-or clp: ${CLP_PREFIX}")
     add_definitions(-DCLP_FOUND)
 else()
     message(STATUS "Building without coin-or clp")
+endif()
+
+if(qpOASES_FOUND)
+    message(STATUS "Building with qpOASES: ${qpOASES_PREFIX}")
+    add_definitions(-DqpOASES_FOUND)
+else()
+    message(STATUS "Building without qpOASES")
+endif()
+
+if(NOT CLP_FOUND AND NOT qpOASES_FOUND)
+    message(FATAL_ERROR "Need CLP or qpOASES")
 endif()
 
 # Main Library
@@ -114,11 +122,15 @@ target_include_directories(
 )
 target_link_libraries(
     ${PROJECT_NAME}
-    PUBLIC Eigen3::Eigen qpOASES::qpOASES CDD::CDD Boost::boost
+    PUBLIC Eigen3::Eigen CDD::CDD Boost::boost
 )
 
-if(BUILD_WITH_CLP)
+if(CLP_FOUND)
     target_link_libraries(${PROJECT_NAME} PUBLIC CoinUtils::CoinUtils CLP::CLP)
+endif()
+
+if(qpOASES_FOUND)
+    target_link_libraries(${PROJECT_NAME} PUBLIC qpOASES::qpOASES)
 endif()
 
 install(TARGETS ${PROJECT_NAME} EXPORT ${TARGETS_EXPORT_NAME} DESTINATION lib)

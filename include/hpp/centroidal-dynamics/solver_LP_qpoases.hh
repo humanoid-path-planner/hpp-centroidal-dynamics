@@ -3,6 +3,8 @@
  * Author: Andrea Del Prete
  */
 
+#ifdef qpOASES_FOUND
+
 #ifndef HPP_CENTROIDAL_DYNAMICS_SOLVER_LP_QPOASES_HH
 #define HPP_CENTROIDAL_DYNAMICS_SOLVER_LP_QPOASES_HH
 
@@ -50,3 +52,5 @@ class CENTROIDAL_DYNAMICS_DLLAPI Solver_LP_qpoases : public Solver_LP_abstract {
 }  // end namespace centroidal_dynamics
 
 #endif  // HPP_CENTROIDAL_DYNAMICS_SOLVER_LP_QPOASES_HH
+
+#endif  // qpOASES_FOUND

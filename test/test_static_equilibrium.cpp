@@ -408,7 +408,12 @@ void testWithLoadedData() {
   double robustness[N_SOLVERS];
   for (int s = 0; s < N_SOLVERS; s++) {
     solvers[s] = new Equilibrium(solverNames[s], mass, generatorsPerContact,
-                                 SOLVER_LP_QPOASES);
+#ifdef qpOASES_FOUND
+                                 SOLVER_LP_QPOASES
+#else
+                                 SOLVER_LP_CLP
+#endif
+    );
 
     if (!solvers[s]->setNewContacts(cp, cn, mu, algorithms[s])) {
       SEND_ERROR_MSG("Error while setting new contacts for solver " +
@@ -466,6 +471,7 @@ int main() {
    * *****************************/
 
 #ifdef CLP_FOUND
+#ifdef qpOASES_FOUND
   const int N_SOLVERS = 6;
   string solverNames[] = {"LP oases", "LP2 oases", "DLP oases",
                           "LP coin",  "LP2 coin",  "DLP coin"};
@@ -476,6 +482,15 @@ int main() {
   SolverLP lp_solver_types[] = {SOLVER_LP_QPOASES, SOLVER_LP_QPOASES,
                                 SOLVER_LP_QPOASES, SOLVER_LP_CLP,
                                 SOLVER_LP_CLP,     SOLVER_LP_CLP};
+#else
+  const int N_SOLVERS = 3;
+  string solverNames[] = {"LP coin", "LP2 coin", "DLP coin"};
+  EquilibriumAlgorithm algorithms[] = {EQUILIBRIUM_ALGORITHM_LP,
+                                       EQUILIBRIUM_ALGORITHM_LP2,
+                                       EQUILIBRIUM_ALGORITHM_DLP};
+  SolverLP lp_solver_types[] = {SOLVER_LP_CLP, SOLVER_LP_CLP, SOLVER_LP_CLP};
+
+#endif
 #else
   const int N_SOLVERS = 3;
   string solverNames[] = {"LP oases", "LP2 oases", "DLP oases"};
@@ -491,8 +506,13 @@ int main() {
   cout << "Gonna test equilibrium on a 2d grid of " << GRID_SIZE << "X"
        << GRID_SIZE << " points " << endl;
 
-  Equilibrium* solver_PP =
-      new Equilibrium("PP", mass, generatorsPerContact, SOLVER_LP_QPOASES);
+  Equilibrium* solver_PP = new Equilibrium("PP", mass, generatorsPerContact,
+#ifdef qpOASES_FOUND
+                                           SOLVER_LP_QPOASES
+#else
+                                           SOLVER_LP_CLP
+#endif
+  );
   Equilibrium* solvers[N_SOLVERS];
   for (int s = 0; s < N_SOLVERS; s++)
     solvers[s] = new Equilibrium(solverNames[s], mass, generatorsPerContact,

@@ -74,16 +74,14 @@ BOOST_PYTHON_MODULE(hpp_centroidal_dynamics) {
   /** END eigenpy init**/
 
   /** BEGIN enum types **/
-#ifdef CLP_FOUND
   enum_<SolverLP>("SolverLP")
+#ifdef qpOASES_FOUND
       .value("SOLVER_LP_QPOASES", SOLVER_LP_QPOASES)
-      .value("SOLVER_LP_CLP", SOLVER_LP_CLP)
-      .export_values();
-#else
-  enum_<SolverLP>("SolverLP")
-      .value("SOLVER_LP_QPOASES", SOLVER_LP_QPOASES)
-      .export_values();
 #endif
+#ifdef CLP_FOUND
+      .value("SOLVER_LP_CLP", SOLVER_LP_CLP)
+#endif
+      .export_values();
 
   enum_<EquilibriumAlgorithm>("EquilibriumAlgorithm")
       .value("EQUILIBRIUM_ALGORITHM_LP", EQUILIBRIUM_ALGORITHM_LP)
@@ -113,7 +111,7 @@ BOOST_PYTHON_MODULE(hpp_centroidal_dynamics) {
   class_<Equilibrium>(
       "Equilibrium",
       init<std::string, double, unsigned int,
-           optional<SolverLP, bool, const unsigned int, const bool> >())
+           optional<SolverLP, bool, const unsigned int, const bool>>())
       .def("useWarmStart", &Equilibrium::useWarmStart)
       .def("setUseWarmStart", &Equilibrium::setUseWarmStart)
       .def("getName", &Equilibrium::getName)
