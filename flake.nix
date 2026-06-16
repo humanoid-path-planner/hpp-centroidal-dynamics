@@ -8,6 +8,7 @@
     inputs.gepetto.lib.mkFlakoboros inputs (
       { lib, ... }:
       {
+        extraDevPyPackages = [ "hpp-centroidal-dynamics" ];
         overrideAttrs.hpp-centroidal-dynamics = {
           src = lib.fileset.toSource {
             root = ./.;

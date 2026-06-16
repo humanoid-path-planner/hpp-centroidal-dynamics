@@ -12,12 +12,15 @@ from numpy import array, asmatrix, cross
 class TestCentroidalDynamics(unittest.TestCase):
     def test_all(self):
         # testing constructors
-        eq = Equilibrium("test", 54.0, 4)
-        eq = Equilibrium("test", 54.0, 4, SolverLP.SOLVER_LP_QPOASES)
-        eq = Equilibrium("test", 54.0, 4, SolverLP.SOLVER_LP_QPOASES)
-        eq = Equilibrium("test", 54.0, 4, SolverLP.SOLVER_LP_QPOASES, False)
-        eq = Equilibrium("test", 54.0, 4, SolverLP.SOLVER_LP_QPOASES, False, 1)
-        eq = Equilibrium("test", 54.0, 4, SolverLP.SOLVER_LP_QPOASES, True, 1, True)
+        for attr in [a for a in dir(SolverLP) if a.startswith("SOLVER_LP_")]:
+            solver = getattr(SolverLP, attr)
+            if attr == "SOLVER_LP_QPOASES":
+                eq = Equilibrium("test", 54.0, 4)
+            eq = Equilibrium("test", 54.0, 4, solver)
+            eq = Equilibrium("test", 54.0, 4, solver)
+            eq = Equilibrium("test", 54.0, 4, solver, False)
+            eq = Equilibrium("test", 54.0, 4, solver, False, 1)
+            eq = Equilibrium("test", 54.0, 4, solver, True, 1, True)
 
         # whether useWarmStart is enable (True by default)
         previous = eq.useWarmStart()

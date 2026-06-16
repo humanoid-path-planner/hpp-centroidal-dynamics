@@ -3,6 +3,8 @@
  * Author: Andrea Del Prete
  */
 
+#ifdef qpOASES_FOUND
+
 #include <hpp/centroidal-dynamics/logger.hh>
 #include <hpp/centroidal-dynamics/solver_LP_qpoases.hh>
 
@@ -70,3 +72,5 @@ LP_status Solver_LP_qpoases::getStatus() {
 }
 
 }  // end namespace centroidal_dynamics
+
+#endif  // qpOASES_FOUND

@@ -3,24 +3,26 @@
  * Author: Andrea Del Prete
  */
 
-#ifdef CLP_FOUND
+#include <hpp/centroidal-dynamics/logger.hh>
 #include <hpp/centroidal-dynamics/solver_LP_clp.hh>
+#include <hpp/centroidal-dynamics/solver_LP_qpoases.hh>
+#include <iomanip>
+#include <iostream>
 
+#ifdef CLP_FOUND
 #include "coin/ClpSimplex.hpp"
 #include "coin/CoinBuild.hpp"
 #include "coin/CoinModel.hpp"
 #include "coin/CoinTime.hpp"
 #endif
 
-#include <hpp/centroidal-dynamics/logger.hh>
-#include <hpp/centroidal-dynamics/solver_LP_qpoases.hh>
-#include <iomanip>
-#include <iostream>
+#ifdef qpOASES_FOUND
 #include <qpOASES.hpp>
+USING_NAMESPACE_QPOASES
+#endif
 
 using namespace std;
 using namespace centroidal_dynamics;
-USING_NAMESPACE_QPOASES
 
 #define EPS 1e-6
 
@@ -296,7 +298,7 @@ void test_addRows() {
       buildObject3.addRow(3, row2Index, row2Value, 1.0, 1.0);
     }
     model.addRows(buildObject3, true);
-  } catch (CoinError e) {
+  } catch (const CoinError& e) {
     e.print();
     if (e.lineNumber() >= 0)
       std::cout << "This was from a CoinAssert" << std::endl;
@@ -376,6 +378,7 @@ void test_small_LP() {
 int main() {
   cout << "Test LP Solvers (1 means ok, 0 means error)\n\n";
 
+#ifdef qpOASES_FOUND
   {
     cout << "TEST QP OASES ON A SMALL 2-VARIABLE LP";
     /* Setup data of first LP. */
@@ -402,11 +405,17 @@ int main() {
       cout << "[ERROR] QpOases could not solve the LP problem, error code: "
            << res << endl;
   }
+#endif
 
   {
     cout << "\nTEST READ-WRITE METHODS OF SOLVER_LP_ABSTRACT\n";
-    Solver_LP_abstract* solverOases =
-        Solver_LP_abstract::getNewSolver(SOLVER_LP_QPOASES);
+    Solver_LP_abstract* solverOases = Solver_LP_abstract::getNewSolver(
+#ifdef qpOASES_FOUND
+        SOLVER_LP_QPOASES
+#else
+        SOLVER_LP_CLP
+#endif
+    );
     const int n = 3;
     const int m = 4;
     const char* filename = "small_3_x_4_LP.dat";
@@ -439,6 +448,7 @@ int main() {
          << endl;
   }
 
+#ifdef qpOASES_FOUND
   {
     cout << "\nTEST QP OASES ON SOME LP PROBLEMS\n";
     string file_path = "../test_data/";
@@ -499,9 +509,8 @@ int main() {
         }
       }
     }
-
-    return 0;
   }
+#endif
 
 #ifdef CLP_FOUND
   test_addRows();
@@ -520,9 +529,11 @@ int main() {
   if (solver->solve(c, lb, ub, A, Alb, Aub, x) == LP_STATUS_OPTIMAL) {
     cout << "solver_LP_clp solved the problem\n";
     cout << "The solution is " << x.transpose() << endl;
-  } else
+  } else {
     cout << "solver_LP_clp failed to solve the problem\n";
+    return 1;
+  }
 #endif
 
-  return 1;
+  return 0;
 }
