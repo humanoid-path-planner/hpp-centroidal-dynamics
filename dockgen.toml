@@ -1,0 +1,7 @@
+[eigenpy]
+url = "github:stack-of-tasks"
+
+[hpp-centroidal-dynamics]
+apt_deps = ["coinor-libclp-dev", "libcdd-dev"]
+src_deps = ["eigenpy"]
+url = "."
