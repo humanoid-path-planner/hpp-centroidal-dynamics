@@ -23,9 +23,6 @@ license = "BSD-2-Clause"
 name = "hpp-centroidal-dynamics"
 version = "9.0.0"
 
-[tool.ruff]
-extend-exclude = ["cmake"]
-
 [tool.ruff.lint]
 extend-select = ["I", "NPY", "RUF", "UP", "W"]
 
