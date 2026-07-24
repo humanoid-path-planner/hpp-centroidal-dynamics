@@ -1,7 +1,7 @@
 <?xml version='1.0'?>
 <package format='3'>
   <name>hpp_centroidal_dynamics</name>
-  <version>9.0.0</version>
+  <version>9.0.2</version>
   <description>Testing equilibrium of a system in contact with the environment</description>
   <author>Andrea Del Prete</author>
   <author>Pierre Fernbach</author>
